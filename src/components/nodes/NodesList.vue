@@ -52,6 +52,7 @@ export default {
         onNodeClick(node) {
             this.$emit("node-click", node);
         },
+        getNodeHexId: (nodeId) => NodeUtils.getNodeHexId(nodeId),
         getNodeShortName: (nodeId) => NodeUtils.getNodeShortName(nodeId),
         getNodeLongName: (nodeId) => NodeUtils.getNodeLongName(nodeId),
         getNodeColour: (nodeId) => NodeUtils.getNodeColour(nodeId),
@@ -72,9 +73,10 @@ export default {
         searchedNodes() {
             return this.nodesOrderedByName.filter((node) => {
                 const search = this.nodesSearchTerm.toLowerCase();
+                const matchesHexId = this.getNodeHexId(node.num).toLowerCase().includes(search);
                 const matchesShortName = this.getNodeShortName(node.num).toLowerCase().includes(search);
                 const matchesLongName = this.getNodeLongName(node.num).toLowerCase().includes(search);
-                return matchesShortName || matchesLongName;
+                return matchesHexId || matchesShortName || matchesLongName;
             });
         },
     },
