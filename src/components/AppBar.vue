@@ -3,15 +3,17 @@
 
         <!-- back button -->
         <div class="my-auto">
-            <div @click="$router.back()" class="cursor-pointer bg-gray-100 m-1 p-1 rounded-full hover:bg-gray-200">
+            <IconButton @click="$router.back()">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
                 </svg>
-            </div>
+            </IconButton>
         </div>
 
         <!-- optional: leading -->
-        <slot name="leading"/>
+        <div class="my-auto">
+            <slot name="leading"/>
+        </div>
 
         <!-- title and subtitle -->
         <div class="my-auto mr-auto">
@@ -20,14 +22,19 @@
         </div>
 
         <!-- optional: trailing -->
-        <slot name="trailing"/>
+        <div class="my-auto">
+            <slot name="trailing"/>
+        </div>
 
     </div>
 </template>
 
 <script>
+import IconButton from "./IconButton.vue";
+
 export default {
     name: 'AppBar',
+    components: {IconButton},
     props: {
         title: String,
         subtitle: String | null,

@@ -1,4 +1,5 @@
 import GlobalState from "./GlobalState.js";
+import { Protobuf } from "@meshtastic/js";
 
 class NodeUtils {
 
@@ -32,6 +33,14 @@ class NodeUtils {
 
     static getNodeLongName(nodeId) {
         return GlobalState.nodesById[nodeId]?.user?.longName ?? NodeUtils.getNodeHexId(nodeId);
+    }
+
+    static getRoleName(roleId) {
+        return Protobuf.Config.Config_DeviceConfig_Role[roleId];
+    }
+
+    static getHardwareName(hardwareId) {
+        return Protobuf.Mesh.HardwareModel[hardwareId];
     }
 
 }
