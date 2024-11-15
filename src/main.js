@@ -9,6 +9,7 @@ const router = createRouter({
     history: createWebHashHistory(),
     routes: [
         {
+            name: "main",
             path: '/',
             component: () => import("./components/MainPage.vue"),
         },

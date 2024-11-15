@@ -34,6 +34,17 @@ export default {
     props: {
         nodeId: String | Number,
     },
+    mounted() {
+
+        // redirect to main page if node not found
+        if(!this.node){
+            this.$router.push({
+                name: "main",
+            });
+            return;
+        }
+
+    },
     computed: {
         node() {
             return GlobalState.nodesById[this.nodeId];

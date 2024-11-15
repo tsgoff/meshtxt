@@ -28,6 +28,17 @@ export default {
     props: {
         channelId: String | Number,
     },
+    mounted() {
+
+        // redirect to main page if channel not found
+        if(!this.channel){
+            this.$router.push({
+                name: "main",
+            });
+            return;
+        }
+
+    },
     computed: {
         channel() {
             return GlobalState.channelsByIndex[this.channelId];
