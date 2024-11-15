@@ -159,10 +159,22 @@ export default {
 
                 // handle error thrown when message to long
                 // unfortunately @meshtastic/js does not provide the packet id in this case...
-                // fixme: this means we can't show an error state for the message that was already added to the ui
+                // this means we have to attempt to find the message that was already added to the ui with using the id
                 if(e instanceof Error){
+
+                    // find latest message sent from us with the exact same text
+                    const message = GlobalState.messages.find((m) => {
+                        return m.from === GlobalState.myNodeId && m.data === newMessageText;
+                    });
+
+                    // update error state on the message we found
+                    if(message){
+                        message.error = e.message;
+                    }
+
                     alert(e.message);
                     return;
+
                 }
 
                 // message failed to send update internal error state
