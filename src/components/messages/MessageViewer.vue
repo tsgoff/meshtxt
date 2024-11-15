@@ -86,6 +86,7 @@
             <textarea
                 :readonly="isSendingMessage"
                 v-model="newMessageText"
+                @keydown.enter.exact.native="onEnterPressed"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                 rows="3"
                 placeholder="Send a message..."></textarea>
@@ -109,6 +110,7 @@ import GlobalState from "../../js/GlobalState.js";
 import NodeAPI from "../../js/NodeAPI.js";
 import MessageUtils from "../../js/MessageUtils.js";
 import NodeUtils from "../../js/NodeUtils.js";
+import DeviceUtils from "../../js/DeviceUtils.js";
 
 export default {
     name: 'MessageViewer',
@@ -158,6 +160,16 @@ export default {
         getNodeTextColour: (nodeId) => NodeUtils.getNodeTextColour(nodeId),
         getNodeShortName: (nodeId) => NodeUtils.getNodeShortName(nodeId),
         getNodeLongName: (nodeId) => NodeUtils.getNodeLongName(nodeId),
+        onEnterPressed: function(event) {
+
+            // send message if not on mobile
+            if(!DeviceUtils.isMobile()){
+                event.preventDefault();
+                this.sendMessage();
+                return;
+            }
+
+        },
         scrollToBottom: function() {
             this.$nextTick(() => {
                 var container = this.$el.querySelector("#messages");
