@@ -43,6 +43,16 @@ class NodeUtils {
         return Protobuf.Mesh.HardwareModel[hardwareId];
     }
 
+    /**
+     * Converts latitudeI or longitudeI to an actual lat/long value
+     * e.g: -38123456 -> -38.123456
+     * @param latLongInteger
+     * @returns {number}
+     */
+    static latLongIntegerToLatLong(latLongInteger) {
+        return latLongInteger / 10000000;
+    }
+
 }
 
 export default NodeUtils;

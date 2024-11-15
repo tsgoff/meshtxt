@@ -9,40 +9,67 @@
         </AppBar>
 
         <!-- list -->
-        <div v-if="node" class="flex h-full w-full overflow-hidden">
+        <div v-if="node" class="flex flex-col h-full w-full overflow-hidden">
+            <div class="bg-white overflow-y-auto">
 
-            <!-- details -->
-            <div class="w-full">
-                <div class="bg-gray-200 p-2 font-semibold">Details</div>
-                <ul role="list" class="flex-1 bg-white divide-y divide-gray-200">
+                <!-- details -->
+                <div>
+                    <div class="bg-gray-200 p-2 font-semibold">Details</div>
+                    <ul role="list" class="flex-1 divide-y divide-gray-200">
 
-                    <!-- id -->
-                    <li class="flex p-3">
-                        <div class="text-sm font-medium text-gray-900">ID</div>
-                        <div class="ml-auto text-sm text-gray-700">{{ node.num }}</div>
-                    </li>
+                        <!-- id -->
+                        <li class="flex p-3">
+                            <div class="text-sm font-medium text-gray-900">ID</div>
+                            <div class="ml-auto text-sm text-gray-700">{{ node.num }}</div>
+                        </li>
 
-                    <!-- hex id -->
-                    <li class="flex p-3">
-                        <div class="text-sm font-medium text-gray-900">Hex ID</div>
-                        <div class="ml-auto text-sm text-gray-700">{{ node.user.id }}</div>
-                    </li>
+                        <!-- hex id -->
+                        <li class="flex p-3">
+                            <div class="text-sm font-medium text-gray-900">Hex ID</div>
+                            <div class="ml-auto text-sm text-gray-700">{{ node.user.id }}</div>
+                        </li>
 
-                    <!-- role -->
-                    <li class="flex p-3">
-                        <div class="text-sm font-medium text-gray-900">Role</div>
-                        <div class="ml-auto text-sm text-gray-700">{{ getRoleName(node.user.role) ?? "???" }}</div>
-                    </li>
+                        <!-- role -->
+                        <li class="flex p-3">
+                            <div class="text-sm font-medium text-gray-900">Role</div>
+                            <div class="ml-auto text-sm text-gray-700">{{ getRoleName(node.user.role) ?? "???" }}</div>
+                        </li>
 
-                    <!-- hardware -->
-                    <li class="flex p-3">
-                        <div class="text-sm font-medium text-gray-900">Hardware</div>
-                        <div class="ml-auto text-sm text-gray-700">{{ getHardwareName(node.user.hwModel) ?? "???" }}</div>
-                    </li>
+                        <!-- hardware -->
+                        <li class="flex p-3">
+                            <div class="text-sm font-medium text-gray-900">Hardware</div>
+                            <div class="ml-auto text-sm text-gray-700">{{ getHardwareName(node.user.hwModel) ?? "???" }}</div>
+                        </li>
 
-                </ul>
+                    </ul>
+                </div>
+
+                <div>
+                    <div class="flex bg-gray-200 p-2 font-semibold">Position</div>
+                    <ul role="list" class="flex-1 divide-y divide-gray-200">
+
+                        <!-- position -->
+                        <li class="flex p-3">
+                            <div class="text-sm font-medium text-gray-900">Lat/Long</div>
+                            <div class="ml-auto text-sm text-gray-700">
+                                <span v-if="node.position && node.position.latitudeI && node.position.longitudeI">{{ latLongIntegerToLatLong(node.position.latitudeI) }}, {{ latLongIntegerToLatLong(node.position.longitudeI) }}</span>
+                                <span v-else>???</span>
+                            </div>
+                        </li>
+
+                        <!-- altitude -->
+                        <li class="flex p-3">
+                            <div class="text-sm font-medium text-gray-900">Altitude</div>
+                            <div class="ml-auto text-sm text-gray-700">
+                                <span v-if="node.position && node.position.altitude != null">{{ node.position.altitude }}</span>
+                                <span v-else>???</span>
+                            </div>
+
+                        </li>
+                    </ul>
+                </div>
+
             </div>
-
         </div>
 
     </Page>
@@ -79,6 +106,7 @@ export default {
     methods: {
         getRoleName: (roleId) => NodeUtils.getRoleName(roleId),
         getHardwareName: (roleId) => NodeUtils.getHardwareName(roleId),
+        latLongIntegerToLatLong: (latLongInteger) => NodeUtils.latLongIntegerToLatLong(latLongInteger),
     },
     computed: {
         node() {
