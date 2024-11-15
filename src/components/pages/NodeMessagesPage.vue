@@ -4,7 +4,7 @@
         <!-- app bar -->
         <AppBar :title="title" subtitle="Direct Messages">
             <template v-slot:leading>
-                <NodeIcon :node="node" class="mr-3"/>
+                <NodeIcon v-if="node" :node="node" class="mr-3"/>
             </template>
         </AppBar>
 
