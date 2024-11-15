@@ -32,13 +32,13 @@
                         <!-- role -->
                         <li class="flex p-3">
                             <div class="text-sm font-medium text-gray-900">Role</div>
-                            <div class="ml-auto text-sm text-gray-700">{{ getRoleName(node.user.role) ?? "???" }}</div>
+                            <div class="ml-auto text-sm text-gray-700">{{ getRoleName(node.user?.role) ?? "???" }}</div>
                         </li>
 
                         <!-- hardware -->
                         <li class="flex p-3">
                             <div class="text-sm font-medium text-gray-900">Hardware</div>
-                            <div class="ml-auto text-sm text-gray-700">{{ getHardwareName(node.user.hwModel) ?? "???" }}</div>
+                            <div class="ml-auto text-sm text-gray-700">{{ getHardwareName(node.user?.hwModel) ?? "???" }}</div>
                         </li>
 
                     </ul>

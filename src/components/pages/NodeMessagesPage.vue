@@ -30,6 +30,7 @@ import MessageViewer from "../messages/MessageViewer.vue";
 import NodeIcon from "../nodes/NodeIcon.vue";
 import Page from "./Page.vue";
 import IconButton from "../IconButton.vue";
+import NodeUtils from "../../js/NodeUtils.js";
 
 export default {
     name: 'NodeMessagesPage',
@@ -55,6 +56,7 @@ export default {
 
     },
     methods: {
+        getNodeLongName: (nodeId) => NodeUtils.getNodeLongName(nodeId),
         onNodeInfoClick(node) {
             this.$router.push({
                 name: "node",
@@ -69,7 +71,7 @@ export default {
             return GlobalState.nodesById[this.nodeId];
         },
         title() {
-            return this.node?.user?.longName || 'Unknown Node';
+            return this.node ? this.getNodeLongName(this.node.num) : "Unknown Node";
         },
     },
 }

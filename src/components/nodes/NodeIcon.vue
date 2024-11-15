@@ -1,6 +1,6 @@
 <template>
     <div class="flex rounded-full h-12 w-12 text-white shadow" :style="{ backgroundColor: getNodeColour(node.num), color: getNodeTextColour(node.num)}">
-        <div class="mx-auto my-auto drop-shadow-sm">{{ node.user.shortName }}</div>
+        <div class="mx-auto my-auto drop-shadow-sm">{{ getNodeShortName(node.num) }}</div>
     </div>
 </template>
 
@@ -13,6 +13,7 @@ export default {
         node: Object,
     },
     methods: {
+        getNodeShortName: (nodeId) => NodeUtils.getNodeShortName(nodeId),
         getNodeColour: (nodeId) => NodeUtils.getNodeColour(nodeId),
         getNodeTextColour: (nodeId) => NodeUtils.getNodeTextColour(nodeId),
     },

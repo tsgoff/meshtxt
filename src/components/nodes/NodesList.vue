@@ -15,7 +15,7 @@
 
                 <!-- name and info -->
                 <div class="mr-2">
-                    <div>{{ node.user.longName }}</div>
+                    <div>{{ getNodeLongName(node.num) }}</div>
                     <div class="text-sm text-gray-500">
                         <span>{{ node.hopsAway }} hops</span>
                         <span v-if="node.lastHeard"> • heard {{ formatUnixSecondsAgo(node.lastHeard) }}</span>
@@ -52,6 +52,8 @@ export default {
         onNodeClick(node) {
             this.$emit("node-click", node);
         },
+        getNodeShortName: (nodeId) => NodeUtils.getNodeShortName(nodeId),
+        getNodeLongName: (nodeId) => NodeUtils.getNodeLongName(nodeId),
         getNodeColour: (nodeId) => NodeUtils.getNodeColour(nodeId),
         getNodeTextColour: (nodeId) => NodeUtils.getNodeTextColour(nodeId),
         formatUnixSecondsAgo(unixSeconds) {
@@ -62,14 +64,16 @@ export default {
         nodesOrderedByName() {
             // sort nodes by name asc
             return this.nodes.sort((nodeA, nodeB) => {
-                return nodeA.user.longName.localeCompare(nodeB.user.longName);
+                const nodeALongName = this.getNodeLongName(nodeA.num);
+                const nodeBLongName = this.getNodeLongName(nodeB.num);
+                return nodeALongName.localeCompare(nodeBLongName);
             });
         },
         searchedNodes() {
             return this.nodesOrderedByName.filter((node) => {
                 const search = this.nodesSearchTerm.toLowerCase();
-                const matchesShortName = node.user.shortName.toLowerCase().includes(search);
-                const matchesLongName = node.user.longName.toLowerCase().includes(search);
+                const matchesShortName = this.getNodeShortName(node.num).toLowerCase().includes(search);
+                const matchesLongName = this.getNodeLongName(node.num).toLowerCase().includes(search);
                 return matchesShortName || matchesLongName;
             });
         },
