@@ -22,10 +22,10 @@
 </template>
 
 <script>
-import GlobalState from "../js/GlobalState.js";
-import Header from "./Header.vue";
-import ChannelsList from "./channels/ChannelsList.vue";
-import NodesList from "./nodes/NodesList.vue";
+import GlobalState from "../../js/GlobalState.js";
+import Header from "../Header.vue";
+import ChannelsList from "../channels/ChannelsList.vue";
+import NodesList from "../nodes/NodesList.vue";
 
 export default {
     name: 'MainPage',

@@ -11,7 +11,7 @@ const router = createRouter({
         {
             name: "main",
             path: '/',
-            component: () => import("./components/MainPage.vue"),
+            component: () => import("./components/pages/MainPage.vue"),
         },
         {
             name: "channel.messages",
