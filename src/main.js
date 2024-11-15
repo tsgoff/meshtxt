@@ -3,6 +3,7 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 import "./style.css";
 
 import App from './components/App.vue';
+import GlobalState from "./js/GlobalState.js";
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -29,3 +30,11 @@ const router = createRouter({
 createApp(App)
     .use(router)
     .mount('#app');
+
+// disconnect before unloading page (chrome webview on android was crashing without this...)
+window.addEventListener("beforeunload", () => {
+    if(GlobalState.connection){
+        GlobalState.connection.disconnect();
+        GlobalState.isConnected = false;
+    }
+});
