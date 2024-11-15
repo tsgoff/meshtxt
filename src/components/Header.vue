@@ -7,7 +7,7 @@
 
             <!-- connected node info -->
             <div class="font-semibold text-sm">
-                <span v-if="GlobalState.isConnected && GlobalState.myNodeUser" class="text-green-500">Connected: [{{ GlobalState.myNodeUser.shortName }}] {{ GlobalState.myNodeUser.longName }}</span>
+                <span v-if="GlobalState.isConnected && GlobalState.myNodeUser">[{{ GlobalState.myNodeUser.shortName }}] {{ GlobalState.myNodeUser.longName }}</span>
                 <span v-else class="text-red-500">Not Connected</span>
             </div>
 
