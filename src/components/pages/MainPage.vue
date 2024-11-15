@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col h-full max-w-3xl mx-auto border-x bg-gray-300">
+    <Page>
 
         <!-- header -->
         <Header/>
@@ -41,7 +41,7 @@
             </div>
         </div>
 
-    </div>
+    </Page>
 </template>
 
 <script>
@@ -49,10 +49,12 @@ import GlobalState from "../../js/GlobalState.js";
 import Header from "../Header.vue";
 import ChannelsList from "../channels/ChannelsList.vue";
 import NodesList from "../nodes/NodesList.vue";
+import Page from "./Page.vue";
 
 export default {
     name: 'MainPage',
     components: {
+        Page,
         Header,
         NodesList,
         ChannelsList
