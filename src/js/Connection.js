@@ -1,12 +1,60 @@
 import GlobalState from "./GlobalState.js";
-import {BleConnection, Constants, Protobuf, Types,} from "@meshtastic/js";
+import {BleConnection, Constants, Protobuf, SerialConnection, Types,} from "@meshtastic/js";
 
 class Connection {
 
     static async connectViaBluetooth() {
+        await this.connect(new BleConnection(), {
+            filters: [
+                {
+                    services: [
+                        Constants.ServiceUuid,
+                    ],
+                },
+            ],
+        });
+    }
 
-        // create ble connection
-        const connection = new BleConnection();
+    static async connectViaSerial() {
+        await this.connect(new SerialConnection(), {
+            concurrentLogOutput: true,
+        });
+    }
+
+    static async connect(connection, connectionArgs) {
+
+        // check if already connected
+        if(GlobalState.isConnected){
+            alert("Already connected");
+            return;
+        }
+
+        // setup connection listeners
+        await this.setupConnectionListeners(connection);
+
+        // connect to device
+        await connection.connect(connectionArgs);
+
+        // update state
+        GlobalState.connection = connection;
+        GlobalState.isConnected = true;
+
+    }
+
+    static async disconnect() {
+
+        // do nothing if already disconnected
+        if(!GlobalState.isConnected){
+            return;
+        }
+
+        // disconnect and clear ui data
+        GlobalState.connection.disconnect();
+        GlobalState.isConnected = false;
+
+    }
+
+    static async setupConnectionListeners(connection) {
 
         // setup packet listeners
         connection.events.onFromRadio.subscribe((data) => {
@@ -18,7 +66,7 @@ class Connection {
                         // todo handle nack for "no channel" etc
                         const ackFrom = meshPacket.from;
                         const requestId = dataPacket.requestId;
-                        Connection.onPacketAck(requestId, ackFrom);
+                        this.onPacketAck(requestId, ackFrom);
                     }
                 }
             }
@@ -64,38 +112,10 @@ class Connection {
 
             // check if device is now disconnected
             if(data === Types.DeviceStatusEnum.DeviceDisconnected){
-                Connection.disconnect();
+                this.disconnect();
             }
 
         });
-
-        // connect to device
-        await connection.connect({
-            filters: [
-                {
-                    services: [
-                        Constants.ServiceUuid,
-                    ],
-                },
-            ],
-        });
-
-        // update state
-        GlobalState.connection = connection;
-        GlobalState.isConnected = true;
-
-    }
-
-    static async disconnect() {
-
-        // do nothing if already disconnected
-        if(!GlobalState.isConnected){
-            return;
-        }
-
-        // disconnect and clear ui data
-        GlobalState.connection.disconnect();
-        GlobalState.isConnected = false;
 
     }
 
