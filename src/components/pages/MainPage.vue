@@ -5,7 +5,7 @@
         <Header/>
 
         <!-- tabs -->
-        <div class="bg-white border-b border-r border-gray-200">
+        <div v-if="channels.length > 0 || nodes.length > 0" class="bg-white border-b border-r border-gray-200">
             <div class="-mb-px flex">
                 <div @click="tab = 'channels'" class="w-full border-b-2 py-3 px-1 text-center text-sm font-medium cursor-pointer" :class="[ tab === 'channels' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700']">Channels</div>
                 <div @click="tab = 'nodes'" class="w-full border-b-2 py-3 px-1 text-center text-sm font-medium cursor-pointer" :class="[ tab === 'nodes' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700']">Nodes</div>
