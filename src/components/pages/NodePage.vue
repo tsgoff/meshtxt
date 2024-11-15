@@ -26,7 +26,7 @@
                         <!-- hex id -->
                         <li class="flex p-3">
                             <div class="text-sm font-medium text-gray-900">Hex ID</div>
-                            <div class="ml-auto text-sm text-gray-700">{{ node.user.id }}</div>
+                            <div class="ml-auto text-sm text-gray-700">{{ getNodeHexId(node.num) }}</div>
                         </li>
 
                         <!-- role -->
@@ -104,6 +104,7 @@ export default {
 
     },
     methods: {
+        getNodeHexId: (roleId) => NodeUtils.getNodeHexId(roleId),
         getRoleName: (roleId) => NodeUtils.getRoleName(roleId),
         getHardwareName: (roleId) => NodeUtils.getHardwareName(roleId),
         latLongIntegerToLatLong: (latLongInteger) => NodeUtils.latLongIntegerToLatLong(latLongInteger),
