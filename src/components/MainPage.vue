@@ -28,6 +28,7 @@
             </div>
         </div>
 
+        <!-- tabs -->
         <div class="bg-white border-b border-r border-gray-200">
             <div class="-mb-px flex">
                 <div @click="tab = 'channels'" class="w-full border-b-2 py-3 px-1 text-center text-sm font-medium cursor-pointer" :class="[ tab === 'channels' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700']">Channels</div>
@@ -38,7 +39,7 @@
         <div class="flex h-full overflow-hidden">
 
             <!-- side menu -->
-            <div class="h-full w-full overflow-y-auto">
+            <div class="flex h-full w-full">
                 <ChannelsList v-if="tab === 'channels'" :channels="Object.values(channelsByIndex)" :selected-channel-id="selectedChannelId" @channel-click="onChannelClick($event)"/>
                 <NodesList v-if="tab === 'nodes'" :nodes="Object.values(nodesById)" :selected-node-id="selectedNodeId" @node-click="onNodeClick($event)"/>
             </div>
