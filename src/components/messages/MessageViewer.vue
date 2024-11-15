@@ -42,11 +42,9 @@
 
                                 <!-- state label -->
                                 <div class="my-auto">
-                                    <span v-if="isMessageDelivered(message)">Delivered</span>
+                                    <span v-if="isMessageFailed(message)">Failed: {{ Protobuf.Mesh.Routing_Error[message.error] ?? message.error }}</span>
+                                    <span v-else-if="isMessageDelivered(message)">Delivered</span>
                                     <span v-else-if="isMessageAcknowledged(message)">Heard by another node</span>
-                                    <span v-else-if="isMessageFailed(message)">
-                                        <span>Failed: {{ Protobuf.Mesh.Routing_Error[message.error] ?? message.error }}</span>
-                                    </span>
                                     <span v-else>Sending</span>
                                 </div>
 
