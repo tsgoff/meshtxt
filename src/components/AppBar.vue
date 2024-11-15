@@ -1,9 +1,9 @@
 <template>
-    <div class="flex bg-gray-100 py-2 border-b">
+    <div class="flex bg-white py-2 border-b h-16">
 
         <!-- back button -->
         <div class="my-auto">
-            <IconButton @click="$router.back()">
+            <IconButton @click="$router.back()" class="bg-transparent">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
                 </svg>
@@ -17,7 +17,7 @@
 
         <!-- title and subtitle -->
         <div class="my-auto mr-auto">
-            <div class="font-semibold">{{ title }}</div>
+            <div class="font-bold">{{ title }}</div>
             <div v-if="subtitle != null" class="text-sm">{{ subtitle }}</div>
         </div>
 

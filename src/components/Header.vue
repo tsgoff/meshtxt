@@ -1,12 +1,12 @@
 <template>
-    <div class="flex bg-gray-100 p-2 border-b">
-        <div class="mr-auto">
+    <div class="flex bg-white p-2 border-b h-16">
+        <div class="my-auto mr-auto">
 
             <!-- title -->
             <div class="font-bold">Mesh TXT</div>
 
             <!-- connected node info -->
-            <div class="font-semibold text-sm">
+            <div class="text-sm">
                 <span v-if="GlobalState.isConnected && GlobalState.myNodeUser">[{{ GlobalState.myNodeUser.shortName }}] {{ GlobalState.myNodeUser.longName }}</span>
                 <span v-else class="text-red-500">Not Connected</span>
             </div>
