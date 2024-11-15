@@ -11,11 +11,7 @@
             <div v-for="node of searchedNodes" @click="onNodeClick(node)" class="flex cursor-pointer p-2 border-l-2" :class="[ selectedNodeId === node.num ? 'bg-gray-100 border-blue-500' : 'bg-white border-transparent hover:bg-gray-50 hover:border-gray-200']">
 
                 <!-- icon -->
-                <div class="my-auto mr-2">
-                    <div class="flex rounded-full h-12 w-12 text-white shadow" :style="{ backgroundColor: NodeUtils.getNodeColour(node.num), color: NodeUtils.getNodeTextColour(node.num)}">
-                        <div class="mx-auto my-auto drop-shadow-sm">{{ node.user.shortName }}</div>
-                    </div>
-                </div>
+                <NodeIcon :node="node" class="my-auto mr-2"/>
 
                 <!-- name and info -->
                 <div class="mr-2">
@@ -33,11 +29,13 @@
 </template>
 
 <script>
-import NodeUtils from "../../js/node_utils.js";
+import NodeUtils from "../../js/NodeUtils.js";
 import moment from "moment";
+import NodeIcon from "./NodeIcon.vue";
 
 export default {
     name: 'NodesList',
+    components: {NodeIcon},
     emits: [
         "node-click",
     ],
@@ -54,14 +52,13 @@ export default {
         onNodeClick(node) {
             this.$emit("node-click", node);
         },
+        getNodeColour: (nodeId) => NodeUtils.getNodeColour(nodeId),
+        getNodeTextColour: (nodeId) => NodeUtils.getNodeTextColour(nodeId),
         formatUnixSecondsAgo(unixSeconds) {
             return moment.unix(unixSeconds).fromNow();
         },
     },
     computed: {
-        NodeUtils() {
-            return NodeUtils;
-        },
         nodesOrderedByName() {
             // sort nodes by name asc
             return this.nodes.sort((nodeA, nodeB) => {

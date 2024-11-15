@@ -1,6 +1,10 @@
 <template>
     <div class="h-screen w-full">
-        <RouterView/>
+        <RouterView v-slot="{ Component }">
+            <KeepAlive>
+                <Component :is="Component" />
+            </KeepAlive>
+        </RouterView>
     </div>
 </template>
 

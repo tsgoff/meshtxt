@@ -11,8 +11,20 @@ const router = createRouter({
             path: '/',
             component: () => import("./components/MainPage.vue"),
         },
+        {
+            name: "channel.messages",
+            path: '/channels/:channelId/messages',
+            props: true,
+            component: () => import("./components/pages/ChannelMessagesPage.vue"),
+        },
+        {
+            name: "node.messages",
+            path: '/nodes/:nodeId/messages',
+            props: true,
+            component: () => import("./components/pages/NodeMessagesPage.vue"),
+        },
     ],
-})
+});
 
 createApp(App)
     .use(router)

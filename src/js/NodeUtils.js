@@ -1,3 +1,5 @@
+import GlobalState from "./GlobalState.js";
+
 class NodeUtils {
 
     static getNodeHexId(nodeId) {
@@ -22,6 +24,14 @@ class NodeUtils {
         // determine text color based on brightness
         return brightness > 0.5 ? "#000000" : "#FFFFFF";
 
+    }
+
+    static getNodeShortName(nodeId) {
+        return GlobalState.nodesById[nodeId]?.user?.shortName?.substring(0, 4) ?? "?";
+    }
+
+    static getNodeLongName(nodeId) {
+        return GlobalState.nodesById[nodeId]?.user?.longName ?? NodeUtils.getNodeHexId(nodeId);
     }
 
 }
