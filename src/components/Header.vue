@@ -3,17 +3,19 @@
         <div class="mr-auto">
 
             <!-- title -->
-            <div class="font-semibold">Mesh TXT</div>
+            <div class="font-bold">Mesh TXT</div>
 
             <!-- connected node info -->
-            <div v-if="GlobalState.isConnected && GlobalState.myNodeUser" class="text-sm text-green-500">Connected: [{{ GlobalState.myNodeUser.shortName }}] {{ GlobalState.myNodeUser.longName }}</div>
-            <div v-else class="text-sm text-red-500">No Device Connected</div>
+            <div class="font-semibold text-sm">
+                <span v-if="GlobalState.isConnected && GlobalState.myNodeUser" class="text-green-500">Connected: [{{ GlobalState.myNodeUser.shortName }}] {{ GlobalState.myNodeUser.longName }}</span>
+                <span v-else class="text-red-500">No Device Connected</span>
+            </div>
 
         </div>
         <div class="my-auto font-semibold">
 
             <!-- connect button -->
-            <button v-if="!GlobalState.isConnected" @click="connect" type="button" class="bg-green-500 text-white px-2 py-1 p-1 rounded shadow hover:bg-green-400">
+            <button v-if="!GlobalState.isConnected" @click="connect" type="button" class="bg-blue-500 text-white px-2 py-1 p-1 rounded shadow hover:bg-blue-400">
                 Connect
             </button>
 
