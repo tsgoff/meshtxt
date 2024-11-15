@@ -13,9 +13,34 @@
         </div>
 
         <!-- tab content -->
-        <div class="flex h-full w-full overflow-hidden">
+        <div v-if="channels.length > 0 || nodes.length > 0" class="flex h-full w-full overflow-hidden">
             <ChannelsList v-if="tab === 'channels'" :channels="channels" @channel-click="onChannelClick"/>
             <NodesList v-if="tab === 'nodes'" :nodes="nodes" @node-click="onNodeClick"/>
+        </div>
+
+        <!-- not connected and no content -->
+        <div v-if="!isConnected && channels.length === 0 && nodes.length === 0" class="mx-auto my-auto">
+            <div class="flex flex-col mx-auto my-auto p-4 text-gray-500 text-center">
+
+                <!-- icon -->
+                <div class="mb-2 mx-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-10">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z" />
+                    </svg>
+                </div>
+
+                <!-- info -->
+                <div class="font-semibold">Not Connected</div>
+                <div class="mb-2">Connect to a Meshtastic device!</div>
+
+                <!-- connect button -->
+                <RouterLink :to="{ name: 'connect' }">
+                    <div class="bg-blue-500 text-white px-2 py-1 p-1 rounded shadow hover:bg-blue-400 font-semibold">
+                        Connect
+                    </div>
+                </RouterLink>
+
+            </div>
         </div>
 
     </div>
@@ -58,6 +83,9 @@ export default {
         },
     },
     computed: {
+        isConnected() {
+            return GlobalState.isConnected;
+        },
         channels() {
             return Object.values(GlobalState.channelsByIndex);
         },
