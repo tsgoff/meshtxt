@@ -24,21 +24,19 @@
 
                 <!-- icon -->
                 <div class="mb-2 mx-auto">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-10">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="w-10">
+                        <rect width="256" height="256" fill="none"/>
+                        <circle cx="136" cy="64" r="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
+                        <line x1="8" y1="128" x2="200" y2="128" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
+                        <polygon points="200 96 200 160 248 128 200 96" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
+                        <rect x="112" y="168" width="48" height="48" rx="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
+                        <path d="M112,64H72a8,8,0,0,0-8,8V184a8,8,0,0,0,8,8h40" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
                     </svg>
                 </div>
 
                 <!-- info -->
                 <div class="font-semibold">Not Connected</div>
                 <div class="mb-2">Connect to a Meshtastic device!</div>
-
-                <!-- connect button -->
-                <RouterLink :to="{ name: 'connect' }">
-                    <div class="bg-blue-500 text-white px-2 py-1 p-1 rounded shadow hover:bg-blue-400 font-semibold">
-                        Connect
-                    </div>
-                </RouterLink>
 
             </div>
         </div>
