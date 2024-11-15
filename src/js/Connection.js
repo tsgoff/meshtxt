@@ -134,6 +134,21 @@ class Connection {
 
     }
 
+    static onPacketError(id, error) {
+
+        console.log(`got error for packet id ${id}: ${error}`);
+
+        // find message by request id
+        const message = GlobalState.messages.find((m) => m.id === id);
+        if(!message){
+            return;
+        }
+
+        // update error
+        message.error = error;
+
+    }
+
 }
 
 export default Connection;

@@ -24,8 +24,7 @@ class MessageUtils {
     }
 
     static isMessageFailed(message) {
-        // todo implement
-        return false;
+        return message.error != null;
     }
 
 }

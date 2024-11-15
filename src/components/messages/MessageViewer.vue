@@ -44,6 +44,9 @@
                                 <div class="my-auto">
                                     <span v-if="isMessageDelivered(message)">Delivered</span>
                                     <span v-else-if="isMessageAcknowledged(message)">Heard by another node</span>
+                                    <span v-else-if="isMessageFailed(message)">
+                                        <span>Failed: {{ Protobuf.Mesh.Routing_Error[message.error] ?? message.error }}</span>
+                                    </span>
                                     <span v-else>Sending</span>
                                 </div>
 
@@ -105,12 +108,13 @@
 </template>
 
 <script>
-import { Constants } from "@meshtastic/js";
+import {Constants, Protobuf} from "@meshtastic/js";
 import GlobalState from "../../js/GlobalState.js";
 import NodeAPI from "../../js/NodeAPI.js";
 import MessageUtils from "../../js/MessageUtils.js";
 import NodeUtils from "../../js/NodeUtils.js";
 import DeviceUtils from "../../js/DeviceUtils.js";
+import Connection from "../../js/Connection.js";
 
 export default {
     name: 'MessageViewer',
@@ -145,10 +149,27 @@ export default {
             this.newMessageText = "";
 
             // send message based on current tab
-            if(this.type === "channel"){
-                await NodeAPI.sendBroadcastMessageToChannel(this.channelId, newMessageText);
-            } else if(this.type === "node") {
-                await NodeAPI.sendDirectMessageToNode(this.nodeId, newMessageText);
+            try {
+                if(this.type === "channel"){
+                    await NodeAPI.sendBroadcastMessageToChannel(this.channelId, newMessageText);
+                } else if(this.type === "node") {
+                    await NodeAPI.sendDirectMessageToNode(this.nodeId, newMessageText);
+                }
+            } catch(e) {
+
+                console.log(e);
+
+                // handle error thrown when message to long
+                // unfortunately @meshtastic/js does not provide the packet id in this case...
+                // fixme: this means we can't show an error state for the message that was already added to the ui
+                if(e instanceof Error){
+                    alert(e.message);
+                    return;
+                }
+
+                // message failed to send update internal error state
+                Connection.onPacketError(e.id, e.error);
+
             }
 
         },
@@ -189,6 +210,9 @@ export default {
         },
     },
     computed: {
+        Protobuf() {
+            return Protobuf;
+        },
         canSendMessage() {
 
             // can't send if channel is not selected
