@@ -2,7 +2,7 @@
     <div class="flex flex-col w-full h-full">
 
         <!-- messages -->
-        <div id="messages" class="h-full overflow-y-auto bg-gray-50">
+        <div @scroll="onMessagesScroll" id="messages" class="h-full overflow-y-auto bg-gray-50">
 
             <div v-if="messagesReversed.length > 0" class="flex flex-col-reverse p-3">
 
@@ -123,6 +123,7 @@ export default {
         return {
             newMessageText: "",
             isSendingMessage: false,
+            autoScrollOnNewMessage: true,
         };
     },
     methods: {
@@ -170,7 +171,17 @@ export default {
             }
 
         },
-        scrollToBottom: function() {
+        onMessagesScroll(event) {
+
+            // check if messages is scrolled to bottom
+            const element = event.target;
+            const isAtBottom = element.scrollTop === (element.scrollHeight - element.offsetHeight);
+
+            // we want to auto scroll if user is at bottom of messages list
+            this.autoScrollOnNewMessage = isAtBottom;
+
+        },
+        scrollMessagesToBottom: function() {
             this.$nextTick(() => {
                 var container = this.$el.querySelector("#messages");
                 container.scrollTop = container.scrollHeight;
@@ -227,6 +238,21 @@ export default {
         messagesReversed() {
             // ensure a copy of the array is returned in reverse order
             return this.messages.map((message) => message).reverse();
+        },
+    },
+    watch: {
+        messages: {
+            handler: function(newMessages, oldMessages) {
+
+                // determine if new messages have been added
+                const hasNewMessages = newMessages.length > oldMessages.length;
+
+                // auto scroll to bottom if we want to
+                if(hasNewMessages && this.autoScrollOnNewMessage){
+                    this.scrollMessagesToBottom();
+                }
+
+            },
         },
     },
 }
