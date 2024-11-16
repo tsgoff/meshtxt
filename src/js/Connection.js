@@ -1,5 +1,5 @@
 import GlobalState from "./GlobalState.js";
-import {BleConnection, Constants, Protobuf, SerialConnection, Types,} from "@meshtastic/js";
+import {BleConnection, Constants, HttpConnection, Protobuf, SerialConnection, Types,} from "@meshtastic/js";
 
 class Connection {
 
@@ -18,6 +18,14 @@ class Connection {
     static async connectViaSerial() {
         await this.connect(new SerialConnection(), {
             concurrentLogOutput: true,
+        });
+    }
+
+    static async connectViaHttp(address) {
+        await this.connect(new HttpConnection(), {
+            address: address,
+            fetchInterval: 1000,
+            tls: true,
         });
     }
 
