@@ -23,6 +23,7 @@ npm run dev
 
 - Implement database persistence so message history is saved across page reloads
 - Possibly use RxDB https://rxdb.info/
+- Show unread message indicators on channels and nodes
 
 ## CORS Proxy for HTTP Connections
 
