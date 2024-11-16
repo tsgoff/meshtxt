@@ -62,6 +62,9 @@ export default {
         },
     },
     computed: {
+        orderedNodes() {
+            return this.nodesOrderedByLastHeard;
+        },
         nodesOrderedByName() {
             // sort nodes by name asc
             return this.nodes.sort((nodeA, nodeB) => {
@@ -70,8 +73,16 @@ export default {
                 return nodeALongName.localeCompare(nodeBLongName);
             });
         },
+        nodesOrderedByLastHeard() {
+            // sort nodes by last heard desc
+            return this.nodes.sort((nodeA, nodeB) => {
+                const nodeALastHeard = nodeA.lastHeard;
+                const nodeBLastHeard = nodeB.lastHeard;
+                return nodeBLastHeard - nodeALastHeard;
+            });
+        },
         searchedNodes() {
-            return this.nodesOrderedByName.filter((node) => {
+            return this.orderedNodes.filter((node) => {
                 const search = this.nodesSearchTerm.toLowerCase();
                 const matchesId = node.num.toString().includes(search);
                 const matchesHexId = this.getNodeHexId(node.num).toLowerCase().includes(search);
