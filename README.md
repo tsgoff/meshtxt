@@ -19,6 +19,10 @@ npm install
 npm run dev
 ```
 
+## TODO
+
+- Implement database persistence so messages history is saved across page reloads
+
 ## License
 
 MIT
