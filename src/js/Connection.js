@@ -126,6 +126,12 @@ class Connection {
 
         });
 
+        // listen for user info
+        connection.events.onUserPacket.subscribe((data) => {
+            console.log("onUserPacket", data);
+            // todo add new nodes
+        });
+
         // listen for channels
         GlobalState.channelsByIndex = {};
         connection.events.onChannelPacket.subscribe((data) => {
