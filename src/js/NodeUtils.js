@@ -43,6 +43,12 @@ class NodeUtils {
         return Protobuf.Mesh.HardwareModel[hardwareId];
     }
 
+    static getNodeChannel(nodeId) {
+        // get the channel we should use to send packets to this node
+        // otherwise we will just fallback to the primary channel
+        return GlobalState.nodesById[nodeId]?.channel ?? 0;
+    }
+
     /**
      * Converts latitudeI or longitudeI to an actual lat/long value
      * e.g: -38123456 -> -38.123456

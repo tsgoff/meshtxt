@@ -56,7 +56,14 @@ class Connection {
 
     static async setupConnectionListeners(connection) {
 
-        // setup packet listeners
+        // listen for device status changes
+        connection.events.onDeviceStatus.subscribe((deviceStatus) => {
+            console.log("onDeviceStatus", deviceStatus);
+            GlobalState.deviceStatus = deviceStatus;
+        });
+
+        // listen for packets from radio
+        // we are doing this to get error info for a request id as it's not provided in the onRoutingPacket event
         connection.events.onFromRadio.subscribe((data) => {
             if(data.payloadVariant.case.toString() === "packet") {
                 const meshPacket = data.payloadVariant.value;
@@ -90,6 +97,31 @@ class Connection {
             // check if we found our own node info
             if(nodeId === GlobalState.myNodeId){
                 GlobalState.myNodeUser = data.user;
+            }
+
+        });
+
+        // listen for mesh packets
+        connection.events.onMeshPacket.subscribe((data) => {
+
+            console.log("onMeshPacket", data);
+
+            // update last heard on node we received packet from
+            // we don't want to do this during the device configuring state
+            // otherwise it would set last heard to _now_, but we are actually receiving old packets in this state
+            if(GlobalState.deviceStatus !== Types.DeviceStatusEnum.DeviceConfiguring){
+
+                // get packet data
+                const rxTime = data.rxTime;
+                const fromNodeId = data.from;
+
+                // find node by id and update
+                const node = GlobalState.nodesById[fromNodeId];
+                if(node){
+                    console.log(`updating last heard for node ${fromNodeId} to ${rxTime}`);
+                    node.lastHeard = rxTime;
+                }
+
             }
 
         });
