@@ -73,10 +73,11 @@ export default {
         searchedNodes() {
             return this.nodesOrderedByName.filter((node) => {
                 const search = this.nodesSearchTerm.toLowerCase();
+                const matchesId = node.num.toString().includes(search);
                 const matchesHexId = this.getNodeHexId(node.num).toLowerCase().includes(search);
                 const matchesShortName = this.getNodeShortName(node.num).toLowerCase().includes(search);
                 const matchesLongName = this.getNodeLongName(node.num).toLowerCase().includes(search);
-                return matchesHexId || matchesShortName || matchesLongName;
+                return matchesId || matchesHexId || matchesShortName || matchesLongName;
             });
         },
     },
