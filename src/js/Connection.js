@@ -106,23 +106,19 @@ class Connection {
 
             console.log("onMeshPacket", data);
 
-            // update last heard on node we received packet from
-            // we don't want to do this during the device configuring state
-            // otherwise it would set last heard to _now_, but we are actually receiving old packets in this state
-            if(GlobalState.deviceStatus !== Types.DeviceStatusEnum.DeviceConfiguring){
+            // get packet data
+            const rxTime = data.rxTime;
+            const fromNodeId = data.from;
 
-                // get packet data
-                const rxTime = data.rxTime;
-                const fromNodeId = data.from;
-
-                // find node by id and update
-                const node = GlobalState.nodesById[fromNodeId];
-                if(node){
-                    console.log(`updating last heard for node ${fromNodeId} to ${rxTime}`);
-                    node.lastHeard = rxTime;
-                }
-
+            // find node by id or do nothing
+            const node = GlobalState.nodesById[fromNodeId];
+            if(!node){
+                return;
             }
+
+            // update last heard on node we received packet from
+            console.log(`updating last heard for node ${fromNodeId} to ${rxTime}`);
+            node.lastHeard = rxTime;
 
         });
 
