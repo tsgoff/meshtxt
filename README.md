@@ -4,7 +4,7 @@ A simple, mobile friendly, web based Meshtastic client.
 
 ## What can it do?
 
-- Connect to a Meshtastic device over Bluetooth or Serial
+- Connect to a Meshtastic device over Bluetooth, Serial and HTTP
 - Send and receive text messages on existing channels
 - Send and receive direct messages with known nodes
 - Send and receive node info on demand with a specific node
@@ -21,7 +21,7 @@ npm run dev
 
 ## TODO
 
-- Implement database persistence so messages history is saved across page reloads
+- Implement database persistence so message history is saved across page reloads
 
 ## CORS Proxy for HTTP Connections
 
