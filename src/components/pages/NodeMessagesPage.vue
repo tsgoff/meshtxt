@@ -2,7 +2,7 @@
     <Page>
 
         <!-- app bar -->
-        <AppBar :title="title" subtitle="Direct Messages">
+        <AppBar title="Direct Messages" :subtitle="subtitle">
             <template v-slot:leading>
                 <NodeIcon v-if="node" :node="node" class="mr-3"/>
             </template>
@@ -70,7 +70,7 @@ export default {
         node() {
             return GlobalState.nodesById[this.nodeId];
         },
-        title() {
+        subtitle() {
             return this.node ? this.getNodeLongName(this.node.num) : "Unknown Node";
         },
     },

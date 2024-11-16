@@ -2,7 +2,7 @@
     <Page>
 
         <!-- app bar -->
-        <AppBar :title="title" subtitle="Node Info">
+        <AppBar title="Node Info" :subtitle="subtitle">
             <template v-slot:leading>
                 <NodeIcon v-if="node" :node="node" class="mr-3"/>
             </template>
@@ -134,7 +134,7 @@ export default {
         node() {
             return GlobalState.nodesById[this.nodeId];
         },
-        title() {
+        subtitle() {
             return this.node?.user?.longName || 'Unknown Node';
         },
     },

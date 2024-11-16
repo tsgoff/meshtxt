@@ -2,7 +2,7 @@
     <Page>
 
         <!-- app bar -->
-        <AppBar :title="title" subtitle="Channel Messages"/>
+        <AppBar title="Channel Messages" :subtitle="subtitle"/>
 
         <!-- list -->
         <div class="flex h-full w-full overflow-hidden">
@@ -43,7 +43,7 @@ export default {
         channel() {
             return GlobalState.channelsByIndex[this.channelId];
         },
-        title() {
+        subtitle() {
             return this.channel?.settings?.name || 'Unnamed Channel';
         },
     },
