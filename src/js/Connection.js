@@ -132,8 +132,25 @@ class Connection {
 
         // listen for user info
         connection.events.onUserPacket.subscribe((data) => {
+
             console.log("onUserPacket", data);
-            // todo add new nodes
+
+            // get packet data
+            const fromNodeId = data.from;
+            const user = data.data;
+
+            // find node by id or do nothing
+            const node = GlobalState.nodesById[fromNodeId];
+            if(!node){
+                return;
+            }
+
+            // update node user
+            console.log(`updating node user ${fromNodeId}`);
+            node.user = user;
+
+            // todo add new nodes if they don't already exist
+
         });
 
         // listen for channels
