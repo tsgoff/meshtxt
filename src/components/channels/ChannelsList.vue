@@ -6,7 +6,7 @@
             <div class="my-auto mr-auto">
                 <div>
                     <span v-if="channel.settings.name.length > 0">{{ channel.settings.name }}</span>
-                    <span v-else class="text-gray-500 italic">Unnamed Channel</span>
+                    <span v-else class="text-gray-500 italic">(No Name)</span>
                 </div>
                 <div class="text-sm text-gray-500">
                     <span v-if="channel.role === Protobuf.Channel.Channel_Role.PRIMARY">Primary Channel</span>

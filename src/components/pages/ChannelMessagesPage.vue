@@ -50,7 +50,7 @@ export default {
             return GlobalState.channelsByIndex[this.channelId];
         },
         subtitle() {
-            return this.channel?.settings?.name || 'Unnamed Channel';
+            return this.channel?.settings?.name || '(No Name)';
         },
     },
 }
