@@ -22,6 +22,7 @@ npm run dev
 ## TODO
 
 - Implement database persistence so message history is saved across page reloads
+- Possibly use RxDB https://rxdb.info/
 
 ## CORS Proxy for HTTP Connections
 
