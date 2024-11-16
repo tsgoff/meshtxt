@@ -3,7 +3,7 @@
         <div class="my-auto mr-auto">
 
             <!-- title -->
-            <div class="font-bold">Mesh TXT</div>
+            <div class="font-bold">MeshTXT</div>
 
             <!-- connected node info -->
             <div class="text-sm">
