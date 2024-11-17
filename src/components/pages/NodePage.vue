@@ -53,6 +53,7 @@
                     </ul>
                 </div>
 
+                <!-- position -->
                 <div>
                     <div class="flex bg-gray-200 p-2 font-semibold">Position</div>
                     <ul role="list" class="flex-1 divide-y divide-gray-200">
@@ -75,6 +76,62 @@
                             </div>
 
                         </li>
+                    </ul>
+                </div>
+
+                <!-- device metrics -->
+                <div>
+                    <div class="flex bg-gray-200 p-2 font-semibold">Device Metrics</div>
+                    <ul role="list" class="flex-1 divide-y divide-gray-200">
+
+                        <!-- battery level -->
+                        <li class="flex p-3">
+                            <div class="text-sm font-medium text-gray-900">Battery Level</div>
+                            <div class="ml-auto text-sm text-gray-700">
+                                <span v-if="node.deviceMetrics && node.deviceMetrics.batteryLevel != null">
+                                    <span v-if="node.deviceMetrics.batteryLevel === 101">Plugged-In</span>
+                                    <span v-else>{{ node.deviceMetrics.batteryLevel }}%</span>
+                                </span>
+                                <span v-else>???</span>
+                            </div>
+                        </li>
+
+                        <!-- voltage -->
+                        <li class="flex p-3">
+                            <div class="text-sm font-medium text-gray-900">Voltage</div>
+                            <div class="ml-auto text-sm text-gray-700">
+                                <span v-if="node.deviceMetrics && node.deviceMetrics.voltage != null">{{ node.deviceMetrics.voltage.toFixed(2) }}v</span>
+                                <span v-else>???</span>
+                            </div>
+                        </li>
+
+                        <!-- channel utilization -->
+                        <li class="flex p-3">
+                            <div class="text-sm font-medium text-gray-900">Channel Utilization</div>
+                            <div class="ml-auto text-sm text-gray-700">
+                                <span v-if="node.deviceMetrics && node.deviceMetrics.channelUtilization != null">{{ node.deviceMetrics.channelUtilization.toFixed(2) }}%</span>
+                                <span v-else>???</span>
+                            </div>
+                        </li>
+
+                        <!-- air util tx -->
+                        <li class="flex p-3">
+                            <div class="text-sm font-medium text-gray-900">Air Util Tx</div>
+                            <div class="ml-auto text-sm text-gray-700">
+                                <span v-if="node.deviceMetrics && node.deviceMetrics.airUtilTx != null">{{ node.deviceMetrics.airUtilTx.toFixed(2) }}%</span>
+                                <span v-else>???</span>
+                            </div>
+                        </li>
+
+                        <!-- uptime -->
+                        <li class="flex p-3">
+                            <div class="text-sm font-medium text-gray-900">Uptime</div>
+                            <div class="ml-auto text-sm text-gray-700">
+                                <span v-if="node.deviceMetrics && node.deviceMetrics.uptimeSeconds != null">{{ formatUptimeSeconds(node.deviceMetrics.uptimeSeconds) }}</span>
+                                <span v-else>???</span>
+                            </div>
+                        </li>
+
                     </ul>
                 </div>
 
@@ -121,6 +178,15 @@ export default {
         getRoleName: (roleId) => NodeUtils.getRoleName(roleId),
         getHardwareName: (roleId) => NodeUtils.getHardwareName(roleId),
         latLongIntegerToLatLong: (latLongInteger) => NodeUtils.latLongIntegerToLatLong(latLongInteger),
+        formatUptimeSeconds: function(secondsToFormat) {
+            secondsToFormat = Number(secondsToFormat);
+            const days = Math.floor(secondsToFormat / (3600 * 24));
+            const hours = Math.floor((secondsToFormat % (3600 * 24)) / 3600);
+            const minutes = Math.floor((secondsToFormat % 3600) / 60);
+            const seconds = Math.floor(secondsToFormat % 60);
+            const daysPlural = days === 1 ? 'day' : 'days';
+            return `${days} ${daysPlural} ${hours}h ${minutes}m ${seconds}s`;
+        },
         onNodeDeleted() {
 
             // go back to main page
