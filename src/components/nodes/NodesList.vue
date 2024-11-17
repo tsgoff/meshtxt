@@ -27,7 +27,7 @@
                         <div v-else>
 
                             <!-- hops away -->
-                            <span v-if="node.hopsAway === -1">Direct Connection</span>
+                            <span v-if="node.hopsAway === -1">Unknown Hops</span>
                             <span v-else-if="node.hopsAway === 0">Direct Connection</span>
                             <span v-else-if="node.hopsAway === 1">1 Hop Away</span>
                             <span v-else>{{ node.hopsAway }} Hops Away</span>
