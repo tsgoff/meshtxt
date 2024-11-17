@@ -1,5 +1,6 @@
 import { createApp } from 'vue';
 import { createRouter, createWebHashHistory } from 'vue-router';
+import vClickOutside from "click-outside-vue3";
 import "./style.css";
 
 import App from './components/App.vue';
@@ -41,6 +42,7 @@ const router = createRouter({
 
 createApp(App)
     .use(router)
+    .use(vClickOutside)
     .mount('#app');
 
 // disconnect before unloading page (chrome webview on android was crashing without this...)

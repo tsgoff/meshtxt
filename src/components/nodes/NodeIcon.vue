@@ -1,6 +1,8 @@
 <template>
-    <div class="flex rounded-full h-12 w-12 text-white shadow" :style="{ backgroundColor: getNodeColour(node.num), color: getNodeTextColour(node.num)}">
-        <div class="mx-auto my-auto drop-shadow-sm">{{ getNodeShortName(node.num) }}</div>
+    <div>
+        <div class="flex rounded-full h-12 w-12 text-white shadow" :style="{ backgroundColor: getNodeColour(node.num), color: getNodeTextColour(node.num)}">
+            <div class="mx-auto my-auto drop-shadow-sm">{{ getNodeShortName(node.num) }}</div>
+        </div>
     </div>
 </template>
 
