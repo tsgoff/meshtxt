@@ -8,13 +8,7 @@
 
         <!-- nodes -->
         <div class="h-full overflow-y-auto">
-
-            <!-- always show connected node first -->
-            <NodeListItem v-if="myNode" :key="myNode.num" :node="myNode" @click="onNodeClick(myNode)" class="border-b"/>
-
-            <!-- other nodes -->
             <NodeListItem :key="node.num" v-for="node of searchedNodes" :node="node" @click="onNodeClick(node)"/>
-
         </div>
 
     </div>
@@ -53,30 +47,38 @@ export default {
         GlobalState() {
             return GlobalState;
         },
-        myNode() {
-            return this.nodes.find((node) => {
+        orderedNodes() {
+
+            // get ordered nodes
+            var orderedNodes = this.nodesOrderedByLastHeard;
+
+            // find our node in the list
+            const myNode = orderedNodes.find((node) => {
                 return node.num === GlobalState.myNodeId;
             });
-        },
-        otherNodes() {
-            return this.nodes.filter((node) => {
+
+            // remove our node from the list
+            orderedNodes = orderedNodes.filter((node) => {
                 return node.num !== GlobalState.myNodeId;
             });
-        },
-        orderedNodes() {
-            return this.nodesOrderedByLastHeard;
+
+            // add our node to the start of the list
+            orderedNodes.unshift(myNode);
+
+            return orderedNodes;
+
         },
         nodesOrderedByName() {
-            // sort nodes by name asc
-            return this.otherNodes.sort((nodeA, nodeB) => {
+            // sort nodes by name asc (using a shallow copy to ensure it updates automatically)
+            return [...this.nodes].sort((nodeA, nodeB) => {
                 const nodeALongName = this.getNodeLongName(nodeA.num);
                 const nodeBLongName = this.getNodeLongName(nodeB.num);
                 return nodeALongName.localeCompare(nodeBLongName);
             });
         },
         nodesOrderedByLastHeard() {
-            // sort nodes by last heard desc
-            return this.otherNodes.sort((nodeA, nodeB) => {
+            // sort nodes by last heard desc (using a shallow copy to ensure it updates automatically)
+            return [...this.nodes].sort((nodeA, nodeB) => {
                 const nodeALastHeard = nodeA.lastHeard;
                 const nodeBLastHeard = nodeB.lastHeard;
                 return nodeBLastHeard - nodeALastHeard;
