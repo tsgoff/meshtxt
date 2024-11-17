@@ -1,5 +1,5 @@
 <template>
-    <div v-click-outside="{ handler: onClickOutsideMenu, capture: true }" class="relative inline-block text-left">
+    <div v-click-outside="{ handler: onClickOutsideMenu, capture: true }" class="cursor-default relative inline-block text-left">
 
         <!-- menu button -->
         <div ref="dropdown-button" @click.stop="toggleMenu">
