@@ -1,16 +1,6 @@
 <template>
-    <div class="cursor-pointer group flex items-center p-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 hover:outline-none">
-
-        <!-- icon -->
-        <div class="mr-2 text-gray-400 group-hover:text-gray-500">
-            <slot name="icon"/>
-        </div>
-
-        <!-- label -->
-        <div>
-            <slot name="label"/>
-        </div>
-
+    <div class="cursor-pointer flex p-2 space-x-2 text-sm text-gray-500 hover:bg-gray-100">
+        <slot/>
     </div>
 </template>
 
