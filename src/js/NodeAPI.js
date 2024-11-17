@@ -36,6 +36,16 @@ class NodeAPI {
 
     }
 
+    /**
+     * Removes the node from global state, and also tells the meshtastic device to remove the node.
+     * @param nodeId the node id to remove
+     * @returns {Promise<*>}
+     */
+    static async removeNodeByNum(nodeId) {
+        delete GlobalState.nodesById[nodeId];
+        return await GlobalState.connection.removeNodeByNum(nodeId);
+    }
+
 }
 
 export default NodeAPI;
