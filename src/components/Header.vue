@@ -1,18 +1,13 @@
 <template>
     <div class="flex bg-white p-2 border-b h-16">
-        <div class="my-auto mr-auto">
-
-            <!-- title -->
-            <div class="font-bold">MeshTXT</div>
-
-            <!-- connected node info -->
-            <div class="text-sm">
-                <span v-if="GlobalState.isConnected && GlobalState.myNodeUser">[{{ GlobalState.myNodeUser.shortName }}] {{ GlobalState.myNodeUser.longName }}</span>
-                <span v-else class="text-red-500">Not Connected</span>
-            </div>
-
+        <div class="my-auto mr-2">
+            <img src="../assets/icon.png" class="size-12 rounded"/>
         </div>
-        <div class="my-auto font-semibold">
+        <div class="my-auto mr-auto">
+            <div class="font-bold">MeshTXT</div>
+            <div class="text-sm">Built by <a href="https://liamcottle.com" target="_blank" class="text-blue-600 hover:underline">Liam Cottle</a></div>
+        </div>
+        <div class="my-auto flex font-semibold">
 
             <!-- connect button -->
             <RouterLink v-if="!GlobalState.isConnected" :to="{ name: 'connect' }">
@@ -22,9 +17,11 @@
             </RouterLink>
 
             <!-- disconnect button -->
-            <button v-else @click="disconnect" type="button" class="bg-gray-500 text-white px-2 py-1 p-1 rounded shadow hover:bg-gray-400">
-                Disconnect
-            </button>
+            <div v-else>
+                <button @click="disconnect" type="button" class="bg-gray-500 text-white px-2 py-1 p-1 rounded shadow hover:bg-gray-400">
+                    Disconnect
+                </button>
+            </div>
 
         </div>
     </div>
