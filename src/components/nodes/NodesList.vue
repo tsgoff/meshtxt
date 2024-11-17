@@ -8,7 +8,13 @@
 
         <!-- nodes -->
         <div class="h-full overflow-y-auto">
+
+            <!-- always show connected node first -->
+            <NodeListItem v-if="myNode" :key="myNode.num" :node="myNode" @click="onNodeClick(myNode)" class="border-b"/>
+
+            <!-- other nodes -->
             <NodeListItem :key="node.num" v-for="node of searchedNodes" :node="node" @click="onNodeClick(node)"/>
+
         </div>
 
     </div>
@@ -47,12 +53,22 @@ export default {
         GlobalState() {
             return GlobalState;
         },
+        myNode() {
+            return this.nodes.find((node) => {
+                return node.num === GlobalState.myNodeId;
+            });
+        },
+        otherNodes() {
+            return this.nodes.filter((node) => {
+                return node.num !== GlobalState.myNodeId;
+            });
+        },
         orderedNodes() {
             return this.nodesOrderedByLastHeard;
         },
         nodesOrderedByName() {
             // sort nodes by name asc
-            return this.nodes.sort((nodeA, nodeB) => {
+            return this.otherNodes.sort((nodeA, nodeB) => {
                 const nodeALongName = this.getNodeLongName(nodeA.num);
                 const nodeBLongName = this.getNodeLongName(nodeB.num);
                 return nodeALongName.localeCompare(nodeBLongName);
@@ -60,7 +76,7 @@ export default {
         },
         nodesOrderedByLastHeard() {
             // sort nodes by last heard desc
-            return this.nodes.sort((nodeA, nodeB) => {
+            return this.otherNodes.sort((nodeA, nodeB) => {
                 const nodeALastHeard = nodeA.lastHeard;
                 const nodeBLastHeard = nodeB.lastHeard;
                 return nodeBLastHeard - nodeALastHeard;
