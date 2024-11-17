@@ -18,13 +18,24 @@
                     <div>{{ getNodeLongName(node.num) }}</div>
                     <div class="text-sm text-gray-500">
 
-                        <!-- hops away -->
-                        <span v-if="node.hopsAway === 0">Direct Connection</span>
-                        <span v-else-if="node.hopsAway === 1">1 Hop Away</span>
-                        <span v-else>{{ node.hopsAway }} Hops Away</span>
+                        <!-- our node info -->
+                        <div v-if="node.num === GlobalState.myNodeId">
+                            You are connected to this node
+                        </div>
 
-                        <!-- last heard -->
-                        <span v-if="node.lastHeard"> • heard {{ formatUnixSecondsAgo(node.lastHeard) }}</span>
+                        <!-- other node info -->
+                        <div v-else>
+
+                            <!-- hops away -->
+                            <span v-if="node.hopsAway === -1">Direct Connection</span>
+                            <span v-else-if="node.hopsAway === 0">Direct Connection</span>
+                            <span v-else-if="node.hopsAway === 1">1 Hop Away</span>
+                            <span v-else>{{ node.hopsAway }} Hops Away</span>
+
+                            <!-- last heard -->
+                            <span v-if="node.lastHeard"> • heard {{ formatUnixSecondsAgo(node.lastHeard) }}</span>
+
+                        </div>
 
                     </div>
                 </div>
@@ -39,6 +50,7 @@
 import NodeUtils from "../../js/NodeUtils.js";
 import moment from "moment";
 import NodeIcon from "./NodeIcon.vue";
+import GlobalState from "../../js/GlobalState.js";
 
 export default {
     name: 'NodesList',
@@ -69,6 +81,9 @@ export default {
         },
     },
     computed: {
+        GlobalState() {
+            return GlobalState;
+        },
         orderedNodes() {
             return this.nodesOrderedByLastHeard;
         },

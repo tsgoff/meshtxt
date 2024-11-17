@@ -118,15 +118,21 @@ class Connection {
             const rxTime = data.rxTime;
             const fromNodeId = data.from;
 
+            // determine hops away
+            const hopStart = data.hopStart;
+            const hopLimit = data.hopLimit;
+            const hopsAway = (hopStart === 0 || hopLimit > hopStart) ? -1 : hopStart - hopLimit;
+
             // find node by id or do nothing
             const node = GlobalState.nodesById[fromNodeId];
             if(!node){
                 return;
             }
 
-            // update last heard on node we received packet from
+            // update last heard and hops away for the node we received packet from
             console.log(`updating last heard for node ${fromNodeId} to ${rxTime}`);
             node.lastHeard = rxTime;
+            node.hopsAway = hopsAway;
 
         });
 
