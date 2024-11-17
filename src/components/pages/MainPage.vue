@@ -20,25 +20,7 @@
 
         <!-- not connected and no content -->
         <div v-if="!isConnected && channels.length === 0 && nodes.length === 0" class="mx-auto my-auto">
-            <div class="flex flex-col mx-auto my-auto p-4 text-gray-500 text-center">
-
-                <!-- icon -->
-                <div class="mb-2 mx-auto">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" class="w-10">
-                        <rect width="256" height="256" fill="none"/>
-                        <circle cx="136" cy="64" r="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
-                        <line x1="8" y1="128" x2="200" y2="128" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
-                        <polygon points="200 96 200 160 248 128 200 96" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
-                        <rect x="112" y="168" width="48" height="48" rx="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
-                        <path d="M112,64H72a8,8,0,0,0-8,8V184a8,8,0,0,0,8,8h40" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/>
-                    </svg>
-                </div>
-
-                <!-- info -->
-                <div class="font-semibold">Not Connected</div>
-                <div class="mb-2">Connect to a Meshtastic device!</div>
-
-            </div>
+            <ConnectButtons/>
         </div>
 
     </Page>
@@ -50,10 +32,12 @@ import Header from "../Header.vue";
 import ChannelsList from "../channels/ChannelsList.vue";
 import NodesList from "../nodes/NodesList.vue";
 import Page from "./Page.vue";
+import ConnectButtons from "../connect/ConnectButtons.vue";
 
 export default {
     name: 'MainPage',
     components: {
+        ConnectButtons,
         Page,
         Header,
         NodesList,
