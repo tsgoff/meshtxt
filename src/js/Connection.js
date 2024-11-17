@@ -4,6 +4,13 @@ import {BleConnection, Constants, HttpConnection, Protobuf, SerialConnection, Ty
 class Connection {
 
     static async connectViaBluetooth() {
+
+        // ensure browser supports web bluetooth
+        if(!navigator.bluetooth){
+            alert("Web Bluetooth is not supported in this browser");
+            return;
+        }
+
         await this.connect(new BleConnection(), {
             filters: [
                 {
@@ -13,12 +20,21 @@ class Connection {
                 },
             ],
         });
+
     }
 
     static async connectViaSerial() {
+
+        // ensure browser supports web serial
+        if(!navigator.serial){
+            alert("Web Serial is not supported in this browser");
+            return null;
+        }
+
         await this.connect(new SerialConnection(), {
             concurrentLogOutput: true,
         });
+
     }
 
     static async connectViaHttp(address) {
