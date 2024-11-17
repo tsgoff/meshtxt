@@ -9,7 +9,8 @@
     <title>MeshTXT</title>
     <meta name="title" content="MeshTXT">
     <meta name="description" content="A simple, mobile friendly, web based Meshtastic client.">
-    <link rel="icon" type="image/png" href="assets/icon.png"/>
+    <link rel="icon" type="image/png" href="icon.png"/>
+    <link rel="manifest" href="/manifest.json">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -21,5 +22,11 @@
 <body>
 <div id="app" class="bg-gray-100"></div>
 <script type="module" src="main.js"></script>
+<script>
+    // install service worker to allow for pwa install
+    if('serviceWorker' in navigator){
+        navigator.serviceWorker.register('/service-worker.js');
+    }
+</script>
 </body>
 </html>

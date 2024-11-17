@@ -1,0 +1,17 @@
+{
+  "name": "MeshTXT",
+  "short_name": "MeshTXT",
+  "description": "A simple, mobile friendly, web based Meshtastic client.",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "display": "standalone",
+  "theme_color": "#FFFFFF",
+  "background_color": "#FFFFFF"
+}
