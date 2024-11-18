@@ -99,6 +99,22 @@ async function initDatabase(nodeId) {
                 },
             }
         },
+        node_messages_read_state: {
+            schema: {
+                version: 0,
+                primaryKey: 'id',
+                type: 'object',
+                properties: {
+                    id: {
+                        type: 'string',
+                        maxLength: 10,
+                    },
+                    timestamp: {
+                        type: 'integer',
+                    },
+                },
+            }
+        },
     });
 
 }
@@ -314,8 +330,21 @@ class TraceRoute {
 
 }
 
+class NodeMessagesReadState {
+
+    // update the read state of messages for the provided node id
+    static async touch(nodeId) {
+        return await database.node_messages_read_state.upsert({
+            id: nodeId.toString(),
+            timestamp: Date.now(),
+        });
+    }
+
+}
+
 export default {
     initDatabase,
     Message,
     TraceRoute,
+    NodeMessagesReadState,
 };

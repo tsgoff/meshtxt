@@ -146,6 +146,12 @@ export default {
     unmounted() {
         this.messagesSubscription?.unsubscribe();
     },
+    activated() {
+
+        // update read state when coming back to message viewer
+        Database.NodeMessagesReadState.touch(this.nodeId);
+
+    },
     methods: {
         async sendMessage() {
 
@@ -216,9 +222,15 @@ export default {
             // update messages in ui
             this.messages = messages.map((message) => message.toJSON());
 
-            // auto scroll to bottom if we want to
+            // check if we should auto scroll on new message
             if(this.autoScrollOnNewMessage){
+
+                // auto scroll to bottom if we want to
                 this.scrollMessagesToBottom();
+
+                // update read state since we auto scrolled to bottom of new messages
+                Database.NodeMessagesReadState.touch(this.nodeId);
+
             }
 
         },
@@ -240,6 +252,11 @@ export default {
 
             // we want to auto scroll if user is at bottom of messages list
             this.autoScrollOnNewMessage = isAtBottom;
+
+            // update read state since we scrolled to bottom
+            if(isAtBottom){
+                Database.NodeMessagesReadState.touch(this.nodeId);
+            }
 
         },
         scrollMessagesToBottom: function() {
