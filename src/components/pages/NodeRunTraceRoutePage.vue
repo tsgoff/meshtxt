@@ -70,6 +70,7 @@ import NodeIcon from "../nodes/NodeIcon.vue";
 import Page from "./Page.vue";
 import NodeUtils from "../../js/NodeUtils.js";
 import NodeAPI from "../../js/NodeAPI.js";
+import Connection from "../../js/Connection.js";
 
 export default {
     name: 'NodeTracesRoutePage',
@@ -89,9 +90,7 @@ export default {
     mounted() {
 
         // listen for trace routes
-        if(GlobalState.connection){
-            GlobalState.connection.events.onTraceRoutePacket.subscribe(this.onTraceRoutePacket);
-        }
+        Connection.addTraceRouteListener(this.onTraceRoutePacket);
 
         // redirect to main page if node not found
         if(!this.node){
@@ -105,9 +104,7 @@ export default {
     beforeUnmount() {
 
         // stop listening for trace routes
-        if(GlobalState.connection){
-            GlobalState.connection.events.onTraceRoutePacket.unsubscribe(this.onTraceRoutePacket);
-        }
+        Connection.removeTraceRouteListener(this.onTraceRoutePacket);
 
     },
     beforeRouteLeave(to, from) {

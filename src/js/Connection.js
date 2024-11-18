@@ -3,6 +3,18 @@ import {BleConnection, Constants, HttpConnection, Protobuf, SerialConnection, Ty
 
 class Connection {
 
+    static traceRouteListeners = [];
+
+    static addTraceRouteListener(listener) {
+        this.traceRouteListeners.push(listener);
+    }
+
+    static removeTraceRouteListener(listenerToRemove) {
+        this.traceRouteListeners = this.traceRouteListeners.filter((listener) => {
+            return listener !== listenerToRemove;
+        });
+    }
+
     static async connectViaBluetooth() {
 
         // ensure browser supports web bluetooth
@@ -203,6 +215,13 @@ class Connection {
         connection.events.onTraceRoutePacket.subscribe((data) => {
             console.log("onTraceRoutePacket", data);
             GlobalState.traceRoutesById[data.id] = data;
+            for(const traceRouteListener of this.traceRouteListeners){
+                try {
+                    traceRouteListener(data);
+                } catch(e) {
+                    // ignore error calling listener
+                }
+            }
         });
 
     }
