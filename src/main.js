@@ -5,6 +5,7 @@ import "./style.css";
 
 import App from './components/App.vue';
 import GlobalState from "./js/GlobalState.js";
+import {BleConnection, SerialConnection} from "@meshtastic/js";
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -63,10 +64,13 @@ createApp(App)
     .use(vClickOutside)
     .mount('#app');
 
-// disconnect before unloading page (chrome webview on android was crashing without this...)
+// disconnect from ble and serial before unloading page (chrome webview on android was crashing without this...)
+// don't disconnect from http connection, as this seem to cause an infinite loop issue, and the crash was from ble anyway...
 window.addEventListener("beforeunload", () => {
     if(GlobalState.connection){
-        GlobalState.connection.disconnect();
-        GlobalState.isConnected = false;
+        if(GlobalState.connection instanceof BleConnection || GlobalState.connection instanceof SerialConnection){
+            GlobalState.connection.disconnect();
+            GlobalState.isConnected = false;
+        }
     }
 });
