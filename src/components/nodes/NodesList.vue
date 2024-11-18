@@ -32,7 +32,7 @@
 
         <!-- nodes -->
         <div class="h-full overflow-y-auto">
-            <NodeListItem :key="node.num" v-for="node of searchedNodes" :node="node" @click="onNodeClick(node)"/>
+            <NodeListItem :key="node.num" v-for="node of searchedNodes" :node="node" @click="onNodeClick(node)" :class="{ 'border-b': node.num === GlobalState.myNodeId }"/>
         </div>
 
     </div>
