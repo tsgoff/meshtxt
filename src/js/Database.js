@@ -54,6 +54,9 @@ await database.addCollections({
                 acked_by_node_id: {
                     type: 'integer',
                 },
+                error: {
+                    type: 'string',
+                },
             },
         }
     },
@@ -106,7 +109,7 @@ class Message {
     static async setMessageErrorByPacketId(packetId, error) {
 
         // find one latest message with the provided packet id
-        const latestMessageByText = database.messages.findOne({
+        const latestMessageByPacketId = database.messages.findOne({
             selector: {
                 packet_id: {
                     $eq: packetId,
@@ -120,7 +123,7 @@ class Message {
         });
 
         // patch the message with the error
-        return await latestMessageByText.patch({
+        return await latestMessageByPacketId.patch({
             error: error,
         });
 
