@@ -5,6 +5,7 @@ import Database from "./Database.js";
 class Connection {
 
     static clientNotificationListeners = [];
+    static messageListeners = [];
     static traceRouteListeners = [];
 
     static addClientNotificationListener(listener) {
@@ -13,6 +14,16 @@ class Connection {
 
     static removeClientNotificationListener(listenerToRemove) {
         this.clientNotificationListeners = this.clientNotificationListeners.filter((listener) => {
+            return listener !== listenerToRemove;
+        });
+    }
+
+    static addMessageListener(listener) {
+        this.messageListeners.push(listener);
+    }
+
+    static removeMessageListener(listenerToRemove) {
+        this.messageListeners = this.messageListeners.filter((listener) => {
             return listener !== listenerToRemove;
         });
     }
@@ -231,6 +242,11 @@ class Connection {
         connection.events.onMessagePacket.subscribe(async (data) => {
             console.log("onMessagePacket", data);
             await Database.Message.insert(data);
+            for(const messageListener of this.messageListeners){
+                try {
+                    messageListener(data);
+                } catch(e){}
+            }
         });
 
         // listen for device status changes

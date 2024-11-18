@@ -124,6 +124,7 @@ export default {
     data() {
         return {
 
+            isActive: false,
             messages: [],
             messagesSubscription: null,
 
@@ -148,9 +149,14 @@ export default {
     },
     activated() {
 
-        // update read state when coming back to message viewer
-        Database.NodeMessagesReadState.touch(this.nodeId);
+        this.isActive = true;
 
+        // update read state when coming back to message viewer
+        this.updateMessagesLastReadAt();
+
+    },
+    deactivated() {
+        this.isActive = false;
     },
     methods: {
         async sendMessage() {
@@ -229,7 +235,7 @@ export default {
                 this.scrollMessagesToBottom();
 
                 // update read state since we auto scrolled to bottom of new messages
-                Database.NodeMessagesReadState.touch(this.nodeId);
+                this.updateMessagesLastReadAt();
 
             }
 
@@ -255,7 +261,7 @@ export default {
 
             // update read state since we scrolled to bottom
             if(isAtBottom){
-                Database.NodeMessagesReadState.touch(this.nodeId);
+                this.updateMessagesLastReadAt();
             }
 
         },
@@ -264,6 +270,17 @@ export default {
                 var container = this.$el.querySelector("#messages");
                 container.scrollTop = container.scrollHeight;
             });
+        },
+        updateMessagesLastReadAt() {
+
+            // do nothing if route is not active
+            if(!this.isActive){
+                return;
+            }
+
+            // update last read at
+            Database.NodeMessagesReadState.touch(this.nodeId);
+
         },
     },
     computed: {

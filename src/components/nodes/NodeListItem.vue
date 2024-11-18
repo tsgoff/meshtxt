@@ -44,6 +44,14 @@
             </div>
         </div>
 
+        <!-- unread messages count -->
+        <div v-if="unreadMessagesCount > 0" class="my-auto">
+            <div class="inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 rounded-full shadow">
+                <span v-if="unreadMessagesCount >= 100">99</span>
+                <span>{{ unreadMessagesCount }}</span>
+            </div>
+        </div>
+
         <!-- our node battery level -->
         <div v-if="node.num === GlobalState.myNodeId && node.deviceMetrics && node.deviceMetrics.batteryLevel != null" class="ml-1 my-auto flex text-gray-500">
             <div class="my-auto text-sm">
@@ -110,6 +118,8 @@ import NodeDropDownMenu from "./NodeDropDownMenu.vue";
 import GlobalState from "../../js/GlobalState.js";
 import TimeUtils from "../../js/TimeUtils.js";
 import moment from "moment";
+import Database from "../../js/Database.js";
+import Connection from "../../js/Connection.js";
 
 export default {
     name: 'NodeListItem',
@@ -119,6 +129,22 @@ export default {
     },
     props: {
         node: Object,
+    },
+    data() {
+        return {
+            unreadMessagesCount: 0,
+            nodeMessagesReadStateSubscription: null,
+        };
+    },
+    mounted() {
+        Connection.addMessageListener(this.onMessage);
+        this.nodeMessagesReadStateSubscription = Database.NodeMessagesReadState.get(this.node.num).$.subscribe(async (nodeMessagesReadState) => {
+            await this.onNodeMessagesReadStateChange(nodeMessagesReadState);
+        });
+    },
+    unmounted() {
+        Connection.removeMessageListener(this.onMessage);
+        this.nodeMessagesReadStateSubscription?.unsubscribe();
     },
     methods: {
         getNodeLongName: (nodeId) => NodeUtils.getNodeLongName(nodeId),
@@ -131,6 +157,17 @@ export default {
 
             return "Unknown";
 
+        },
+        async onMessage() {
+            const nodeMessagesReadState = await Database.NodeMessagesReadState.get(this.node.num).exec();
+            await this.onNodeMessagesReadStateChange(nodeMessagesReadState);
+        },
+        async updateUnreadMessagesCount(lastReadTimestamp) {
+            this.unreadMessagesCount = await Database.Message.getNodeMessagesUnreadCount(this.node.num, lastReadTimestamp).exec();
+        },
+        async onNodeMessagesReadStateChange(nodeMessagesReadState) {
+            const messagesLastReadTimestamp = nodeMessagesReadState?.timestamp ?? 0;
+            await this.updateUnreadMessagesCount(messagesLastReadTimestamp);
         },
     },
     computed: {

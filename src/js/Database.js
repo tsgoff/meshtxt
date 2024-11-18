@@ -23,6 +23,7 @@ async function initDatabase(nodeId) {
     database = await createRxDatabase({
         name: `meshtxt_db_node_${nodeId}`,
         storage: getRxStorageDexie(),
+        allowSlowCount: true, // fixme: figure out why rxdb complains about indexes when they existed during testing...
     });
 
     // add database schemas
@@ -265,6 +266,23 @@ class Message {
         });
     }
 
+    // get unread direct messages count for the provided node id
+    static getNodeMessagesUnreadCount(nodeId, messagesLastReadTimestamp) {
+        return database.messages.count({
+            selector: {
+                timestamp: {
+                    $gt: messagesLastReadTimestamp,
+                },
+                from: {
+                    $eq: nodeId,
+                },
+                to: {
+                    $eq: GlobalState.myNodeId,
+                },
+            },
+        });
+    }
+
 }
 
 class TraceRoute {
@@ -337,6 +355,17 @@ class NodeMessagesReadState {
         return await database.node_messages_read_state.upsert({
             id: nodeId.toString(),
             timestamp: Date.now(),
+        });
+    }
+
+    // get the read state of messages for the provided node id
+    static get(nodeId) {
+        return database.node_messages_read_state.findOne({
+            selector: {
+                id: {
+                    $eq: nodeId.toString(),
+                },
+            },
         });
     }
 
