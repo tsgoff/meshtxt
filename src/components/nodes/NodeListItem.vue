@@ -45,7 +45,7 @@
         </div>
 
         <!-- our node battery level -->
-        <div v-if="node.num === GlobalState.myNodeId && node.deviceMetrics && node.deviceMetrics.batteryLevel != null" class="my-auto flex text-gray-500 space-x-1">
+        <div v-if="node.num === GlobalState.myNodeId && node.deviceMetrics && node.deviceMetrics.batteryLevel != null" class="ml-1 my-auto flex text-gray-500">
             <div class="my-auto text-sm">
                 <span v-if="node.deviceMetrics.batteryLevel === 101">CHG</span>
                 <span v-else>{{ node.deviceMetrics.batteryLevel }}%</span>
