@@ -106,13 +106,13 @@
 </template>
 
 <script>
-import {Constants, Protobuf} from "@meshtastic/js";
+import {Protobuf} from "@meshtastic/js";
 import GlobalState from "../../js/GlobalState.js";
 import NodeAPI from "../../js/NodeAPI.js";
 import MessageUtils from "../../js/MessageUtils.js";
 import NodeUtils from "../../js/NodeUtils.js";
 import DeviceUtils from "../../js/DeviceUtils.js";
-import Connection from "../../js/Connection.js";
+import Database from "../../js/Database.js";
 
 export default {
     name: 'MessageViewer',
@@ -123,10 +123,28 @@ export default {
     },
     data() {
         return {
+
+            messages: [],
+            messagesSubscription: null,
+
             newMessageText: "",
             isSendingMessage: false,
             autoScrollOnNewMessage: true,
+
         };
+    },
+    mounted() {
+
+        // init database subscription for messages
+        if(this.type === "channel"){
+            this.messagesSubscription = Database.Message.getChannelMessages(this.channelId).$.subscribe(this.onMessagesUpdated);
+        } else if(this.type === "node") {
+            this.messagesSubscription = Database.Message.getNodeMessages(this.nodeId).$.subscribe(this.onMessagesUpdated);
+        }
+
+    },
+    unmounted() {
+        this.messagesSubscription?.unsubscribe();
     },
     methods: {
         async sendMessage() {
@@ -157,28 +175,19 @@ export default {
 
                 console.log(e);
 
-                // handle error thrown when message to long
+                // handle error thrown when message too long
                 // unfortunately @meshtastic/js does not provide the packet id in this case...
-                // this means we have to attempt to find the message that was already added to the ui with using the id
+                // this means we have to attempt to find the message that was already added to the ui without using the packet id
                 if(e instanceof Error){
 
-                    // find latest message sent from us with the exact same text
-                    const message = GlobalState.messages.find((m) => {
-                        return m.from === GlobalState.myNodeId && m.data === newMessageText;
-                    });
-
-                    // update error state on the message we found
-                    if(message){
-                        message.error = e.message;
-                    }
-
-                    alert(e.message);
+                    // set error message on latest message from us with provided text
+                    await Database.Message.setMessageErrorByLatestMessageText(newMessageText, e.message);
                     return;
 
                 }
 
                 // message failed to send update internal error state
-                Connection.onPacketError(e.id, e.error);
+                await Database.Message.setMessageErrorByPacketId(e.id, e.error);
 
             }
 
@@ -192,6 +201,17 @@ export default {
         getNodeTextColour: (nodeId) => NodeUtils.getNodeTextColour(nodeId),
         getNodeShortName: (nodeId) => NodeUtils.getNodeShortName(nodeId),
         getNodeLongName: (nodeId) => NodeUtils.getNodeLongName(nodeId),
+        onMessagesUpdated(messages) {
+
+            // update messages in ui
+            this.messages = messages;
+
+            // auto scroll to bottom if we want to
+            if(this.autoScrollOnNewMessage){
+                this.scrollMessagesToBottom();
+            }
+
+        },
         onEnterPressed: function(event) {
 
             // send message if not on mobile
@@ -249,44 +269,9 @@ export default {
             return true;
 
         },
-        messages() {
-            return GlobalState.messages.filter((message) => {
-
-                // get messages for channel
-                if(this.type === 'channel'){
-                    return message.to === Constants.broadcastNum && message.channel === this.channelId;
-                }
-
-                // get messages for node
-                if(this.type === 'node'){
-                    const isFromMeToSelectedNode = message.from === GlobalState.myNodeId && message.to === this.nodeId;
-                    const isFromSelectedNodeToMe = message.from === this.nodeId && message.to === GlobalState.myNodeId;
-                    return isFromMeToSelectedNode || isFromSelectedNodeToMe;
-                }
-
-                // we don't want to show this message
-                return false;
-
-            });
-        },
         messagesReversed() {
             // ensure a copy of the array is returned in reverse order
             return this.messages.map((message) => message).reverse();
-        },
-    },
-    watch: {
-        messages: {
-            handler: function(newMessages, oldMessages) {
-
-                // determine if new messages have been added
-                const hasNewMessages = newMessages.length > oldMessages.length;
-
-                // auto scroll to bottom if we want to
-                if(hasNewMessages && this.autoScrollOnNewMessage){
-                    this.scrollMessagesToBottom();
-                }
-
-            },
         },
     },
 }

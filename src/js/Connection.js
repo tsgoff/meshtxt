@@ -1,5 +1,6 @@
 import GlobalState from "./GlobalState.js";
 import {BleConnection, Constants, HttpConnection, Protobuf, SerialConnection, Types,} from "@meshtastic/js";
+import Database from "./Database.js";
 
 class Connection {
 
@@ -111,7 +112,7 @@ class Connection {
 
         // listen for packets from radio
         // we use this for some packets that don't have their own event listener
-        connection.events.onFromRadio.subscribe((data) => {
+        connection.events.onFromRadio.subscribe(async (data) => {
 
             // handle packets
             // we are doing this to get error info for a request id as it's not provided in the onRoutingPacket event
@@ -123,7 +124,7 @@ class Connection {
                         // todo handle nack for "no channel" etc
                         const ackFrom = meshPacket.from;
                         const requestId = dataPacket.requestId;
-                        this.onPacketAck(requestId, ackFrom);
+                        await this.onPacketAck(requestId, ackFrom);
                     }
                 }
             }
@@ -220,9 +221,9 @@ class Connection {
         });
 
         // listen for new messages
-        connection.events.onMessagePacket.subscribe((data) => {
+        connection.events.onMessagePacket.subscribe(async (data) => {
             console.log("onMessagePacket", data);
-            GlobalState.messages.push(data);
+            await Database.Message.insert(data);
         });
 
         // listen for device status changes
@@ -249,33 +250,12 @@ class Connection {
 
     }
 
-    static onPacketAck(requestId, ackedByNodeId) {
+    static async onPacketAck(requestId, ackedByNodeId) {
 
         console.log(`got ack for request id ${requestId} from ${ackedByNodeId}`);
 
-        // find message by request id
-        const message = GlobalState.messages.find((m) => m.id === requestId);
-        if(!message){
-            return;
-        }
-
-        // update ack
-        message.acked_by_id = ackedByNodeId;
-
-    }
-
-    static onPacketError(id, error) {
-
-        console.log(`got error for packet id ${id}: ${error}`);
-
-        // find message by request id
-        const message = GlobalState.messages.find((m) => m.id === id);
-        if(!message){
-            return;
-        }
-
-        // update error
-        message.error = error;
+        // todo make sure request id was for a message, otherwise we might be updating an older packet for something else
+        await Database.Message.setMessageAckedByNodeId(requestId, ackedByNodeId);
 
     }
 

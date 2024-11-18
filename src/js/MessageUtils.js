@@ -14,13 +14,13 @@ class MessageUtils {
 
     static isMessageAcknowledged(message) {
         // implicit acks for broadcast messages are always acked from our own id
-        // fixme: acked_by_id is set on the message by our code when we receive an ack...
-        return message.acked_by_id === GlobalState.myNodeId;
+        // acked_by_node_id is saved on the message in the database when we receive an ack for this messages packet id
+        return message.acked_by_node_id === GlobalState.myNodeId;
     }
 
     static isMessageDelivered(message) {
         // message is delivered if it was a direct message and was acked by the recipient
-        return message.type === "direct" && message.acked_by_id === message.to;
+        return message.type === "direct" && message.acked_by_node_id === message.to;
     }
 
     static isMessageFailed(message) {
