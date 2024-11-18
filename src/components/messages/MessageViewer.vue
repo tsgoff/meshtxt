@@ -214,7 +214,7 @@ export default {
         onMessagesUpdated(messages) {
 
             // update messages in ui
-            this.messages = messages;
+            this.messages = messages.map((message) => message.toJSON());
 
             // auto scroll to bottom if we want to
             if(this.autoScrollOnNewMessage){

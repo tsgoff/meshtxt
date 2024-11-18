@@ -244,10 +244,9 @@ class Connection {
         });
 
         // listen for trace routes
-        GlobalState.traceRoutesById = {};
-        connection.events.onTraceRoutePacket.subscribe((data) => {
+        connection.events.onTraceRoutePacket.subscribe(async (data) => {
             console.log("onTraceRoutePacket", data);
-            GlobalState.traceRoutesById[data.id] = data;
+            await Database.TraceRoute.insert(data);
             for(const traceRouteListener of this.traceRouteListeners){
                 try {
                     traceRouteListener(data);

@@ -14,7 +14,6 @@ const globalState = reactive({
 
     channelsByIndex: {},
     nodesById: {},
-    traceRoutesById: {},
 
 });
 

@@ -49,6 +49,7 @@ async function initDatabase(nodeId) {
                     from: {
                         type: 'integer',
                     },
+                    // todo channel hash for when a channel changes slots, or is deleted then recreated later
                     channel: {
                         type: 'integer',
                     },
@@ -63,6 +64,37 @@ async function initDatabase(nodeId) {
                     },
                     error: {
                         type: 'string',
+                    },
+                },
+            }
+        },
+        traceroutes: {
+            schema: {
+                version: 0,
+                primaryKey: 'id',
+                type: 'object',
+                properties: {
+                    id: {
+                        type: 'string',
+                        maxLength: 36,
+                    },
+                    packet_id: {
+                        type: 'integer',
+                    },
+                    to: {
+                        type: 'integer',
+                    },
+                    from: {
+                        type: 'integer',
+                    },
+                    channel: {
+                        type: 'integer',
+                    },
+                    data: {
+                        type: 'object',
+                    },
+                    timestamp: {
+                        type: 'integer',
                     },
                 },
             }
@@ -102,7 +134,7 @@ class Message {
             },
             sort: [
                 {
-                    timestamp: "asc",
+                    timestamp: "desc",
                 },
             ],
         });
@@ -126,7 +158,7 @@ class Message {
             },
             sort: [
                 {
-                    timestamp: "asc",
+                    timestamp: "desc",
                 },
             ],
         });
@@ -153,7 +185,7 @@ class Message {
             },
             sort: [
                 {
-                    timestamp: "asc",
+                    timestamp: "desc",
                 },
             ],
         });
@@ -219,7 +251,71 @@ class Message {
 
 }
 
+class TraceRoute {
+
+    // insert a traceroute into the database
+    static async insert(data) {
+        return await database.traceroutes.insert({
+            id: v4(),
+            packet_id: data.id,
+            to: data.to,
+            from: data.from,
+            channel: data.channel,
+            data: data.data,
+            timestamp: data.rxTime.getTime(),
+        });
+    }
+
+    // get traceroute responses from the provided node id
+    static getTraceRoutesByNodeId(nodeId) {
+        return database.traceroutes.find({
+            selector: {
+                to: {
+                    $eq: GlobalState.myNodeId,
+                },
+                from: {
+                    $eq: parseInt(nodeId),
+                },
+            },
+            sort: [
+                {
+                    timestamp: "asc",
+                },
+            ],
+        });
+    }
+
+    // find traceroute by id
+    static findTraceRouteById(id) {
+        return database.traceroutes.findOne({
+            selector: {
+                id: {
+                    $eq: id,
+                },
+            },
+        });
+    }
+
+    // find traceroute by packet id
+    static findTraceRouteByPacketId(packetId) {
+        return database.traceroutes.findOne({
+            selector: {
+                packet_id: {
+                    $eq: packetId,
+                },
+            },
+            sort: [
+                {
+                    timestamp: "desc",
+                },
+            ],
+        });
+    }
+
+}
+
 export default {
     initDatabase,
     Message,
+    TraceRoute,
 };

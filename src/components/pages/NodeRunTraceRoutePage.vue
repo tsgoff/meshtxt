@@ -71,6 +71,7 @@ import Page from "./Page.vue";
 import NodeUtils from "../../js/NodeUtils.js";
 import NodeAPI from "../../js/NodeAPI.js";
 import Connection from "../../js/Connection.js";
+import Database from "../../js/Database.js";
 
 export default {
     name: 'NodeTracesRoutePage',
@@ -115,9 +116,6 @@ export default {
     },
     methods: {
         getNodeLongName: (nodeId) => NodeUtils.getNodeLongName(nodeId),
-        onNewTraceRouteClick(node) {
-            NodeAPI.traceRoute(node.num);
-        },
         async runTraceRoute(node) {
 
             // do nothing if already running
@@ -129,7 +127,11 @@ export default {
             this.isRunningTraceRoute = true;
 
             // run trace route
-            await NodeAPI.traceRoute(node.num);
+            try {
+                await NodeAPI.traceRoute(node.num);
+            } catch(e) {
+                // don't care about timeout
+            }
 
         },
         onIgnoreResultClick() {
@@ -142,18 +144,25 @@ export default {
                 }
             }
         },
-        onTraceRouteComplete(traceRoute) {
+        async onTraceRouteComplete(traceRoute) {
 
             // no longer running trace route
             this.isRunningTraceRoute = false;
+
+            // find latest trace route by packet id
+            const databaseTraceRoute = await Database.TraceRoute.findTraceRouteByPacketId(traceRoute.id).exec();
+            if(!databaseTraceRoute){
+                return;
+            }
 
             // go to trace route page
             this.$router.push({
                 name: "traceroute",
                 params: {
-                    traceRouteId: traceRoute.id,
+                    traceRouteId: databaseTraceRoute.id,
                 },
             });
+
         },
         onClientNotification(clientNotification) {
 

@@ -19,18 +19,18 @@
                             </div>
                             <div class="my-auto relative flex flex-none items-center justify-center">
                                 <div>
-                                    <NodeIcon :node="findNodeById(this.traceRoute.to)"/>
+                                    <NodeIcon :node="findNodeById(traceRoute.to)"/>
                                 </div>
                             </div>
                             <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
-                                <div class="font-medium text-gray-900">{{ getNodeLongName(this.traceRoute.to) || '???' }}</div>
-                                <div>{{ getNodeHexId(this.traceRoute.to) }}</div>
+                                <div class="font-medium text-gray-900">{{ getNodeLongName(traceRoute.to) || '???' }}</div>
+                                <div>{{ getNodeHexId(traceRoute.to) }}</div>
                                 <div>Started the traceroute</div>
                             </div>
                         </li>
 
                         <!-- middleman nodes -->
-                        <li v-for="route of this.traceRoute.data.route" class="relative flex gap-x-4">
+                        <li v-for="route of traceRoute.data.route" class="relative flex gap-x-4">
                             <div class="absolute left-0 top-0 flex w-12 justify-center -bottom-3">
                                 <div class="w-px bg-gray-200"></div>
                             </div>
@@ -47,19 +47,19 @@
                         </li>
 
                         <!-- node that replied to traceroute -->
-                        <li v-if="this.traceRoute.from" class="relative flex gap-x-4">
+                        <li v-if="traceRoute.from" class="relative flex gap-x-4">
                             <div class="absolute left-0 top-0 flex w-12 justify-center h-6">
                                 <div class="w-px bg-gray-200"></div>
                             </div>
                             <div class="my-auto relative flex flex-none items-center justify-center">
                                 <div>
-                                    <NodeIcon :node="findNodeById(this.traceRoute.from)"/>
+                                    <NodeIcon :node="findNodeById(traceRoute.from)"/>
                                 </div>
                             </div>
                             <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
 
-                                <div class="font-medium text-gray-900">{{ getNodeLongName(this.traceRoute.from) || '???' }}</div>
-                                <div>{{ getNodeHexId(this.traceRoute.from) }}</div>
+                                <div class="font-medium text-gray-900">{{ getNodeLongName(traceRoute.from) || '???' }}</div>
+                                <div>{{ getNodeHexId(traceRoute.from) }}</div>
                                 <div>Replied to traceroute</div>
                             </div>
                         </li>
@@ -72,7 +72,7 @@
                 <div>
                     <div class="bg-gray-200 p-2 font-semibold">Raw Data</div>
                     <div class="text-sm text-gray-700">
-                        <pre class="bg-white p-2 overflow-x-auto">{{ JSON.stringify(this.traceRoute, null, 4) }}</pre>
+                        <pre class="bg-white p-2 overflow-x-auto">{{ JSON.stringify(traceRoute, null, 4) }}</pre>
                     </div>
                 </div>
 
@@ -91,6 +91,7 @@ import NodeIcon from "../nodes/NodeIcon.vue";
 import moment from "moment";
 import ChannelUtils from "../../js/ChannelUtils.js";
 import TimeUtils from "../../js/TimeUtils.js";
+import Database from "../../js/Database.js";
 
 export default {
     name: 'TraceRoutePage',
@@ -102,16 +103,22 @@ export default {
     props: {
         traceRouteId: String | Number,
     },
+    data() {
+        return {
+            traceRoute: null,
+            traceRouteSubscription: null,
+        };
+    },
     mounted() {
 
-        // redirect to main page if trace route not found
-        if(!this.traceRoute){
-            this.$router.push({
-                name: "main",
-            });
-            return;
-        }
+        // find trace route by id
+        this.traceRouteSubscription = Database.TraceRoute.findTraceRouteById(this.traceRouteId).$.subscribe((traceRoute) => {
+            this.traceRoute = traceRoute?.toJSON();
+        });
 
+    },
+    beforeUnmount() {
+        this.traceRouteSubscription?.unsubscribe();
     },
     methods: {
         getNodeHexId: (nodeId) => NodeUtils.getNodeHexId(nodeId),
@@ -125,9 +132,6 @@ export default {
         },
     },
     computed: {
-        traceRoute() {
-            return GlobalState.traceRoutesById[this.traceRouteId];
-        },
         subtitle() {
             if(this.traceRoute){
                 return `${this.getTimeAgo(this.traceRoute.rxTime)} • ${this.traceRoute.data.route.length} hop(s) on channel ${this.getChannelName(this.traceRoute.channel)}`;
