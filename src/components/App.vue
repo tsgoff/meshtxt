@@ -9,7 +9,20 @@
 </template>
 
 <script>
+import Connection from "../js/Connection.js";
+
 export default {
     name: 'App',
+    mounted() {
+        Connection.addClientNotificationListener(this.onClientNotification);
+    },
+    beforeUnmount() {
+        Connection.removeClientNotificationListener(this.onClientNotification);
+    },
+    methods: {
+        onClientNotification(clientNotification) {
+            alert(clientNotification.message);
+        },
+    },
 }
 </script>

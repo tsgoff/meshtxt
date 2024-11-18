@@ -3,7 +3,18 @@ import {BleConnection, Constants, HttpConnection, Protobuf, SerialConnection, Ty
 
 class Connection {
 
+    static clientNotificationListeners = [];
     static traceRouteListeners = [];
+
+    static addClientNotificationListener(listener) {
+        this.clientNotificationListeners.push(listener);
+    }
+
+    static removeClientNotificationListener(listenerToRemove) {
+        this.clientNotificationListeners = this.clientNotificationListeners.filter((listener) => {
+            return listener !== listenerToRemove;
+        });
+    }
 
     static addTraceRouteListener(listener) {
         this.traceRouteListeners.push(listener);
@@ -99,8 +110,11 @@ class Connection {
         });
 
         // listen for packets from radio
-        // we are doing this to get error info for a request id as it's not provided in the onRoutingPacket event
+        // we use this for some packets that don't have their own event listener
         connection.events.onFromRadio.subscribe((data) => {
+
+            // handle packets
+            // we are doing this to get error info for a request id as it's not provided in the onRoutingPacket event
             if(data.payloadVariant.case.toString() === "packet") {
                 const meshPacket = data.payloadVariant.value;
                 if(meshPacket.payloadVariant.case === "decoded"){
@@ -113,6 +127,17 @@ class Connection {
                     }
                 }
             }
+
+            // handle clientNotification
+            if(data.payloadVariant.case.toString() === "clientNotification") {
+                const clientNotification = data.payloadVariant.value;
+                for(const clientNotificationListener of this.clientNotificationListeners){
+                    try {
+                        clientNotificationListener(clientNotification);
+                    } catch(e){}
+                }
+            }
+
         });
 
         // listen for our node number
@@ -218,9 +243,7 @@ class Connection {
             for(const traceRouteListener of this.traceRouteListeners){
                 try {
                     traceRouteListener(data);
-                } catch(e) {
-                    // ignore error calling listener
-                }
+                } catch(e){}
             }
         });
 

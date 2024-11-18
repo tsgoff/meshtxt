@@ -91,6 +91,7 @@ export default {
 
         // listen for trace routes
         Connection.addTraceRouteListener(this.onTraceRoutePacket);
+        Connection.addClientNotificationListener(this.onClientNotification);
 
         // redirect to main page if node not found
         if(!this.node){
@@ -105,6 +106,7 @@ export default {
 
         // stop listening for trace routes
         Connection.removeTraceRouteListener(this.onTraceRoutePacket);
+        Connection.removeClientNotificationListener(this.onClientNotification);
 
     },
     beforeRouteLeave(to, from) {
@@ -152,6 +154,14 @@ export default {
                     traceRouteId: traceRoute.id,
                 },
             });
+        },
+        onClientNotification(clientNotification) {
+
+            // check if meshtastic device rate limited trace route
+            if(clientNotification.message === "TraceRoute can only be sent once every 30 seconds"){
+                this.isRunningTraceRoute = false;
+            }
+
         },
     },
     computed: {
