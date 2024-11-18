@@ -161,6 +161,16 @@ export default {
                 return;
             }
 
+            // don't allow sending messages longer than 200 characters
+            // I was able to send 245 characters to the radio without any error, but the sending times out
+            // to prevent the user from having to wait for this timeout, just hard limit to 200 for a faster response
+            const maxMessageLength = 200;
+            const messageLength = newMessageText.length;
+            if(messageLength > maxMessageLength){
+                alert(`Your message is too long. Please shorten it and try again. ${messageLength}/${maxMessageLength}.`)
+                return;
+            }
+
             // clear new message input
             this.newMessageText = "";
 
