@@ -11,56 +11,65 @@ if(process.env.NODE_ENV === 'development'){
     addRxPlugin(RxDBDevModePlugin);
 }
 
-// create a database
-// todo use a unique database name per node id
-const database = await createRxDatabase({
-    name: 'database',
-    storage: getRxStorageDexie(),
-});
+var database = null;
+async function initDatabase(nodeId) {
 
-// add database schemas
-await database.addCollections({
-    messages: {
-        schema: {
-            version: 0,
-            primaryKey: 'id',
-            type: 'object',
-            properties: {
-                id: {
-                    type: 'string',
-                    maxLength: 36,
+    // close any exsiting database connection
+    if(database){
+        await database.destroy();
+    }
+
+    // create a database with a unique name per node
+    database = await createRxDatabase({
+        name: `meshtxt_db_node_${nodeId}`,
+        storage: getRxStorageDexie(),
+    });
+
+    // add database schemas
+    await database.addCollections({
+        messages: {
+            schema: {
+                version: 0,
+                primaryKey: 'id',
+                type: 'object',
+                properties: {
+                    id: {
+                        type: 'string',
+                        maxLength: 36,
+                    },
+                    packet_id: {
+                        type: 'integer',
+                    },
+                    type: {
+                        type: 'string',
+                    },
+                    to: {
+                        type: 'integer',
+                    },
+                    from: {
+                        type: 'integer',
+                    },
+                    channel: {
+                        type: 'integer',
+                    },
+                    data: {
+                        type: 'string',
+                    },
+                    timestamp: {
+                        type: 'integer',
+                    },
+                    acked_by_node_id: {
+                        type: 'integer',
+                    },
+                    error: {
+                        type: 'string',
+                    },
                 },
-                packet_id: {
-                    type: 'integer',
-                },
-                type: {
-                    type: 'string',
-                },
-                to: {
-                    type: 'integer',
-                },
-                from: {
-                    type: 'integer',
-                },
-                channel: {
-                    type: 'integer',
-                },
-                data: {
-                    type: 'string',
-                },
-                timestamp: {
-                    type: 'integer',
-                },
-                acked_by_node_id: {
-                    type: 'integer',
-                },
-                error: {
-                    type: 'string',
-                },
-            },
-        }
-    },
-});
+            }
+        },
+    });
+
+}
 
 class Message {
 
@@ -211,5 +220,6 @@ class Message {
 }
 
 export default {
+    initDatabase,
     Message,
 };

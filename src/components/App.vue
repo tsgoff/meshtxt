@@ -1,7 +1,7 @@
 <template>
     <div class="w-full">
         <RouterView v-slot="{ Component, route }">
-            <KeepAlive>
+            <KeepAlive :key="GlobalState.keepAliveKey">
                 <Component :is="Component" :key="route.fullPath" />
             </KeepAlive>
         </RouterView>
@@ -10,6 +10,7 @@
 
 <script>
 import Connection from "../js/Connection.js";
+import GlobalState from "../js/GlobalState.js";
 
 export default {
     name: 'App',
@@ -22,6 +23,11 @@ export default {
     methods: {
         onClientNotification(clientNotification) {
             alert(clientNotification.message);
+        },
+    },
+    computed: {
+        GlobalState() {
+            return GlobalState;
         },
     },
 }

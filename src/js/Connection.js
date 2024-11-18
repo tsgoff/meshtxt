@@ -77,6 +77,12 @@ class Connection {
             return;
         }
 
+        // reset keep alive state. this forces kept alive pages such as MessageViewer to reset
+        // this allows them to be recreated with a new call to the "mounted" function, which sets up new database subscriptions
+        // without doing this, when the user opens the MessageViewer when a new database connection was created
+        // no events will be fired because the subscription is to a previously closed database instance
+        GlobalState.keepAliveKey++;
+
         // setup connection listeners
         await this.setupConnectionListeners(connection);
 
@@ -142,9 +148,10 @@ class Connection {
         });
 
         // listen for our node number
-        connection.events.onMyNodeInfo.subscribe((data) => {
+        connection.events.onMyNodeInfo.subscribe(async (data) => {
             console.log("onMyNodeInfo", data);
             GlobalState.myNodeId = data.myNodeNum;
+            await Database.initDatabase(GlobalState.myNodeId);
         });
 
         // listen for node info
