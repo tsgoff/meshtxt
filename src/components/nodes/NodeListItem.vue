@@ -123,7 +123,14 @@ export default {
     methods: {
         getNodeLongName: (nodeId) => NodeUtils.getNodeLongName(nodeId),
         formatUnixSecondsAgo(unixSeconds) {
-            return TimeUtils.getTimeAgoShortHand(moment.unix(unixSeconds).toDate());
+
+            // check if date is known
+            if(unixSeconds > 0){
+                return TimeUtils.getTimeAgoShortHand(moment.unix(unixSeconds).toDate());
+            }
+
+            return "Unknown";
+
         },
     },
     computed: {
