@@ -1,0 +1,140 @@
+<template>
+    <Page>
+
+        <!-- app bar -->
+        <AppBar title="TraceRoute" :subtitle="subtitle"/>
+
+        <!-- list -->
+        <div v-if="traceRoute" class="flex flex-col h-full w-full overflow-hidden">
+            <div class="overflow-y-auto">
+
+                <!-- details -->
+                <div class="p-2 bg-white">
+                    <ul role="list" class="space-y-3">
+
+                        <!-- node that initiated traceroute -->
+                        <li class="relative flex gap-x-4">
+                            <div class="absolute left-0 top-0 flex w-12 justify-center top-3 -bottom-3">
+                                <div class="w-px bg-gray-200"></div>
+                            </div>
+                            <div class="my-auto relative flex flex-none items-center justify-center">
+                                <div>
+                                    <NodeIcon :node="findNodeById(this.traceRoute.to)"/>
+                                </div>
+                            </div>
+                            <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
+                                <div class="font-medium text-gray-900">{{ getNodeLongName(this.traceRoute.to) || '???' }}</div>
+                                <div>{{ getNodeHexId(this.traceRoute.to) }}</div>
+                                <div>Started the traceroute</div>
+                            </div>
+                        </li>
+
+                        <!-- middleman nodes -->
+                        <li v-for="route of this.traceRoute.data.route" class="relative flex gap-x-4">
+                            <div class="absolute left-0 top-0 flex w-12 justify-center -bottom-3">
+                                <div class="w-px bg-gray-200"></div>
+                            </div>
+                            <div class="my-auto relative flex flex-none items-center justify-center">
+                                <div>
+                                    <NodeIcon :node="findNodeById(route)"/>
+                                </div>
+                            </div>
+                            <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
+                                <div class="font-medium text-gray-900">{{ getNodeLongName(route) || '???' }}</div>
+                                <div>{{ getNodeHexId(route) }}</div>
+                                <div>Forwarded the packet</div>
+                            </div>
+                        </li>
+
+                        <!-- node that replied to traceroute -->
+                        <li v-if="this.traceRoute.from" class="relative flex gap-x-4">
+                            <div class="absolute left-0 top-0 flex w-12 justify-center h-6">
+                                <div class="w-px bg-gray-200"></div>
+                            </div>
+                            <div class="my-auto relative flex flex-none items-center justify-center">
+                                <div>
+                                    <NodeIcon :node="findNodeById(this.traceRoute.from)"/>
+                                </div>
+                            </div>
+                            <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
+
+                                <div class="font-medium text-gray-900">{{ getNodeLongName(this.traceRoute.from) || '???' }}</div>
+                                <div>{{ getNodeHexId(this.traceRoute.from) }}</div>
+                                <div>Replied to traceroute</div>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </div>
+
+                <!-- raw data -->
+                <div>
+                    <div class="bg-gray-200 p-2 font-semibold">Raw Data</div>
+                    <div class="text-sm text-gray-700">
+                        <pre class="bg-white p-2 overflow-x-auto">{{ JSON.stringify(this.traceRoute, null, 4) }}</pre>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </Page>
+</template>
+
+<script>
+import GlobalState from "../../js/GlobalState.js";
+import AppBar from "../AppBar.vue";
+import Page from "./Page.vue";
+import NodeUtils from "../../js/NodeUtils.js";
+import NodeIcon from "../nodes/NodeIcon.vue";
+import moment from "moment";
+import ChannelUtils from "../../js/ChannelUtils.js";
+import TimeUtils from "../../js/TimeUtils.js";
+
+export default {
+    name: 'TraceRoutePage',
+    components: {
+        NodeIcon,
+        Page,
+        AppBar,
+    },
+    props: {
+        traceRouteId: String | Number,
+    },
+    mounted() {
+
+        // redirect to main page if trace route not found
+        if(!this.traceRoute){
+            this.$router.push({
+                name: "main",
+            });
+            return;
+        }
+
+    },
+    methods: {
+        getNodeHexId: (nodeId) => NodeUtils.getNodeHexId(nodeId),
+        getNodeLongName: (nodeId) => NodeUtils.getNodeLongName(nodeId),
+        findNodeById(nodeId){
+            return GlobalState.nodesById[nodeId];
+        },
+        getTimeAgo: (date) => TimeUtils.getTimeAgo(date),
+        getChannelName: (channelId) => {
+            return ChannelUtils.getChannelName(channelId) || `#${channelId}`;
+        },
+    },
+    computed: {
+        traceRoute() {
+            return GlobalState.traceRoutesById[this.traceRouteId];
+        },
+        subtitle() {
+            if(this.traceRoute){
+                return `${this.getTimeAgo(this.traceRoute.rxTime)} • ${this.traceRoute.data.route.length} hop(s) on channel ${this.getChannelName(this.traceRoute.channel)}`;
+            } else {
+                return `#${this.traceRouteId}`;
+            }
+        },
+    },
+}
+</script>

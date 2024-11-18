@@ -13,6 +13,7 @@ const globalState = reactive({
     channelsByIndex: {},
     nodesById: {},
     messages: [],
+    traceRoutesById: {},
 
 });
 

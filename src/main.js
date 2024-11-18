@@ -37,6 +37,18 @@ const router = createRouter({
             props: true,
             component: () => import("./components/pages/NodeMessagesPage.vue"),
         },
+        {
+            name: "node.traceroutes",
+            path: '/nodes/:nodeId/traceroutes',
+            props: true,
+            component: () => import("./components/pages/NodeTraceRoutesPage.vue"),
+        },
+        {
+            name: "traceroute",
+            path: '/traceroutes/:traceRouteId',
+            props: true,
+            component: () => import("./components/pages/TraceRoutePage.vue"),
+        },
     ],
 });
 

@@ -2,6 +2,10 @@ import moment from "moment";
 
 class TimeUtils {
 
+    static getTimeAgo(date) {
+        return moment(date).fromNow();
+    };
+
     static getTimeAgoShortHand(date) {
 
         // get duration between now and provided date

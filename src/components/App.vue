@@ -1,8 +1,8 @@
 <template>
     <div class="w-full">
-        <RouterView v-slot="{ Component }">
+        <RouterView v-slot="{ Component, route }">
             <KeepAlive>
-                <Component :is="Component" />
+                <Component :is="Component" :key="route.fullPath" />
             </KeepAlive>
         </RouterView>
     </div>

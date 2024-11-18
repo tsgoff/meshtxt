@@ -198,6 +198,13 @@ class Connection {
 
         });
 
+        // listen for trace routes
+        GlobalState.traceRoutesById = {};
+        connection.events.onTraceRoutePacket.subscribe((data) => {
+            console.log("onTraceRoutePacket", data);
+            GlobalState.traceRoutesById[data.id] = data;
+        });
+
     }
 
     static onPacketAck(requestId, ackedByNodeId) {

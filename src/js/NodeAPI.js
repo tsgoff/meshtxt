@@ -46,6 +46,10 @@ class NodeAPI {
         return await GlobalState.connection.removeNodeByNum(nodeId);
     }
 
+    static async traceRoute(nodeId) {
+        return await GlobalState.connection.traceRoute(nodeId);
+    }
+
 }
 
 export default NodeAPI;
