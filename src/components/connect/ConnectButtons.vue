@@ -59,7 +59,6 @@
         <div class="text-center text-gray-500 text-sm">HTTP requires a proxy to bypass CORS</div>
 
     </div>
-
 </template>
 
 <script>
