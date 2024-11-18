@@ -51,8 +51,8 @@
 
                 <!-- ignore result button -->
                 <div class="w-full">
-                    <button @click="onDismissClick" type="button" class="mx-auto flex cursor-pointer bg-white rounded shadow px-3 py-2 text-black font-semibold hover:bg-gray-100">
-                        Dismiss
+                    <button @click="onIgnoreResultClick" type="button" class="mx-auto flex cursor-pointer bg-white rounded shadow px-3 py-2 text-black font-semibold hover:bg-gray-100">
+                        Ignore Result
                     </button>
                 </div>
 
@@ -133,7 +133,7 @@ export default {
             await NodeAPI.traceRoute(node.num);
 
         },
-        onDismissClick() {
+        onIgnoreResultClick() {
             this.isRunningTraceRoute = false;
         },
         onTraceRoutePacket(data) {
