@@ -4,7 +4,7 @@
         <!-- app bar -->
         <AppBar title="Direct Messages" :subtitle="subtitle">
             <template v-slot:leading>
-                <NodeIcon v-if="node" :node="node" class="mr-3"/>
+                <NodeIcon v-if="node" :node-id="node.num" class="mr-3"/>
             </template>
             <template v-slot:trailing>
                 <IconButton v-if="node" @click="deleteMessageHistory" class="bg-transparent text-gray-500">

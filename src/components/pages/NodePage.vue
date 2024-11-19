@@ -4,7 +4,7 @@
         <!-- app bar -->
         <AppBar title="Node Info" :subtitle="subtitle">
             <template v-slot:leading>
-                <NodeIcon v-if="node" :node="node" class="mr-3"/>
+                <NodeIcon v-if="node" :node-id="node.num" class="mr-3"/>
             </template>
             <template v-slot:trailing>
                 <NodeDropDownMenu v-if="node" :node="node" @node-deleted="onNodeDeleted"/>

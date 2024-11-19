@@ -2,7 +2,7 @@
     <div class="flex cursor-pointer p-2 bg-white hover:bg-gray-50">
 
         <!-- icon -->
-        <NodeIcon :node="node" class="my-auto mr-2"/>
+        <NodeIcon :node-id="node.num" class="my-auto mr-2"/>
 
         <!-- name and info -->
         <div class="mr-auto">

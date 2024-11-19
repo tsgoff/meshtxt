@@ -4,7 +4,7 @@
         <!-- app bar -->
         <AppBar title="Trace Routes" :subtitle="subtitle">
             <template v-slot:leading>
-                <NodeIcon v-if="node" :node="node" class="mr-3"/>
+                <NodeIcon v-if="node" :node-id="node.num" class="mr-3"/>
             </template>
             <template v-slot:trailing>
                 <RouterLink v-if="node" :to="{ name: 'node.traceroutes.run', params: { nodeId: node.num }}">

@@ -19,7 +19,7 @@
                             </div>
                             <div class="my-auto relative flex flex-none items-center justify-center">
                                 <div>
-                                    <NodeIcon :node="findNodeById(traceRoute.to)"/>
+                                    <NodeIcon :node-id="traceRoute.to"/>
                                 </div>
                             </div>
                             <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
@@ -39,7 +39,7 @@
                             </div>
                             <div class="my-auto relative flex flex-none items-center justify-center">
                                 <div>
-                                    <NodeIcon :node="findNodeById(route)"/>
+                                    <NodeIcon :node-id="route"/>
                                 </div>
                             </div>
                             <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
@@ -59,7 +59,7 @@
                             </div>
                             <div class="my-auto relative flex flex-none items-center justify-center">
                                 <div>
-                                    <NodeIcon :node="findNodeById(traceRoute.from)"/>
+                                    <NodeIcon :node-id="traceRoute.from"/>
                                 </div>
                             </div>
                             <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">

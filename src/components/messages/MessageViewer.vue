@@ -10,9 +10,7 @@
 
                     <!-- inbound sender -->
                     <div v-if="isMessageInbound(message)" class="mr-2 mt-2">
-                        <div class="flex rounded-full h-12 w-12 text-white shadow" :style="{ backgroundColor: getNodeColour(message.from), color: getNodeTextColour(message.from)}">
-                            <div class="mx-auto my-auto drop-shadow-sm">{{ getNodeShortName(message.from) }}</div>
-                        </div>
+                        <NodeIcon :node-id="message.from"/>
                     </div>
 
                     <div class="flex flex-col" :class="{ 'items-end': isMessageOutbound(message), 'items-start': isMessageInbound(message) }">
@@ -113,9 +111,11 @@ import MessageUtils from "../../js/MessageUtils.js";
 import NodeUtils from "../../js/NodeUtils.js";
 import DeviceUtils from "../../js/DeviceUtils.js";
 import Database from "../../js/Database.js";
+import NodeIcon from "../nodes/NodeIcon.vue";
 
 export default {
     name: 'MessageViewer',
+    components: {NodeIcon},
     props: {
         type: String,
         channelId: Number,
