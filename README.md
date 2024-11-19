@@ -83,7 +83,7 @@ What does this mean? It means that it is possible to fetch packets from a `mesht
 
 This could be fixed by adding the correct CORS response in `meshtasticd` code, or you can alternatively use an HTTP reverse proxy that injects the required CORS headers in all responses.
 
-Here is an example config I use in my Caddy reverse proxy. Do note that I have omitted my TLS configuration.
+Here is an example config I use in my Caddy reverse proxy. Do note that I have omitted my TLS configuration and IP allow list.
 
 ```
 # Meshtastic - Liam's Pi Gateway
