@@ -117,6 +117,16 @@ meshtasticd.example.com {
 }
 ```
 
+## Contributing
+
+If you have a feature request, or find a bug, please [open an issue](https://github.com/liamcottle/meshtxt/issues) here on GitHub.
+
 ## License
 
 MIT
+
+## Legal
+
+This project is not affiliated with or endorsed by the Meshtastic project.
+
+The Meshtastic logo is the trademark of Meshtastic LLC.
