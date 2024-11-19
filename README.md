@@ -24,6 +24,7 @@ npm run dev
 - Show unread message indicators on channels
 - Add side drawer navigation
 - Save nodes to database and allow user to set a custom name/label for "anonymous" nodes
+- Add NodeJS server script to run directly on Pi and connect to meshtasticd over localhost
 
 ## CORS Proxy for HTTP Connections
 
