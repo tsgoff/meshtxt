@@ -65,6 +65,7 @@ node server.js --port 8080 --meshtastic-api-url https://127.0.0.1
 
 ## TODO
 
+- Delete message history
 - Add side drawer navigation
 - Show unread message indicators on channels
 - Save nodes to database and allow user to set a custom name/label for "anonymous" nodes
