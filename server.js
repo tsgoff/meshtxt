@@ -66,7 +66,7 @@ function main() {
         const chunks = [];
         req.on('data', (chunk) => chunks.push(chunk));
         req.on('end', () => {
-            req.rawBody = Buffer.concat(chunks); // Combine chunks into a single Buffer
+            req.rawBody = Buffer.concat(chunks);
             next();
         });
     });
