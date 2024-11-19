@@ -292,7 +292,12 @@ class Message {
 
     // delete direct messages for the provided node id
     static async deleteNodeMessages(nodeId) {
-        await this.getNodeMessages(nodeId).remove();
+        await this.getNodeMessages(parseInt(nodeId)).remove();
+    }
+
+    // delete broadcast messages for the provided channel id
+    static async deleteChannelMessages(channelId) {
+        await this.getChannelMessages(parseInt(channelId)).remove();
     }
 
 }
