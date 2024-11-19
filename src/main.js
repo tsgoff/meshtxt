@@ -21,6 +21,11 @@ const router = createRouter({
             component: () => import("./components/pages/ConnectPage.vue"),
         },
         {
+            name: "connect.http",
+            path: '/connect/http',
+            component: () => import("./components/pages/ConnectViaHttpPage.vue"),
+        },
+        {
             name: "channel.messages",
             path: '/channels/:channelId/messages',
             props: true,
