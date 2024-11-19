@@ -87,7 +87,7 @@ Now when you navigate to your `meshtasticd` web server, it will serve MeshTXT.
 
 **Running server.js**
 
-This approach allows you to run the original web client as-is, while running MeshTXT as a separate process.
+This approach allows you to run the original web client as-is, while running MeshTXT as a separate process on a different port.
 
 When running the server, `--meshtastic-api-url` should be pointed to the internal `meshtasticd` web server.
 
