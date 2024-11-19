@@ -33,6 +33,8 @@ npm run dev
 - Add side drawer navigation
 - Save nodes to database and allow user to set a custom name/label for "anonymous" nodes
 - Add NodeJS server script to run directly on Pi and connect to meshtasticd over localhost
+- Add a profile/node config page to allow user to quickly update node short/long name, and maybe set lora region
+- Add a full node settings page
 
 ## CORS Proxy for HTTP Connections
 
