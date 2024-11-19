@@ -150,6 +150,13 @@ class Connection {
             GlobalState.deviceStatus = deviceStatus;
         });
 
+        // listen for lora config
+        connection.events.onConfigPacket.subscribe((configPacket) => {
+            if(configPacket.payloadVariant.case.toString() === "lora"){
+                GlobalState.loraConfig = configPacket.payloadVariant.value;
+            }
+        });
+
         // listen for packets from radio
         // we use this for some packets that don't have their own event listener
         connection.events.onFromRadio.subscribe(async (data) => {

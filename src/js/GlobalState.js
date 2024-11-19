@@ -12,6 +12,7 @@ const globalState = reactive({
     myNodeId: null,
     myNodeUser: null,
 
+    loraConfig: null,
     channelsByIndex: {},
     nodesById: {},
 

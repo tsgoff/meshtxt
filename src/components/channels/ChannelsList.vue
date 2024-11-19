@@ -4,10 +4,7 @@
 
             <!-- channel info -->
             <div class="my-auto mr-auto">
-                <div>
-                    <span v-if="channel.settings.name.length > 0">{{ channel.settings.name }}</span>
-                    <span v-else class="text-gray-500 italic">(No Name)</span>
-                </div>
+                <div>{{ getChannelName(channel.index) }}</div>
                 <div class="text-sm text-gray-500">
                     <span v-if="channel.role === Protobuf.Channel.Channel_Role.PRIMARY">Primary Channel</span>
                     <span v-else-if="channel.role === Protobuf.Channel.Channel_Role.SECONDARY">Secondary Channel</span>
@@ -30,6 +27,7 @@ import {
     Protobuf,
 } from "@meshtastic/js";
 import ChannelPskBadge from "./ChannelPskBadge.vue";
+import ChannelUtils from "../../js/ChannelUtils.js";
 export default {
     name: 'ChannelsList',
     components: {ChannelPskBadge},
@@ -46,6 +44,7 @@ export default {
         };
     },
     methods: {
+        getChannelName: (channelId) => ChannelUtils.getChannelName(channelId),
         onChannelClick(channel) {
             this.$emit("channel-click", channel);
         },

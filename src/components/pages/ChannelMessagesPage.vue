@@ -29,6 +29,7 @@ import Page from "./Page.vue";
 import ChannelPskBadge from "../channels/ChannelPskBadge.vue";
 import IconButton from "../IconButton.vue";
 import Database from "../../js/Database.js";
+import ChannelUtils from "../../js/ChannelUtils.js";
 
 export default {
     name: 'ChannelMessagesPage',
@@ -54,6 +55,7 @@ export default {
 
     },
     methods: {
+        getChannelName: (channelId) => ChannelUtils.getChannelName(channelId),
         async deleteMessageHistory() {
 
             // confirm user wants to delete message history
@@ -71,7 +73,10 @@ export default {
             return GlobalState.channelsByIndex[this.channelId];
         },
         subtitle() {
-            return this.channel?.settings?.name || '(No Name)';
+            if(this.channel){
+                return this.getChannelName(this.channel.index);
+            }
+            return "Unknown Channel";
         },
     },
 }
