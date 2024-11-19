@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-import { createRouter, createWebHashHistory } from 'vue-router';
+import { createRouter, createMemoryHistory } from 'vue-router';
 import vClickOutside from "click-outside-vue3";
 import "./style.css";
 
@@ -8,7 +8,7 @@ import GlobalState from "./js/GlobalState.js";
 import {BleConnection, SerialConnection} from "@meshtastic/js";
 
 const router = createRouter({
-    history: createWebHashHistory(),
+    history: createMemoryHistory(),
     routes: [
         {
             name: "main",
