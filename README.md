@@ -21,6 +21,7 @@ A simple, mobile friendly, web based [Meshtastic](https://meshtastic.org/) clien
 - Display information about a specific node
 - Perform and visualise trace routes to other nodes
 - Saves messages and trace routes to database so they survive page reloads
+- Uses a unique database for each node you connect so message history is separated
 - Mark and unmark a node as a favourite
 - Filter nodes to only show favourites
 - Allows you to run a server directly from a meshtasticd (Linux Native) device
