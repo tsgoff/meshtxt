@@ -37,6 +37,39 @@ class NodeAPI {
     }
 
     /**
+     * Sets, or unsets the node as a favourite on the meshtastic device.
+     * @param nodeId the node id to set or unset as a favourite
+     * @param isFavourite whether the node should be a favourite or not
+     * @returns {Promise<*>}
+     */
+    static async setNodeAsFavourite(nodeId, isFavourite) {
+
+        // create admin message packet
+        var adminMessage = null;
+        if(isFavourite){
+            adminMessage = Protobuf.Admin.AdminMessage.fromJson({
+                setFavoriteNode: nodeId,
+            });
+        } else {
+            adminMessage = Protobuf.Admin.AdminMessage.fromJson({
+                removeFavoriteNode: nodeId,
+            });
+        }
+
+        // create packet data
+        const byteData = adminMessage.toBinary().buffer;
+        const portNum = Protobuf.Portnums.PortNum.ADMIN_APP;
+        const destination = GlobalState.myNodeId;
+        const channel = 0;
+        const wantAck = true;
+        const wantResponse = false;
+
+        // send packet
+        return await GlobalState.connection.sendPacket(byteData, portNum, destination, channel, wantAck, wantResponse);
+
+    }
+
+    /**
      * Removes the node from global state, and also tells the meshtastic device to remove the node.
      * @param nodeId the node id to remove
      * @returns {Promise<*>}

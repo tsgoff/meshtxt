@@ -25,6 +25,15 @@
                             <input type="radio" :checked="order === 'heard-recently'"/>
                             <div class="my-auto" :class="[ order === 'heard-recently' ? 'font-bold' : '' ]">Heard Recently</div>
                         </DropDownMenuItem>
+                        <div class="p-2 border-b text-sm font-bold">Filter</div>
+                        <DropDownMenuItem @click="filter = 'all'">
+                            <input type="radio" :checked="filter === 'all'"/>
+                            <div class="my-auto" :class="[ filter === 'all' ? 'font-bold' : '' ]">All</div>
+                        </DropDownMenuItem>
+                        <DropDownMenuItem @click="filter = 'favourites-only'">
+                            <input type="radio" :checked="filter === 'favourites-only'"/>
+                            <div class="my-auto" :class="[ filter === 'favourites-only' ? 'font-bold' : '' ]">Favourites Only</div>
+                        </DropDownMenuItem>
                     </template>
                 </DropDownMenu>
             </div>
@@ -62,6 +71,7 @@ export default {
     },
     data() {
         return {
+            filter: "all",
             order: "heard-recently",
             nodesSearchTerm: "",
         };
@@ -73,22 +83,33 @@ export default {
         onNodeClick(node) {
             this.$emit("node-click", node);
         },
-    },
-    computed: {
-        GlobalState() {
-            return GlobalState;
+        getNodesOrderedByName(nodes) {
+            // sort nodes by name asc (using a shallow copy to ensure it updates automatically)
+            return nodes.sort((nodeA, nodeB) => {
+                const nodeALongName = this.getNodeLongName(nodeA.num);
+                const nodeBLongName = this.getNodeLongName(nodeB.num);
+                return nodeALongName.localeCompare(nodeBLongName);
+            });
         },
-        orderedNodes() {
+        getNodesOrderedByLastHeard(nodes) {
+            // sort nodes by last heard desc (using a shallow copy to ensure it updates automatically)
+            return nodes.sort((nodeA, nodeB) => {
+                const nodeALastHeard = nodeA.lastHeard;
+                const nodeBLastHeard = nodeB.lastHeard;
+                return nodeBLastHeard - nodeALastHeard;
+            });
+        },
+        getOrderedNodes(nodes) {
 
             // get ordered nodes
             var orderedNodes = [];
             switch(this.order){
                 case "a-z": {
-                    orderedNodes = this.nodesOrderedByName;
+                    orderedNodes = this.getNodesOrderedByName(nodes);
                     break;
                 }
                 case "heard-recently": {
-                    orderedNodes = this.nodesOrderedByLastHeard;
+                    orderedNodes = this.getNodesOrderedByLastHeard(nodes);
                     break;
                 }
             }
@@ -109,24 +130,34 @@ export default {
             return orderedNodes;
 
         },
-        nodesOrderedByName() {
-            // sort nodes by name asc (using a shallow copy to ensure it updates automatically)
-            return [...this.nodes].sort((nodeA, nodeB) => {
-                const nodeALongName = this.getNodeLongName(nodeA.num);
-                const nodeBLongName = this.getNodeLongName(nodeB.num);
-                return nodeALongName.localeCompare(nodeBLongName);
-            });
+        getFilteredNodes(nodes) {
+
+            // filter by favourites only
+            if(this.filter === "favourites-only"){
+                return nodes.filter((node) => {
+                    return node.isFavorite;
+                });
+            }
+
+            // fallback to returning all nodes
+            return nodes;
+
         },
-        nodesOrderedByLastHeard() {
-            // sort nodes by last heard desc (using a shallow copy to ensure it updates automatically)
-            return [...this.nodes].sort((nodeA, nodeB) => {
-                const nodeALastHeard = nodeA.lastHeard;
-                const nodeBLastHeard = nodeB.lastHeard;
-                return nodeBLastHeard - nodeALastHeard;
-            });
+    },
+    computed: {
+        GlobalState() {
+            return GlobalState;
         },
         searchedNodes() {
-            return this.orderedNodes.filter((node) => {
+
+            // filter and sort nodes
+            var nodes = [...this.nodes];
+            nodes = this.getFilteredNodes(nodes);
+            nodes = this.getOrderedNodes(nodes);
+            nodes = nodes.filter((node) => node != null);
+
+            // search nodes
+            nodes = nodes.filter((node) => {
                 const search = this.nodesSearchTerm.toLowerCase();
                 const matchesId = node.num.toString().includes(search);
                 const matchesHexId = this.getNodeHexId(node.num).toLowerCase().includes(search);
@@ -134,6 +165,9 @@ export default {
                 const matchesLongName = this.getNodeLongName(node.num).toLowerCase().includes(search);
                 return matchesId || matchesHexId || matchesShortName || matchesLongName;
             });
+
+            return nodes;
+
         },
     },
 }
