@@ -73,11 +73,20 @@ class Connection {
     }
 
     static async connectViaHttp(address) {
+
+        // check if address is https
+        const isHttps = address.startsWith("https://");
+
+        // get address without http:// and https://
+        const [ _, addressWithoutScheme ] = address.split("://")
+
+        // connect
         await this.connect(new HttpConnection(), {
-            address: address,
+            address: addressWithoutScheme,
             fetchInterval: 1000,
-            tls: true,
+            tls: isHttps,
         });
+
     }
 
     static async connect(connection, connectionArgs) {

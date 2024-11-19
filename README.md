@@ -27,6 +27,24 @@ npm install
 npm run dev
 ```
 
+## Running with Meshtastic Linux Native
+
+If you have a Linux Native `meshtasticd` setup, you can install and run MeshTXT directly on the same hardware.
+
+When running the server, `--meshtastic-api-url` should be pointed to the internal `meshtasticd` web server.
+
+This runs an HTTP proxy internally to allow MeshTXT to access the `fromradio` and `toradio` APIs from the same origin, which will bypass CORS restrictions.
+
+It is up to you to roll your own HTTPS support if you want it. I generally put all of my internal HTTP servers behind Caddy, which provides automatic HTTPS on my external domains.
+
+```
+git clone https://github.com/liamcottle/meshtxt
+cd meshtxt
+npm install
+npm run build
+node server.js --port 8080 --meshtastic-api-url https://127.0.0.1
+```
+
 ## TODO
 
 - Show unread message indicators on channels

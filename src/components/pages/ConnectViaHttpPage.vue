@@ -10,7 +10,7 @@
             <!-- manually connect -->
             <div class="flex p-1 space-x-1 bg-white border-b border-gray-300">
                 <div class="w-full">
-                    <input v-model="newHttpConnectionAddress" type="text" placeholder="e.g: mesh.example.com" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                    <input v-model="newHttpConnectionAddress" type="text" placeholder="e.g: https://mesh.example.com" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                 </div>
                 <div class="flex h-full my-auto">
                     <button @click="connect(newHttpConnectionAddress)" type="button" class="bg-blue-500 text-white px-2 py-1 rounded shadow hover:bg-blue-400">
@@ -56,7 +56,7 @@ export default {
     },
     data() {
         return {
-            newHttpConnectionAddress: "",
+            newHttpConnectionAddress: window.location.origin,
             previousHttpConnectionAddresses: [],
         };
     },
@@ -68,6 +68,20 @@ export default {
 
             // do nothing if address not provided
             if(!address){
+                return;
+            }
+
+            // ensure address starts with https:// if user is browsing via https:// already
+            // the browser will not allow mixed content, so we won't be able to connect to http://
+            if(window.location.protocol === "https:" && !address.startsWith("https://")){
+                alert("Address must start with https:// when page is loaded over HTTPS");
+                return;
+            }
+
+            // ensure address starts with http:// or https://
+            // we can allow the user to connect over http:// if they aren't loading the page over https://
+            if(!address.startsWith("http://") && !address.startsWith("https://")){
+                alert("Address must start with http:// or https://");
                 return;
             }
 
