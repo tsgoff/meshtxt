@@ -106,6 +106,7 @@ node server.js --port 8080 --meshtastic-api-url https://127.0.0.1
 ## TODO
 
 - Delete message history
+- Pagination message history instead of loading all at once
 - Add side drawer navigation
 - Show unread message indicators on channels
 - Implement standalone "messages/inbox" page that shows conversations ordered by most recent message
