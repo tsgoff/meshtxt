@@ -2,6 +2,10 @@
 
 A simple, mobile friendly, web based Meshtastic client.
 
+|Nodes | Messages | Trace Routes |
+|:---:|:---:|:---:|
+|![](screenshots/3_nodes.png) | ![](screenshots/4_direct_messages.png) | ![](screenshots/5_trace_routes.png) |
+
 ## What can it do?
 
 - Connect to a Meshtastic device over Bluetooth, Serial and HTTP
