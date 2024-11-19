@@ -155,6 +155,10 @@ export default {
                 return;
             }
 
+            // pop this route off the stack
+            // we don't want the user to have to navigate out of the run page after leaving trace route result
+            this.$router.back();
+
             // go to trace route page
             this.$router.push({
                 name: "traceroute",
