@@ -23,6 +23,7 @@ npm run dev
 
 - Show unread message indicators on channels
 - Add side drawer navigation
+- Save nodes to database and allow user to set a custom name/label for "anonymous" nodes
 
 ## CORS Proxy for HTTP Connections
 
