@@ -225,7 +225,6 @@ class Connection {
             }
 
             // update last heard and hops away for the node we received packet from
-            console.log(`updating last heard for node ${fromNodeId} to ${rxTime}`);
             node.lastHeard = rxTime;
             node.hopsAway = hopsAway;
 
@@ -247,7 +246,6 @@ class Connection {
             }
 
             // update node user
-            console.log(`updating node user ${fromNodeId}`);
             node.user = user;
 
             // todo add new nodes if they don't already exist
