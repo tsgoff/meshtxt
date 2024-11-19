@@ -26,6 +26,8 @@ A simple, mobile friendly, web based [Meshtastic](https://meshtastic.org/) clien
 - Filter nodes to only show favourites
 - Allows you to run a server directly from a meshtasticd (Linux Native) device
 
+> Note: database state is saved in your browser, and is not shared across other browsers or devices. Maybe the server script could support a local SQLite database in the future.
+
 ## Is there a hosted version?
 
 Yes! I have a hosted web client available at https://meshtxt.liamcottle.net
