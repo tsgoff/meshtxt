@@ -272,15 +272,17 @@ export default {
             });
         },
         updateMessagesLastReadAt() {
+            if(this.type === "node"){
 
-            // do nothing if route is not active
-            if(!this.isActive){
-                return;
+                // do nothing if route is not active
+                if(!this.isActive){
+                    return;
+                }
+
+                // update last read at
+                Database.NodeMessagesReadState.touch(this.nodeId);
+
             }
-
-            // update last read at
-            Database.NodeMessagesReadState.touch(this.nodeId);
-
         },
     },
     computed: {
