@@ -73,6 +73,7 @@ node server.js --port 8080 --meshtastic-api-url https://127.0.0.1
 - Add a profile/node config page to allow user to quickly update node short/long name, and maybe set lora region
 - Add a full node settings page
 - Fix issue where some devices don't have an rx timestamp, or it's way out of sync
+- Fix issues where some newly received messages show as older in the list, due to the above issue
 
 ## CORS Proxy for HTTP Connections
 
