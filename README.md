@@ -23,6 +23,7 @@ A simple, mobile friendly, web based [Meshtastic](https://meshtastic.org/) clien
 - Saves messages and trace routes to database so they survive page reloads
 - Mark and unmark a node as a favourite
 - Filter nodes to only show favourites
+- Allows you to run a server directly from a meshtasticd (Linux Native) device
 
 ## Is there a hosted version?
 
@@ -63,15 +64,17 @@ node server.js --port 8080 --meshtastic-api-url https://127.0.0.1
 
 ## TODO
 
-- Show unread message indicators on channels
 - Add side drawer navigation
+- Show unread message indicators on channels
 - Save nodes to database and allow user to set a custom name/label for "anonymous" nodes
 - Add NodeJS server script to run directly on Pi and connect to meshtasticd over localhost
 - Add a profile/node config page to allow user to quickly update node short/long name, and maybe set lora region
 - Add a full node settings page
+- Fix issue where some devices don't have an rx timestamp, or it's way out of sync
 
 ## CORS Proxy for HTTP Connections
 
+> Note: this info was written before I wrote the [server.js](./server.js) script. You should probably use that instead.
 
 - The `/api/v1/fromradio` endpoint in `meshtasticd` works as expected.
 - The `/api/v1/toradio` endpoint in `meshtasticd` does not return an `OPTIONS` response.
