@@ -10,7 +10,9 @@
 
                     <!-- inbound sender -->
                     <div v-if="isMessageInbound(message)" class="mr-2 mt-2">
-                        <NodeIcon :node-id="message.from"/>
+                        <RouterLink :to="{ name: 'node', params: { nodeId: message.from }}">
+                            <NodeIcon :node-id="message.from"/>
+                        </RouterLink>
                     </div>
 
                     <div class="flex flex-col" :class="{ 'items-end': isMessageOutbound(message), 'items-start': isMessageInbound(message) }">
