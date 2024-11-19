@@ -10,7 +10,7 @@
             <!-- manually connect -->
             <div class="flex p-1 space-x-1 bg-white border-b border-gray-300">
                 <div class="w-full">
-                    <input v-model="newHttpConnectionAddress" type="text" placeholder="Address. e.g: meshtasticd.example.com" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                    <input v-model="newHttpConnectionAddress" type="text" placeholder="e.g: mesh.example.com" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                 </div>
                 <div class="flex h-full my-auto">
                     <button @click="connect(newHttpConnectionAddress)" type="button" class="bg-blue-500 text-white px-2 py-1 rounded shadow hover:bg-blue-400">
