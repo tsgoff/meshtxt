@@ -60,6 +60,9 @@ async function initDatabase(nodeId) {
                     timestamp: {
                         type: 'integer',
                     },
+                    rx_timestamp: {
+                        type: 'integer',
+                    },
                     acked_by_node_id: {
                         type: 'integer',
                     },
@@ -97,6 +100,9 @@ async function initDatabase(nodeId) {
                     timestamp: {
                         type: 'integer',
                     },
+                    rx_timestamp: {
+                        type: 'integer',
+                    },
                 },
             }
         },
@@ -132,7 +138,8 @@ class Message {
             from: data.from,
             channel: data.channel,
             data: data.data,
-            timestamp: data.rxTime.getTime(),
+            timestamp: Date.now(),
+            rx_timestamp: data.rxTime.getTime(),
             acked_by_node_id: null,
             error: null,
         });
@@ -296,7 +303,8 @@ class TraceRoute {
             from: data.from,
             channel: data.channel,
             data: data.data,
-            timestamp: data.rxTime.getTime(),
+            timestamp: Date.now(),
+            rx_timestamp: data.rxTime.getTime(),
         });
     }
 
