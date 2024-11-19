@@ -10,10 +10,10 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 
 const optionsList = [
     {
-        name: 'help',
-        alias: 'h',
+        name: "help",
+        alias: "h",
         type: Boolean,
-        description: 'Display this usage guide.'
+        description: "Display this usage guide."
     },
     {
         name: "port",
@@ -36,11 +36,11 @@ function main() {
     if(options.help){
         const usage = commandLineUsage([
             {
-                header: 'MeshTXT Server',
-                content: 'A server that hosts the MeshTXT Web UI and optionally runs a proxy to a Meshtastic devices HTTP API.',
+                header: "MeshTXT Server",
+                content: "A server that hosts the MeshTXT Web UI and optionally runs a proxy to a Meshtastic devices HTTP API.",
             },
             {
-                header: 'Options',
+                header: "Options",
                 optionList: optionsList,
             },
         ]);
@@ -64,21 +64,21 @@ function main() {
     // allow retrieving raw request body as buffer
     app.use((req, res, next) => {
         const chunks = [];
-        req.on('data', (chunk) => chunks.push(chunk));
-        req.on('end', () => {
+        req.on("data", (chunk) => chunks.push(chunk));
+        req.on("end", () => {
             req.rawBody = Buffer.concat(chunks);
             next();
         });
     });
 
     // serve vite app from /dist
-    app.use('/', express.static('./dist'));
+    app.use("/", express.static("./dist"));
 
     // setup proxy endpoints to meshtasticd if api url was provided
     if(meshtasticApiUrl !== ""){
 
         // proxy fromradio to meshtasticd to allow connecting to localhost to bypass cors
-        app.get('/api/v1/fromradio', async (req, res) => {
+        app.get("/api/v1/fromradio", async (req, res) => {
             try {
 
                 // proxy fromradio request to meshtasticd endpoint
@@ -97,11 +97,11 @@ function main() {
 
             } catch(e) {
                 console.error(`Proxy error: ${e.message}`);
-                res.status(502).send('Proxy Error');
+                res.status(502).send("Proxy Error");
             }
         });
 
-        app.put('/api/v1/toradio', async (req, res) => {
+        app.put("/api/v1/toradio", async (req, res) => {
             try {
 
                 // proxy toradio request to meshtasticd endpoint
@@ -125,7 +125,7 @@ function main() {
 
             } catch(e) {
                 console.error(`Proxy error: ${e.message}`);
-                res.status(502).send('Proxy Error');
+                res.status(502).send("Proxy Error");
             }
         });
 
