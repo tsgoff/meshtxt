@@ -113,8 +113,29 @@ class Connection {
             return;
         }
 
-        // disconnect and clear ui data
-        GlobalState.connection.disconnect();
+        // disconnect
+        if(GlobalState.connection instanceof HttpConnection){
+
+            // fixme: this should probably be fixed in @meshtastic/js directly
+            // calling disconnect() on an HttpConnection during the initial config fetching locks up the web page
+            // this is caused by an infinite loop of errors with the below message:
+            // ERROR	[iMeshDevice:HttpConnection]	ReadFromRadio ❌ signal is aborted without reason
+            // to fix this, we are calling the same internal methods that disconnect() does
+            // however, we are skipping the call to abortController.abort(), this reliably fixes the issue
+            // and no longer locks up the page, however we still get packet callbacks until the config phase finishes
+            // I don't really care if a few more packets come in after disconnecting
+            GlobalState.connection.updateDeviceStatus(Types.DeviceStatusEnum.DeviceDisconnected);
+            if(GlobalState.connection.readLoop){
+                clearInterval(GlobalState.connection.readLoop);
+                GlobalState.connection.complete();
+            }
+
+        } else {
+            // disconnect normally
+            GlobalState.connection.disconnect();
+        }
+
+        // update ui
         GlobalState.isConnected = false;
 
     }
