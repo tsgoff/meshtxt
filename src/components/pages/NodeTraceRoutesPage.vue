@@ -19,7 +19,8 @@
 
         <!-- list -->
         <div class="flex h-full w-full overflow-hidden">
-            <div class="w-full overflow-y-auto">
+
+            <div v-if="traceRoutes.length > 0" class="w-full overflow-y-auto">
                 <div v-for="traceRoute of traceRoutes">
                     <RouterLink :to="{ name: 'traceroute', params: { traceRouteId: traceRoute.id} }">
                         <div class="flex p-2 bg-white hover:bg-gray-50">
@@ -37,6 +38,20 @@
                     </RouterLink>
                 </div>
             </div>
+
+            <!-- empty state -->
+            <div v-else class="mx-auto my-auto">
+                <div class="flex flex-col mx-auto my-auto text-gray-700 text-center">
+                    <div class="mb-2 mx-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 256 256" class="size-10">
+                            <path d="M235.81,75.79A27.91,27.91,0,0,1,216,84a28.49,28.49,0,0,1-5.67-.58l-30.57,56.77,0,0a28,28,0,1,1-44.43,6.49l-26.06-26.06A28.07,28.07,0,0,1,96,124a28.41,28.41,0,0,1-5.67-.58L59.76,180.18l0,0a28,28,0,1,1-39.6,0h0a28,28,0,0,1,25.47-7.61l30.57-56.77,0,0a28.05,28.05,0,0,1,0-39.61h0a28,28,0,0,1,44.43,33.12l26.06,26.06a28.1,28.1,0,0,1,19-2.77l30.57-56.77,0,0a28,28,0,0,1,0-39.6h0a28,28,0,0,1,39.6,39.6Z"></path>
+                        </svg>
+                    </div>
+                    <div class="font-semibold">No Trace Routes</div>
+                    <div>Trace Routes show how messages make their way across the mesh to this node.</div>
+                </div>
+            </div>
+
         </div>
 
     </Page>
