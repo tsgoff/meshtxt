@@ -290,6 +290,11 @@ class Message {
         });
     }
 
+    // delete direct messages for the provided node id
+    static async deleteNodeMessages(nodeId) {
+        await this.getNodeMessages(nodeId).remove();
+    }
+
 }
 
 class TraceRoute {

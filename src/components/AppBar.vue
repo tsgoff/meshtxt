@@ -22,7 +22,7 @@
         </div>
 
         <!-- optional: trailing -->
-        <div class="my-auto mr-2">
+        <div class="flex my-auto mr-2">
             <slot name="trailing"/>
         </div>
 
