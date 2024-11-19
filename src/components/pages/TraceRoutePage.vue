@@ -27,6 +27,9 @@
                                 <div>{{ getNodeHexId(traceRoute.to) }}</div>
                                 <div>Started the traceroute</div>
                             </div>
+                            <div class="my-auto">
+                                <NodeDropDownMenu :node="findNodeById(traceRoute.to)"/>
+                            </div>
                         </li>
 
                         <!-- middleman nodes -->
@@ -43,6 +46,9 @@
                                 <div class="font-medium text-gray-900">{{ getNodeLongName(route) || '???' }}</div>
                                 <div>{{ getNodeHexId(route) }}</div>
                                 <div>Forwarded the packet</div>
+                            </div>
+                            <div class="my-auto">
+                                <NodeDropDownMenu :node="findNodeById(route)"/>
                             </div>
                         </li>
 
@@ -61,6 +67,9 @@
                                 <div class="font-medium text-gray-900">{{ getNodeLongName(traceRoute.from) || '???' }}</div>
                                 <div>{{ getNodeHexId(traceRoute.from) }}</div>
                                 <div>Replied to traceroute</div>
+                            </div>
+                            <div class="my-auto">
+                                <NodeDropDownMenu :node="findNodeById(traceRoute.from)"/>
                             </div>
                         </li>
 
@@ -92,10 +101,12 @@ import moment from "moment";
 import ChannelUtils from "../../js/ChannelUtils.js";
 import TimeUtils from "../../js/TimeUtils.js";
 import Database from "../../js/Database.js";
+import NodeDropDownMenu from "../nodes/NodeDropDownMenu.vue";
 
 export default {
     name: 'TraceRoutePage',
     components: {
+        NodeDropDownMenu,
         NodeIcon,
         Page,
         AppBar,
