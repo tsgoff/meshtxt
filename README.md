@@ -51,6 +51,44 @@ npm run dev
 
 If you have a Linux Native `meshtasticd` setup, you can install and run MeshTXT directly on the same hardware.
 
+There are a couple of options for doing this:
+
+- Changing `RootPath` in `/etc/meshtasticd/config.yaml` to point to MeshTXT instead of the bundled Web Client.
+- Running [server.js](./server.js) as a separate process.
+
+**Changing RootPath**
+
+This is the easiest approach, but it means you lose access to the bundled Meshtastic web client that comes with `meshtasticd`.
+
+If you'd like to do this, edit `/etc/meshtasticd/config.yaml` and update it to the following:
+
+```
+Webserver:
+  Port: 443
+  #RootPath: /usr/share/doc/meshtasticd/web
+  RootPath: /home/liamcottle/meshtxt/dist
+```
+
+> Note: make sure to update `/home/liamcottle/meshtxt/dist` to the `dist` folder where you cloned the repo.
+
+You'll also need to build the MeshTXT web app.
+
+```
+npm run build
+```
+
+Then make sure to restart the `meshtasticd` service.
+
+```
+service meshtasticd restart
+```
+
+Now when you navigate to your `meshtasticd` web server, it will serve MeshTXT.
+
+**Running server.js**
+
+This approach allows you to run the original web client as-is, while running MeshTXT as a separate process.
+
 When running the server, `--meshtastic-api-url` should be pointed to the internal `meshtasticd` web server.
 
 This runs an HTTP proxy internally to allow MeshTXT to access the `fromradio` and `toradio` APIs from the same origin, which will bypass CORS restrictions.
