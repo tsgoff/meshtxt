@@ -9,6 +9,10 @@ A simple, mobile friendly, web based Meshtastic client.
 - Send and receive direct messages with known nodes
 - Send and receive node info on demand with a specific node
 - Display information about a specific node
+- Perform and visualise trace routes to other nodes
+- Saves messages and trace routes to database so they survive page reloads
+- Mark and unmark a node as a favourite
+- Filter nodes to only show favourites
 
 ## Running Locally
 
