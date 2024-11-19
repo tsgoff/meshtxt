@@ -44,6 +44,14 @@
             </div>
         </div>
 
+        <!-- unread messages count -->
+        <div v-if="unreadMessagesCount > 0" class="my-auto">
+            <div class="inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 rounded-full shadow">
+                <span v-if="unreadMessagesCount >= 100">99</span>
+                <span>{{ unreadMessagesCount }}</span>
+            </div>
+        </div>
+
         <!-- favourite icon for other nodes -->
         <div v-if="node.num !== GlobalState.myNodeId" class="my-auto">
             <IconButton @click.stop="toggleFavouriteNode(node)" class="bg-transparent">
@@ -58,14 +66,6 @@
                     </svg>
                 </div>
             </IconButton>
-        </div>
-
-        <!-- unread messages count -->
-        <div v-if="unreadMessagesCount > 0" class="my-auto">
-            <div class="inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 rounded-full shadow">
-                <span v-if="unreadMessagesCount >= 100">99</span>
-                <span>{{ unreadMessagesCount }}</span>
-            </div>
         </div>
 
         <!-- our node battery level -->
