@@ -180,7 +180,7 @@ class Message {
         });
 
         // patch the message with the new acked by id
-        return await latestMessageByPacketId.patch({
+        return await latestMessageByPacketId.incrementalPatch({
             acked_by_node_id: ackedByNodeId,
         });
 
@@ -204,7 +204,7 @@ class Message {
         });
 
         // patch the message with the error
-        return await latestMessageByPacketId.patch({
+        return await latestMessageByPacketId.incrementalPatch({
             error: error,
         });
 
@@ -231,7 +231,7 @@ class Message {
         });
 
         // patch the message with the error
-        return await latestMessageByText.patch({
+        return await latestMessageByText.incrementalPatch({
             error: errorMessage,
         });
 
