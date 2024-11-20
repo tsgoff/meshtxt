@@ -1,6 +1,7 @@
 import GlobalState from "./GlobalState.js";
 import {BleConnection, Constants, HttpConnection, Protobuf, SerialConnection, Types,} from "@meshtastic/js";
 import Database from "./Database.js";
+import NodeAPI from "./NodeAPI.js";
 
 class Connection {
 
@@ -191,6 +192,8 @@ class Connection {
 
             await databaseToBeReady;
 
+            console.log("onFromRadio", data);
+
             // handle packets
             // we are doing this to get error info for a request id as it's not provided in the onRoutingPacket event
             if(data.payloadVariant.case.toString() === "packet") {
@@ -214,6 +217,23 @@ class Connection {
                         clientNotificationListener(clientNotification);
                     } catch(e){}
                 }
+            }
+
+            // handle config complete
+            if(data.payloadVariant.case.toString() === "configCompleteId"){
+
+                console.log("config complete");
+
+                // send current timestamp to meshtastic device
+                // this allows it to send us an semi accurate rx timestamp for packets when we connect later on
+                // if we don't set the time, the node may not know a time at all, in which case rxTime will be zero
+                // or, the node might have a timestamp, but its drifted out of sync
+                // so we will just send the node the current time each time we connect to it
+                try {
+                    const timestampInSeconds = Math.floor(Date.now() / 1000);
+                    await NodeAPI.setTime(timestampInSeconds);
+                } catch(e) {}
+
             }
 
         });

@@ -70,6 +70,31 @@ class NodeAPI {
     }
 
     /**
+     * Sets the provided timestamp as the current time on the meshtastic device.
+     * @param timestamp the timestamp in seconds to set as the current time
+     * @returns {Promise<*>}
+     */
+    static async setTime(timestamp) {
+
+        // create admin message packet
+        var adminMessage = Protobuf.Admin.AdminMessage.fromJson({
+            setTimeOnly: timestamp,
+        });
+
+        // create packet data
+        const byteData = adminMessage.toBinary().buffer;
+        const portNum = Protobuf.Portnums.PortNum.ADMIN_APP;
+        const destination = GlobalState.myNodeId;
+        const channel = 0;
+        const wantAck = true;
+        const wantResponse = false;
+
+        // send packet
+        return await GlobalState.connection.sendPacket(byteData, portNum, destination, channel, wantAck, wantResponse);
+
+    }
+
+    /**
      * Removes the node from global state, and also tells the meshtastic device to remove the node.
      * @param nodeId the node id to remove
      * @returns {Promise<*>}
