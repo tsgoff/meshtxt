@@ -114,6 +114,7 @@ node server.js --port 8080 --meshtastic-api-url https://127.0.0.1
 - Add a full node settings page
 - Fix issue where some devices don't have an rx timestamp, or it's way out of sync
 - Fix issues where some newly received messages show as older in the list, due to the above issue
+- Fix issue where opening message viewer a second time doesn't auto scroll to bottom of messages
 - Use an SQLite database when running from server.js to allow cross device message history sharing
 
 ## CORS Proxy for HTTP Connections
