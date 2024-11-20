@@ -107,7 +107,6 @@ node server.js --port 8080 --meshtastic-api-url https://127.0.0.1
 
 - Pagination message history instead of loading all at once
 - Add side drawer navigation
-- Show unread message indicators on channels
 - Implement standalone "messages/inbox" page that shows conversations ordered by most recent message
 - Save nodes to database and allow user to set a custom name/label for "anonymous" nodes
 - Add a profile/node config page to allow user to quickly update node short/long name, and maybe set lora region
