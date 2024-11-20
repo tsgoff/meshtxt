@@ -144,14 +144,42 @@ class Connection {
 
     static async setupConnectionListeners(connection) {
 
+        // weird way to allow us to lock all other callbacks from doing anything, until the database is ready...
+        // maybe we should use some sort of lock or mutex etc. basically, onMyNodeInfo is called with our node info
+        // we use this to create a new database instance that is unique based on the node id.
+        // initDatabase is async, which means all the other callbacks such as onChannelPacket are able to fire before the database is ready
+        // this means when we try to access the database when it isn't ready yet, we get fun errors...
+        // so we need to force the callbacks to wait until the database is ready
+        // we will just resolve this promise when the database is ready, and all the packet callbacks should be set to await it
+        var onDatabaseReady = null;
+        const databaseToBeReady = new Promise((resolve) => {
+            onDatabaseReady = resolve;
+        });
+
         // listen for device status changes
         connection.events.onDeviceStatus.subscribe((deviceStatus) => {
+
             console.log("onDeviceStatus", deviceStatus);
             GlobalState.deviceStatus = deviceStatus;
+
+            // check if device is now disconnected
+            if(deviceStatus === Types.DeviceStatusEnum.DeviceDisconnected){
+                this.disconnect();
+            }
+
+        });
+
+        // listen for our node number
+        connection.events.onMyNodeInfo.subscribe(async (data) => {
+            console.log("onMyNodeInfo", data);
+            GlobalState.myNodeId = data.myNodeNum;
+            await Database.initDatabase(GlobalState.myNodeId);
+            onDatabaseReady();
         });
 
         // listen for lora config
-        connection.events.onConfigPacket.subscribe((configPacket) => {
+        connection.events.onConfigPacket.subscribe(async (configPacket) => {
+            await databaseToBeReady;
             if(configPacket.payloadVariant.case.toString() === "lora"){
                 GlobalState.loraConfig = configPacket.payloadVariant.value;
             }
@@ -160,6 +188,8 @@ class Connection {
         // listen for packets from radio
         // we use this for some packets that don't have their own event listener
         connection.events.onFromRadio.subscribe(async (data) => {
+
+            await databaseToBeReady;
 
             // handle packets
             // we are doing this to get error info for a request id as it's not provided in the onRoutingPacket event
@@ -188,16 +218,11 @@ class Connection {
 
         });
 
-        // listen for our node number
-        connection.events.onMyNodeInfo.subscribe(async (data) => {
-            console.log("onMyNodeInfo", data);
-            GlobalState.myNodeId = data.myNodeNum;
-            await Database.initDatabase(GlobalState.myNodeId);
-        });
-
         // listen for node info
         GlobalState.nodesById = {};
-        connection.events.onNodeInfoPacket.subscribe((data) => {
+        connection.events.onNodeInfoPacket.subscribe(async (data) => {
+
+            await databaseToBeReady;
 
             console.log("onNodeInfoPacket", data);
 
@@ -212,7 +237,9 @@ class Connection {
         });
 
         // listen for mesh packets
-        connection.events.onMeshPacket.subscribe((data) => {
+        connection.events.onMeshPacket.subscribe(async (data) => {
+
+            await databaseToBeReady;
 
             console.log("onMeshPacket", data);
 
@@ -238,7 +265,9 @@ class Connection {
         });
 
         // listen for user info
-        connection.events.onUserPacket.subscribe((data) => {
+        connection.events.onUserPacket.subscribe(async (data) => {
+
+            await databaseToBeReady;
 
             console.log("onUserPacket", data);
 
@@ -261,13 +290,15 @@ class Connection {
 
         // listen for channels
         GlobalState.channelsByIndex = {};
-        connection.events.onChannelPacket.subscribe((data) => {
+        connection.events.onChannelPacket.subscribe(async (data) => {
+            await databaseToBeReady;
             console.log("onChannelPacket", data);
             GlobalState.channelsByIndex[data.index] = data;
         });
 
         // listen for new messages
         connection.events.onMessagePacket.subscribe(async (data) => {
+            await databaseToBeReady;
             console.log("onMessagePacket", data);
             await Database.Message.insert(data);
             for(const messageListener of this.messageListeners){
@@ -277,18 +308,9 @@ class Connection {
             }
         });
 
-        // listen for device status changes
-        connection.events.onDeviceStatus.subscribe((data) => {
-
-            // check if device is now disconnected
-            if(data === Types.DeviceStatusEnum.DeviceDisconnected){
-                this.disconnect();
-            }
-
-        });
-
         // listen for trace routes
         connection.events.onTraceRoutePacket.subscribe(async (data) => {
+            await databaseToBeReady;
             console.log("onTraceRoutePacket", data);
             await Database.TraceRoute.insert(data);
             for(const traceRouteListener of this.traceRouteListeners){

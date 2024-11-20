@@ -67,6 +67,9 @@ export default {
         },
     },
     computed: {
+        GlobalState() {
+            return GlobalState;
+        },
         isConnected() {
             return GlobalState.isConnected;
         },

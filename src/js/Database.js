@@ -122,6 +122,22 @@ async function initDatabase(nodeId) {
                 },
             }
         },
+        channel_messages_read_state: {
+            schema: {
+                version: 0,
+                primaryKey: 'id',
+                type: 'object',
+                properties: {
+                    id: {
+                        type: 'string',
+                        maxLength: 10,
+                    },
+                    timestamp: {
+                        type: 'integer',
+                    },
+                },
+            }
+        },
     });
 
 }
@@ -273,6 +289,23 @@ class Message {
         });
     }
 
+    // get unread broadcast messages count for the provided channel id
+    static getChannelMessagesUnreadCount(channelId, messagesLastReadTimestamp) {
+        return database.messages.count({
+            selector: {
+                timestamp: {
+                    $gt: messagesLastReadTimestamp,
+                },
+                to: {
+                    $eq: Constants.broadcastNum,
+                },
+                channel: {
+                    $eq: channelId,
+                },
+            },
+        });
+    }
+
     // get unread direct messages count for the provided node id
     static getNodeMessagesUnreadCount(nodeId, messagesLastReadTimestamp) {
         return database.messages.count({
@@ -389,9 +422,38 @@ class NodeMessagesReadState {
 
 }
 
+class ChannelMessagesReadState {
+
+    // update the read state of messages for the provided channel id
+    static async touch(channelId) {
+        return await database.channel_messages_read_state.upsert({
+            id: channelId.toString(),
+            timestamp: Date.now(),
+        });
+    }
+
+    // get the read state of messages for all channels
+    static getAll() {
+        return database.channel_messages_read_state.find();
+    }
+
+    // get the read state of messages for the provided channel id
+    static get(channelId) {
+        return database.channel_messages_read_state.findOne({
+            selector: {
+                id: {
+                    $eq: channelId.toString(),
+                },
+            },
+        });
+    }
+
+}
+
 export default {
     initDatabase,
     Message,
     TraceRoute,
     NodeMessagesReadState,
+    ChannelMessagesReadState,
 };

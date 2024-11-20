@@ -274,17 +274,21 @@ export default {
             });
         },
         updateMessagesLastReadAt() {
-            if(this.type === "node"){
 
-                // do nothing if route is not active
-                if(!this.isActive){
-                    return;
-                }
-
-                // update last read at
-                Database.NodeMessagesReadState.touch(this.nodeId);
-
+            // do nothing if route is not active
+            if(!this.isActive){
+                return;
             }
+
+            // check what type of messages we are viewing
+            if(this.type === "node"){
+                // update last read at for node messages
+                Database.NodeMessagesReadState.touch(this.nodeId);
+            } else if(this.type === "channel") {
+                // update last read at for channel messages
+                Database.ChannelMessagesReadState.touch(this.channelId);
+            }
+
         },
     },
     computed: {
