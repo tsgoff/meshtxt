@@ -192,8 +192,6 @@ class Connection {
 
             await databaseToBeReady;
 
-            console.log("onFromRadio", data);
-
             // handle packets
             // we are doing this to get error info for a request id as it's not provided in the onRoutingPacket event
             if(data.payloadVariant.case.toString() === "packet") {
