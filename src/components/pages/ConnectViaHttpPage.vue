@@ -56,7 +56,7 @@ export default {
     },
     data() {
         return {
-            newHttpConnectionAddress: window.location.origin,
+            newHttpConnectionAddress: "",
             previousHttpConnectionAddresses: [],
         };
     },
