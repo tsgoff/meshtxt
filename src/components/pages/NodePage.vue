@@ -53,6 +53,22 @@
                     </ul>
                 </div>
 
+                <!-- public key -->
+                <div>
+                    <div class="bg-gray-200 p-2 font-semibold">Public Key</div>
+                    <ul role="list" class="flex-1 divide-y divide-gray-200">
+
+                        <!-- id -->
+                        <li class="flex p-3">
+                            <div v-if="node.user?.publicKey != null && node.user.publicKey.length > 0" class="text-sm text-gray-700">{{
+                                    convertPublicKeyToBase64(node.user.publicKey)
+                                }}</div>
+                            <div v-else class="text-sm text-gray-700">Unknown</div>
+                        </li>
+
+                    </ul>
+                </div>
+
                 <!-- position -->
                 <div>
                     <div class="flex bg-gray-200 p-2 font-semibold">Position</div>
@@ -177,6 +193,7 @@ export default {
         getNodeHexId: (roleId) => NodeUtils.getNodeHexId(roleId),
         getRoleName: (roleId) => NodeUtils.getRoleName(roleId),
         getHardwareName: (roleId) => NodeUtils.getHardwareName(roleId),
+        convertPublicKeyToBase64: (publicKey) => NodeUtils.convertPublicKeyToBase64(publicKey),
         latLongIntegerToLatLong: (latLongInteger) => NodeUtils.latLongIntegerToLatLong(latLongInteger),
         formatUptimeSeconds: function(secondsToFormat) {
             secondsToFormat = Number(secondsToFormat);

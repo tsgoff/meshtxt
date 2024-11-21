@@ -49,6 +49,14 @@ class NodeUtils {
         return GlobalState.nodesById[nodeId]?.channel ?? 0;
     }
 
+    static convertPublicKeyToBase64(publicKey) {
+        let binary = "";
+        for(let i = 0; i < publicKey.length; i++){
+            binary += String.fromCharCode(publicKey[i]);
+        }
+        return btoa(binary);
+    }
+
     /**
      * Converts latitudeI or longitudeI to an actual lat/long value
      * e.g: -38123456 -> -38.123456
