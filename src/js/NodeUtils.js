@@ -3,6 +3,11 @@ import { Protobuf } from "@meshtastic/js";
 
 class NodeUtils {
 
+    static hasPublicKey(nodeId) {
+        const publicKey = GlobalState.nodesById[nodeId]?.user?.publicKey;
+        return publicKey != null && publicKey.length > 0;
+    }
+
     static getNodeHexId(nodeId) {
         return "!" + parseInt(nodeId).toString(16);
     }
