@@ -2,12 +2,24 @@ import GlobalState from "./GlobalState.js";
 import {BleConnection, Constants, HttpConnection, Protobuf, SerialConnection, Types,} from "@meshtastic/js";
 import Database from "./Database.js";
 import NodeAPI from "./NodeAPI.js";
+import PacketUtils from "./PacketUtils.js";
 
 class Connection {
 
+    static packetAckListeners = [];
     static clientNotificationListeners = [];
     static messageListeners = [];
     static traceRouteListeners = [];
+
+    static addPacketAckListener(listener) {
+        this.packetAckListeners.push(listener);
+    }
+
+    static removePacketAckListener(listenerToRemove) {
+        this.packetAckListeners = this.packetAckListeners.filter((listener) => {
+            return listener !== listenerToRemove;
+        });
+    }
 
     static addClientNotificationListener(listener) {
         this.clientNotificationListeners.push(listener);
@@ -202,7 +214,8 @@ class Connection {
                         // todo handle nack for "no channel" etc
                         const ackFrom = meshPacket.from;
                         const requestId = dataPacket.requestId;
-                        await this.onPacketAck(requestId, ackFrom);
+                        const hopsAway = PacketUtils.getPacketHops(meshPacket);
+                        await this.onPacketAck(requestId, ackFrom, hopsAway);
                     }
                 }
             }
@@ -340,9 +353,16 @@ class Connection {
 
     }
 
-    static async onPacketAck(requestId, ackedByNodeId) {
+    static async onPacketAck(requestId, ackedByNodeId, hopsAway) {
 
         console.log(`got ack for request id ${requestId} from ${ackedByNodeId}`);
+
+        // send to packet ack listeners
+        for(const packetAckListener of this.packetAckListeners){
+            try {
+                packetAckListener(requestId, ackedByNodeId, hopsAway);
+            } catch(e){}
+        }
 
         // todo make sure request id was for a message, otherwise we might be updating an older packet for something else
         await Database.Message.setMessageAckedByNodeId(requestId, ackedByNodeId);

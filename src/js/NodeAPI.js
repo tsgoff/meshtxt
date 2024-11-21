@@ -1,6 +1,7 @@
 import GlobalState from "./GlobalState.js";
 import { Constants, Protobuf } from "@meshtastic/js";
 import NodeUtils from "./NodeUtils.js";
+import Connection from "./Connection.js";
 
 class NodeAPI {
 
@@ -92,6 +93,96 @@ class NodeAPI {
         // send packet
         return await GlobalState.connection.sendPacket(byteData, portNum, destination, channel, wantAck, wantResponse);
 
+    }
+
+    /**
+     * Sends a PRIVATE_APP packet with no data to the provided node id and listens for an ack back from the destination node.
+     * Returns how long it took to receive an ack from the destination node, along with how many hops the response took to get to us.
+     * @returns {Promise<*>}
+     */
+    static async ping(nodeId, timeout = 30000) {
+        return new Promise(async (resolve, reject) => {
+
+            // remember the packet id and when we started the ping
+            var packetId = null;
+            var timestampStart = null;
+
+            // listen for packet acks
+            const packetIdAcks = [];
+            const packetAckListener = (requestId, ackedByNodeId, hopsAway) => {
+
+                // remember ack for request id
+                packetIdAcks.push({
+                    packet_id: requestId,
+                    acked_by_node_id: ackedByNodeId,
+                    hops_away: hopsAway,
+                });
+
+                // we received an ack, check if it's from the destination node
+                checkForAck();
+
+            };
+
+            function checkForAck() {
+
+                // check if we have a packet id yet
+                if(!packetId){
+                    return;
+                }
+
+                // determine how long the ping reply took (without overhead of ack packet lookup)
+                const durationMillis = Date.now() - timestampStart;
+
+                // find ack for packet id from destination node
+                const packetIdAck = packetIdAcks.find((packetIdAck) => {
+                    return packetIdAck.packet_id === packetId && packetIdAck.acked_by_node_id === nodeId;
+                });
+
+                // do nothing if ack not found
+                if(!packetIdAck){
+                    return;
+                }
+
+                // got ack from destination node
+                Connection.removePacketAckListener(packetAckListener);
+                resolve({
+                    duration_millis: durationMillis,
+                    hops_away: packetIdAck.hops_away,
+                });
+
+            }
+
+            // add packet listener
+            Connection.addPacketAckListener(packetAckListener);
+
+            // timeout after delay
+            setTimeout(() => {
+                Connection.removePacketAckListener(packetAckListener);
+                reject("timeout");
+            }, timeout);
+
+            // send ping packet
+            try {
+
+                // create packet data
+                const byteData = new Uint8Array([]).buffer;
+                const portNum = Protobuf.Portnums.PortNum.PRIVATE_APP;
+                const destination = nodeId;
+                const channel = NodeUtils.getNodeChannel(nodeId);
+                const wantAck = true;
+                const wantResponse = false;
+
+                // send packet
+                timestampStart = Date.now();
+                packetId = await GlobalState.connection.sendPacket(byteData, portNum, destination, channel, wantAck, wantResponse);
+                checkForAck();
+
+            } catch(e) {
+                Connection.removePacketAckListener(packetAckListener);
+                reject(e);
+            }
+
+        });
     }
 
     /**
