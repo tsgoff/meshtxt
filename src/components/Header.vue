@@ -3,9 +3,9 @@
         <div class="my-auto mr-2">
             <img src="/icon.png" class="size-12 rounded"/>
         </div>
-        <div class="my-auto mr-auto">
+        <div class="my-auto mr-auto overflow-hidden">
             <div class="font-bold">MeshTXT</div>
-            <div class="text-sm">
+            <div class="text-sm truncate">
 
                 <!-- disconnected -->
                 <span v-if="GlobalState.deviceStatus == null || GlobalState.deviceStatus === Types.DeviceStatusEnum.DeviceDisconnected">
