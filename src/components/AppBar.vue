@@ -16,13 +16,13 @@
         </div>
 
         <!-- title and subtitle -->
-        <div class="my-auto mr-auto">
+        <div class="my-auto mr-auto overflow-hidden">
             <div class="font-bold">{{ title }}</div>
-            <div v-if="subtitle != null" class="text-sm">{{ subtitle }}</div>
+            <div v-if="subtitle != null" class="text-sm truncate">{{ subtitle }}</div>
         </div>
 
         <!-- optional: trailing -->
-        <div class="flex my-auto mr-2">
+        <div class="flex my-auto mx-2">
             <slot name="trailing"/>
         </div>
 
