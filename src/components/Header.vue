@@ -5,7 +5,43 @@
         </div>
         <div class="my-auto mr-auto">
             <div class="font-bold">MeshTXT</div>
-            <div class="text-sm">Built by <a href="https://liamcottle.com" target="_blank" class="text-blue-600 hover:underline">Liam Cottle</a></div>
+            <div class="text-sm">
+
+                <!-- disconnected -->
+                <span v-if="GlobalState.deviceStatus == null || GlobalState.deviceStatus === Types.DeviceStatusEnum.DeviceDisconnected">
+                    Built by <a href="https://liamcottle.com" target="_blank" class="text-blue-600 hover:underline">Liam Cottle</a>
+                </span>
+
+                <!-- any other device state -->
+                <span v-else>
+
+                    <!-- restarting -->
+                    <span v-if="GlobalState.deviceStatus === Types.DeviceStatusEnum.DeviceRestarting" class="text-orange-500">
+                        Device Restarting...
+                    </span>
+
+                    <!-- connecting or reconnecting -->
+                    <span v-else-if="GlobalState.deviceStatus === Types.DeviceStatusEnum.DeviceConnecting || GlobalState.deviceStatus === Types.DeviceStatusEnum.DeviceReconnecting" class="text-orange-500">
+                        Device Connecting...
+                    </span>
+
+                    <!-- connected or configured -->
+                    <span v-else-if="GlobalState.deviceStatus === Types.DeviceStatusEnum.DeviceConnected || GlobalState.deviceStatus === Types.DeviceStatusEnum.DeviceConfigured">
+                        <span v-if="GlobalState.myNodeUser">[{{ GlobalState.myNodeUser.shortName }}] {{ GlobalState.myNodeUser.longName }}</span>
+                        <span v-else>Connected</span>
+                    </span>
+
+                    <!-- configuring -->
+                    <span v-else-if="GlobalState.deviceStatus === Types.DeviceStatusEnum.DeviceConfiguring" class="text-orange-500">
+                        Device Configuring...
+                    </span>
+
+                    <!-- unknown device state -->
+                    <span v-else class="text-orange-500">Device State: {{ GlobalState.deviceStatus }}</span>
+
+                </span>
+
+            </div>
         </div>
         <div class="my-auto flex font-semibold">
 
@@ -30,6 +66,7 @@
 <script>
 import GlobalState from "../js/GlobalState.js";
 import Connection from "../js/Connection.js";
+import { Types } from "@meshtastic/js";
 
 export default {
     name: 'Header',
@@ -41,6 +78,9 @@ export default {
     computed: {
         GlobalState() {
             return GlobalState;
+        },
+        Types() {
+            return Types;
         },
     },
 }
