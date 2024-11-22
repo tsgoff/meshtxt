@@ -51,7 +51,6 @@ import AppBar from "../AppBar.vue";
 import MessageViewer from "../messages/MessageViewer.vue";
 import NodeIcon from "../nodes/NodeIcon.vue";
 import Page from "./Page.vue";
-import IconButton from "../IconButton.vue";
 import NodeUtils from "../../js/NodeUtils.js";
 import NodeDropDownMenu from "../nodes/NodeDropDownMenu.vue";
 
@@ -59,7 +58,6 @@ export default {
     name: 'NodeMessagesPage',
     components: {
         NodeDropDownMenu,
-        IconButton,
         Page,
         NodeIcon,
         AppBar,

@@ -1,7 +1,7 @@
 <template>
-    <div class="cursor-pointer p-2 rounded-full hover:bg-gray-200">
+    <button type="button" class="p-2 rounded-full hover:bg-gray-200">
         <slot/>
-    </div>
+    </button>
 </template>
 
 <script>
