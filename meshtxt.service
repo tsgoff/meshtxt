@@ -1,0 +1,16 @@
+[Unit]
+Description=meshtxt
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+Group=root
+WorkingDirectory=/home/liamcottle/meshtxt
+ExecStart=/usr/bin/env node /home/liamcottle/meshtxt/server.js --port 80
+
+[Install]
+WantedBy=multi-user.target
