@@ -37,7 +37,7 @@ function main() {
         const usage = commandLineUsage([
             {
                 header: "MeshTXT Server",
-                content: "A server that hosts the MeshTXT Web UI and optionally runs a proxy to a Meshtastic devices HTTP API.",
+                content: "A server that hosts the MeshTXT Web UI and runs a proxy to a Meshtastic devices HTTP API.",
             },
             {
                 header: "Options",
@@ -50,7 +50,7 @@ function main() {
 
     // get options and fallback to default values
     const port = options["port"] ?? 8080;
-    const meshtasticApiUrl = options["meshtastic-api-url"] ?? "";
+    const meshtasticApiUrl = options["meshtastic-api-url"] ?? "https://localhost";
 
     // if provided, ensure meshtastic api url is http or https
     if(meshtasticApiUrl !== "" && !meshtasticApiUrl.startsWith("http://") && !meshtasticApiUrl.startsWith("https://")){
