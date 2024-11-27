@@ -19,9 +19,15 @@
                 </div>
             </div>
 
+            <!-- this device -->
+            <div class="bg-gray-200 p-2 font-semibold">This Device</div>
+            <div @click="connect(thisDeviceAddress)" class="flex cursor-pointer bg-white p-2 shadow hover:bg-gray-50 min-h-12">
+                <div class="my-auto">{{ thisDeviceAddress }}</div>
+            </div>
+
             <!-- connection history -->
             <div v-if="previousHttpConnectionAddresses.length > 0" class="bg-gray-200 p-2 font-semibold">Connection History</div>
-            <div @click="connect(address)" v-for="address of previousHttpConnectionAddresses" class="flex cursor-pointer bg-white p-2 shadow hover:bg-gray-50">
+            <div @click="connect(address)" v-for="address of previousHttpConnectionAddresses" class="flex cursor-pointer bg-white p-2 shadow hover:bg-gray-50 min-h-12">
                 <div class="my-auto mr-auto">{{ address }}</div>
                 <div class="my-auto">
                     <IconButton @click.stop="removePreviousHttpConnectionAddress(address)">
@@ -155,6 +161,11 @@ export default {
             // save to local storage
             this.setPreviousHttpConnectionAddresses(previousHttpConnectionAddresses);
 
+        },
+    },
+    computed: {
+        thisDeviceAddress() {
+            return window.location.origin;
         },
     },
 }
