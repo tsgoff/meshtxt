@@ -105,6 +105,19 @@ npm run build
 node server.js --port 8080 --meshtastic-api-url https://127.0.0.1
 ```
 
+**Systemd Service**
+
+A systemd service file is available and can be installed with the following commands:
+
+```
+sudo cp meshtxt.service /etc/systemd/system/meshtxt.service
+sudo systemctl enable meshtxt.service
+sudo systemctl start meshtxt.service
+sudo systemctl status meshtxt.service
+```
+
+> Note: Make sure to update the usernames in the service file if needed.
+
 ## TODO
 
 - Pagination message history instead of loading all at once
