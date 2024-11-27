@@ -7,6 +7,14 @@ class PacketUtils {
         return hopsAway;
     }
 
+    static uInt8ArrayToBase64(uInt8Array) {
+        let binary = "";
+        for(let i = 0; i < uInt8Array.length; i++){
+            binary += String.fromCharCode(uInt8Array[i]);
+        }
+        return btoa(binary);
+    }
+
 }
 
 export default PacketUtils;

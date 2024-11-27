@@ -1,5 +1,6 @@
 import GlobalState from "./GlobalState.js";
 import { Protobuf } from "@meshtastic/js";
+import PacketUtils from "./PacketUtils.js";
 
 class NodeUtils {
 
@@ -55,11 +56,7 @@ class NodeUtils {
     }
 
     static convertPublicKeyToBase64(publicKey) {
-        let binary = "";
-        for(let i = 0; i < publicKey.length; i++){
-            binary += String.fromCharCode(publicKey[i]);
-        }
-        return btoa(binary);
+        return PacketUtils.uInt8ArrayToBase64(publicKey);
     }
 
     /**

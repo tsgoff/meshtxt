@@ -6,10 +6,21 @@ import PacketUtils from "./PacketUtils.js";
 
 class Connection {
 
+    static meshPacketListeners = [];
     static packetAckListeners = [];
     static clientNotificationListeners = [];
     static messageListeners = [];
     static traceRouteListeners = [];
+
+    static addMeshPacketListener(listener) {
+        this.meshPacketListeners.push(listener);
+    }
+
+    static removeMeshPacketListener(listenerToRemove) {
+        this.meshPacketListeners = this.meshPacketListeners.filter((listener) => {
+            return listener !== listenerToRemove;
+        });
+    }
 
     static addPacketAckListener(listener) {
         this.packetAckListeners.push(listener);
@@ -273,6 +284,15 @@ class Connection {
             await databaseToBeReady;
 
             console.log("onMeshPacket", data);
+
+            // pass mesh packet to all mesh packet listeners
+            for(const meshPacketListener of this.meshPacketListeners){
+                try {
+                    meshPacketListener(data);
+                } catch(e) {
+                    console.log(e);
+                }
+            }
 
             // get packet data
             const rxTime = data.rxTime;

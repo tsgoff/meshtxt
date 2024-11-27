@@ -2,6 +2,8 @@ import GlobalState from "./GlobalState.js";
 import { Constants, Protobuf } from "@meshtastic/js";
 import NodeUtils from "./NodeUtils.js";
 import Connection from "./Connection.js";
+import ChannelUtils from "./ChannelUtils.js";
+import PacketUtils from "./PacketUtils.js";
 
 class NodeAPI {
 
@@ -89,6 +91,26 @@ class NodeAPI {
         const channel = 0;
         const wantAck = true;
         const wantResponse = false;
+
+        // send packet
+        return await GlobalState.connection.sendPacket(byteData, portNum, destination, channel, wantAck, wantResponse);
+
+    }
+
+    static async getOwnerRequest() {
+
+        // create admin message packet
+        const adminMessage = Protobuf.Admin.AdminMessage.fromJson({
+            getOwnerRequest: true,
+        });
+
+        // create packet data
+        const byteData = adminMessage.toBinary().buffer;
+        const portNum = Protobuf.Portnums.PortNum.ADMIN_APP;
+        const destination = GlobalState.myNodeId;
+        const channel = 0;
+        const wantAck = true;
+        const wantResponse = true;
 
         // send packet
         return await GlobalState.connection.sendPacket(byteData, portNum, destination, channel, wantAck, wantResponse);
@@ -197,6 +219,157 @@ class NodeAPI {
 
     static async traceRoute(nodeId) {
         return await GlobalState.connection.traceRoute(nodeId);
+    }
+
+    static generatePacketId() {
+        return GlobalState.connection.generateRandId();
+    }
+
+    /**
+     * this function exists because @meshtastic/js sendPacket function doesn't expose a way to provide our own packet id
+     * we want to get the packet id before the packet is sent to allow us to listen for responses and errors
+     * @param id an optional custom packet id to use
+     * @param data payload data to send
+     * @param portNum meshtastic portnum we are sending to
+     * @param destination id of the destination node to send to
+     * @param channel id of the channel to send to
+     * @param wantAck if we want an ack from the destination
+     * @param wantResponse if we want the destination to send us a response
+     * @returns {Promise<*>}
+     */
+    static async sendPacket(id, data, portNum, destination, channel, wantAck, wantResponse) {
+
+        // use provided packet id, otherwise generate one
+        const packetId = id ?? this.generatePacketId();
+
+        // create to radio message
+        const toRadioMessage = Protobuf.Mesh.ToRadio.fromJson({
+            packet: {
+                id: packetId,
+                to: destination,
+                from: GlobalState.myNodeId,
+                channel: channel,
+                wantAck: wantAck,
+                decoded: {
+                    portnum: portNum,
+                    payload: PacketUtils.uInt8ArrayToBase64(data),
+                    wantResponse: wantResponse,
+                },
+            },
+        });
+
+        return await GlobalState.connection.sendRaw(toRadioMessage.toBinary(), packetId);
+
+    }
+
+    /**
+     * Sends an AdminMessage to the provided node id, and waits for a response, or timeouts out after the provided delay
+     * @param nodeId the node id to send the admin message to
+     * @param adminMessage the AdminMessage to send
+     * @param wantResponse if we want the destination to send us a response
+     * @param timeoutMillis how long to wait before timing out
+     * @returns {Promise<unknown>}
+     */
+    static async sendAdminPacketAndWaitForResponse(nodeId, adminMessage, wantResponse = true, timeoutMillis = 15000) {
+        var timeout = null;
+        var responseMeshPacketListener = null;
+        return new Promise(async (resolve, reject) => {
+            try {
+
+                // create packet data
+                const id = this.generatePacketId();
+                const byteData = adminMessage.toBinary();
+                const portNum = Protobuf.Portnums.PortNum.ADMIN_APP;
+                const destination = parseInt(nodeId);
+                const channel = ChannelUtils.getAdminChannelIndex(nodeId);
+                const wantAck = true; // always want ack, otherwise node doesn't send the packet on lora
+
+                // handle response packet
+                responseMeshPacketListener = (meshPacket) => {
+
+                    // ignore packet if not decoded
+                    if(meshPacket.payloadVariant.case !== "decoded"){
+                        return;
+                    }
+
+                    // ignore packet if it's not for our request
+                    const requestId = meshPacket.payloadVariant.value.requestId;
+                    if(requestId !== id){
+                        return;
+                    }
+
+                    // we have response, so we no longer want to time out
+                    clearTimeout(timeout);
+
+                    // stop listening for mesh packets
+                    Connection.removeMeshPacketListener(responseMeshPacketListener);
+
+                    // parse admin response message
+                    const adminResponseMessage = Protobuf.Admin.AdminMessage.fromBinary(meshPacket.payloadVariant.value.payload);
+
+                    // resolve promise
+                    resolve(adminResponseMessage);
+
+                };
+
+                // timeout after configured delay
+                timeout = setTimeout(() => {
+                    Connection.removeMeshPacketListener(responseMeshPacketListener);
+                    reject("timeout");
+                }, timeoutMillis);
+
+                // listen for response packets
+                Connection.addMeshPacketListener(responseMeshPacketListener);
+
+                // send packet
+                await this.sendPacket(id, byteData, portNum, destination, channel, wantAck, wantResponse);
+
+            } catch(e) {
+                clearTimeout(timeout);
+                Connection.removeMeshPacketListener(responseMeshPacketListener);
+                reject(e);
+            }
+        });
+    }
+
+    /**
+     * Sends an admin request to get the owner of the provided node id
+     * @param nodeId
+     * @param timeoutMillis
+     * @returns {Promise<*>}
+     */
+    static async remoteAdminGetOwner(nodeId, timeoutMillis) {
+
+        // create admin message packet
+        const adminMessageRequest = Protobuf.Admin.AdminMessage.fromJson({
+            getOwnerRequest: true,
+        });
+
+        // send packet and wait for response
+        const adminMessageResponse = await this.sendAdminPacketAndWaitForResponse(nodeId, adminMessageRequest, true, timeoutMillis);
+
+        // return user from admin response
+        return adminMessageResponse.payloadVariant.value;
+
+    }
+
+    /**
+     * Sends an admin request to set the owner of the provided node id
+     * @param nodeId
+     * @param user
+     * @param timeoutMillis
+     * @returns {Promise<void>}
+     */
+    static async remoteAdminSetOwner(nodeId, user, timeoutMillis) {
+
+        // create admin message packet
+        const adminMessageRequest = Protobuf.Admin.AdminMessage.fromJson({
+            setOwner: user.toJson(),
+        });
+
+        // send packet and wait for response
+        await this.sendAdminPacketAndWaitForResponse(nodeId, adminMessageRequest, false, timeoutMillis);
+
     }
 
 }

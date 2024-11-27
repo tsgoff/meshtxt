@@ -1,7 +1,11 @@
 import GlobalState from "./GlobalState.js";
 import {Protobuf} from "@meshtastic/js";
+import NodeUtils from "./NodeUtils.js";
 
 class ChannelUtils {
+
+    // channel index used for private key cryptography packets
+    static PKC_CHANNEL_INDEX = 8;
 
     // https://github.com/meshtastic/firmware/blob/2b0113ae82f2dc5cde82e5c00921d41d10ac141d/src/mesh/Channels.cpp#L294
     static getChannelName(channelId) {
@@ -57,6 +61,39 @@ class ChannelUtils {
 
         // channel is a default channel if it is using the default key and default display name
         return hasDefaultPsk && hasDefaultDisplayName;
+
+    }
+
+    static getAdminChannelIndex(nodeId) {
+
+        // ensure node id is numeric
+        nodeId = parseInt(nodeId);
+
+        // always use channel 0 when sending admin packets to self
+        if(nodeId === GlobalState.myNodeId){
+            return 0;
+        }
+
+        // use pkc channel if our node and remote node both have pkc keys available
+        const myNodeHasPkc = NodeUtils.hasPublicKey(GlobalState.myNodeId);
+        const remoteNodeHasPkc = NodeUtils.hasPublicKey(nodeId);
+        if(myNodeHasPkc && remoteNodeHasPkc){
+            return ChannelUtils.PKC_CHANNEL_INDEX;
+        }
+
+        // find channel with the name "admin" (case-insensitive)
+        const adminChannel = Object.values(GlobalState.channelsByIndex).find((channel) => {
+            const channelName = ChannelUtils.getChannelName(channel.index);
+            return channelName?.toLowerCase() === "admin";
+        });
+
+        // use admin channel if available
+        if(adminChannel){
+            return adminChannel.index;
+        }
+
+        // fallback to channel index 0
+        return 0;
 
     }
 
