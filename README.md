@@ -89,9 +89,11 @@ Now when you navigate to your `meshtasticd` web server, it will serve MeshTXT.
 
 This approach allows you to run the original web client as-is, while running MeshTXT as a separate process on a different port.
 
-When running the server, `--meshtastic-api-url` should be pointed to the internal `meshtasticd` web server.
+When running the server, it will automatically proxy `fromradio` and `toradio` requests to the internal `meshtasticd` web server as well as serve the MeshTXT web UI.
 
-This runs an HTTP proxy internally to allow MeshTXT to access the `fromradio` and `toradio` APIs from the same origin, which will bypass CORS restrictions.
+The server needs to run an HTTP proxy internally to allow the MeshTXT web UI to access the `fromradio` and `toradio` APIs from the same origin. This is important to bypass CORS restrictions in web browsers.
+
+If you want to proxy to a `meshtasticd` instance on another device, you can use the `--meshtastic-api-url` flag as shown in the example further down.
 
 It is up to you to roll your own HTTPS support if you want it. I generally put all of my internal HTTP servers behind Caddy, which provides automatic HTTPS on my external domains.
 
