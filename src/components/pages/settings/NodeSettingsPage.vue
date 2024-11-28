@@ -19,7 +19,7 @@ import Page from "../Page.vue";
 import AppBar from "../../AppBar.vue";
 import GlobalState from "../../../js/GlobalState.js";
 import NodeUtils from "../../../js/NodeUtils.js";
-import SettingsList from "./SettingsList.vue";
+import SettingsList from "./NodeSettingsList.vue";
 import NodeIcon from "../../nodes/NodeIcon.vue";
 
 export default {

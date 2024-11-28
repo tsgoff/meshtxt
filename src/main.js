@@ -65,13 +65,13 @@ const router = createRouter({
             name: "settings",
             path: '/settings/:nodeId',
             props: true,
-            component: () => import("./components/pages/settings/SettingsPage.vue"),
+            component: () => import("./components/pages/settings/NodeSettingsPage.vue"),
         },
         {
             name: "settings.user",
             path: '/settings/:nodeId/user',
             props: true,
-            component: () => import("./components/pages/settings/UserSettingsPage.vue"),
+            component: () => import("./components/pages/settings/NodeUserSettingsPage.vue"),
         },
     ],
 });
