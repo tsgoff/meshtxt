@@ -124,8 +124,7 @@ sudo systemctl status meshtxt.service
 - Add side drawer navigation
 - Implement standalone "messages/inbox" page that shows conversations ordered by most recent message
 - Save nodes to database and allow user to set a custom name/label for "anonymous" nodes
-- Add a profile/node config page to allow user to quickly update node short/long name, and maybe set lora region
-- Add a full node settings page
+- Add lora region, frequency and modem preset settings page
 - Fix issue where opening message viewer a second time doesn't auto scroll to bottom of messages
 - Use an SQLite database when running from server.js to allow cross device message history sharing
 
