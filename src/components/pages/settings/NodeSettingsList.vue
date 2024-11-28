@@ -13,11 +13,11 @@
                 <div class="text-sm text-gray-500">{{ getNodeHexId(nodeId) }} / {{ nodeId }}</div>
             </div>
 
-            <div class="flex flex-col divide-y">
+            <div class="flex flex-col">
 
                 <!-- user -->
                 <RouterLink :to="{ name: 'node.settings.user', params: { nodeId: nodeId } }">
-                    <div class="flex cursor-pointer px-2 py-3 bg-white hover:bg-gray-50">
+                    <div class="flex cursor-pointer px-2 py-3 bg-white hover:bg-gray-50 border-b">
 
                         <!-- leading -->
                         <div class="my-auto ml-2 mr-4 text-gray-500">
@@ -63,6 +63,27 @@
                     </div>
                 </RouterLink>
 
+                <div @click="reboot(nodeId)" class="mt-4 flex cursor-pointer px-2 py-3 bg-white hover:bg-gray-50">
+
+                    <!-- leading -->
+                    <div class="my-auto ml-2 mr-4 text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1 0 12.728 0M12 3v9" />
+                        </svg>
+                    </div>
+
+                    <!-- title -->
+                    <div class="my-auto mr-auto">Reboot</div>
+
+                    <!-- trailing -->
+                    <div class="my-auto mr-2 text-gray-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                        </svg>
+                    </div>
+
+                </div>
+
             </div>
 
         </div>
@@ -72,6 +93,8 @@
 <script>
 import GlobalState from "../../../js/GlobalState.js";
 import NodeUtils from "../../../js/NodeUtils.js";
+import NodeAPI from "../../../js/NodeAPI.js";
+import DialogUtils from "../../../js/DialogUtils.js";
 
 export default {
     name: 'SettingsList',
@@ -84,6 +107,21 @@ export default {
         getNodeLongName: (nodeId) => NodeUtils.getNodeLongName(nodeId),
         getNodeColour: (nodeId) => NodeUtils.getNodeColour(nodeId),
         getNodeTextColour: (nodeId) => NodeUtils.getNodeTextColour(nodeId),
+        async reboot(nodeId) {
+
+            // confirm user wants to reboot node
+            if(!confirm("Are you sure you want to reboot this node?")){
+                return;
+            }
+
+            try {
+                await NodeAPI.remoteAdminReboot(nodeId);
+                alert("Node has been asked to reboot!");
+            } catch(e) {
+                DialogUtils.showErrorAlert(e);
+            }
+
+        },
     },
     computed: {
         GlobalState() {

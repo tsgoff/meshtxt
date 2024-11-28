@@ -464,6 +464,23 @@ class NodeAPI {
 
     }
 
+    /**
+     * Sends an admin request to reboot the provided node id
+     * @param nodeId
+     * @returns {Promise<*>}
+     */
+    static async remoteAdminReboot(nodeId) {
+
+        // create admin message packet
+        const adminMessageRequest = Protobuf.Admin.AdminMessage.fromJson({
+            rebootSeconds: 5,
+        });
+
+        // send packet and wait for response
+        await this.sendAdminPacketAndWaitForResponse(nodeId, adminMessageRequest, false);
+
+    }
+
 }
 
 export default NodeAPI;
