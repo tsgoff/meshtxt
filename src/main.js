@@ -44,6 +44,18 @@ const router = createRouter({
             component: () => import("./components/pages/NodeMessagesPage.vue"),
         },
         {
+            name: "node.settings",
+            path: '/nodes/:nodeId/settings',
+            props: true,
+            component: () => import("./components/pages/settings/NodeSettingsPage.vue"),
+        },
+        {
+            name: "node.settings.user",
+            path: '/nodes/:nodeId/settings/user',
+            props: true,
+            component: () => import("./components/pages/settings/NodeUserSettingsPage.vue"),
+        },
+        {
             name: "node.traceroutes",
             path: '/nodes/:nodeId/traceroutes',
             props: true,
@@ -60,18 +72,6 @@ const router = createRouter({
             path: '/traceroutes/:traceRouteId',
             props: true,
             component: () => import("./components/pages/TraceRoutePage.vue"),
-        },
-        {
-            name: "node.settings",
-            path: '/nodes/:nodeId/settings',
-            props: true,
-            component: () => import("./components/pages/settings/NodeSettingsPage.vue"),
-        },
-        {
-            name: "node.settings.user",
-            path: '/nodes/:nodeId/settings/user',
-            props: true,
-            component: () => import("./components/pages/settings/NodeUserSettingsPage.vue"),
         },
     ],
 });
