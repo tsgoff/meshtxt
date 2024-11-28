@@ -9,7 +9,7 @@
                 <div v-for="message of messagesReversed" :key="message.id" class="flex max-w-xl mt-3" :class="{ 'ml-auto pl-4 md:pl-16': isMessageOutbound(message), 'mr-auto pr-4 md:pr-16': isMessageInbound(message) }">
 
                     <!-- inbound sender -->
-                    <div v-if="isMessageInbound(message)" class="mr-2 mt-2">
+                    <div v-if="isMessageInbound(message) && type === 'channel'" class="mr-2 mt-2">
                         <RouterLink :to="{ name: 'node', params: { nodeId: message.from }}">
                             <NodeIcon :node-id="message.from"/>
                         </RouterLink>
