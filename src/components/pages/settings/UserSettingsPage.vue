@@ -41,15 +41,25 @@
 
         <!-- failed to load -->
         <div v-else class="mx-auto my-auto p-2">
+
+            <!-- info -->
             <div class="flex flex-col mx-auto my-auto text-gray-700 text-center">
                 <div class="mb-2 mx-auto">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 256 256" class="size-10">
-                        <path d="M235.81,75.79A27.91,27.91,0,0,1,216,84a28.49,28.49,0,0,1-5.67-.58l-30.57,56.77,0,0a28,28,0,1,1-44.43,6.49l-26.06-26.06A28.07,28.07,0,0,1,96,124a28.41,28.41,0,0,1-5.67-.58L59.76,180.18l0,0a28,28,0,1,1-39.6,0h0a28,28,0,0,1,25.47-7.61l30.57-56.77,0,0a28.05,28.05,0,0,1,0-39.61h0a28,28,0,0,1,44.43,33.12l26.06,26.06a28.1,28.1,0,0,1,19-2.77l30.57-56.77,0,0a28,28,0,0,1,0-39.6h0a28,28,0,0,1,39.6,39.6Z"></path>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-10">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
                     </svg>
                 </div>
-                <div class="font-semibold">Failed to Load</div>
-                <div>Please try again later...</div>
+                <div class="font-semibold">{{ errorTitle }}</div>
+                <div>{{ errorSubtitle }}</div>
             </div>
+
+            <!-- retry button -->
+            <div class="w-full mt-2">
+                <button @click="getOwner" type="button" class="mx-auto flex cursor-pointer bg-white rounded shadow px-3 py-2 text-black font-semibold hover:bg-gray-100">
+                    Try Again
+                </button>
+            </div>
+
         </div>
 
     </Page>
@@ -66,6 +76,7 @@ import NodeAPI from "../../../js/NodeAPI.js";
 import DialogUtils from "../../../js/DialogUtils.js";
 import SaveButton from "../../SaveButton.vue";
 import FetchingDataInfo from "../../FetchingDataInfo.vue";
+import RoutingError from "../../../js/exceptions/RoutingError.js";
 
 export default {
     name: 'UserSettingsPage',
@@ -84,6 +95,8 @@ export default {
         return {
             isLoading: false,
             isSaving: false,
+            errorTitle: null,
+            errorSubtitle: null,
             user: null,
         };
     },
@@ -96,16 +109,31 @@ export default {
 
             // mark as loading
             this.isLoading = true;
+            this.errorTitle = null;
+            this.errorSubtitle = null;
 
             // get owner info from node
             try {
                 this.user = await NodeAPI.remoteAdminGetOwner(this.nodeId);
             } catch(e) {
-                console.log(e);
-            }
 
-            // no longer loading
-            this.isLoading = false;
+                // check if this is a routing error
+                if(e instanceof RoutingError){
+                    this.errorTitle = "Routing Error";
+                    this.errorSubtitle = e.getRoutingErrorMessage();
+                    return;
+                }
+
+                // standard error
+                this.errorTitle = "Failed to Load";
+                this.errorSubtitle = e;
+
+            } finally {
+
+                // no longer loading
+                this.isLoading = false;
+
+            }
 
         },
         async save() {
@@ -123,7 +151,7 @@ export default {
                 await NodeAPI.remoteAdminSetOwner(this.nodeId, this.user);
                 DialogUtils.showSettingsSavedAlert();
             } catch(e) {
-                console.log(e);
+                DialogUtils.showErrorAlert(e);
             }
 
             // no longer saving

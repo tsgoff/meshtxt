@@ -4,6 +4,7 @@ import NodeUtils from "./NodeUtils.js";
 import Connection from "./Connection.js";
 import ChannelUtils from "./ChannelUtils.js";
 import PacketUtils from "./PacketUtils.js";
+import RoutingError from "./exceptions/RoutingError.js";
 
 class NodeAPI {
 
@@ -235,9 +236,11 @@ class NodeAPI {
      * @param channel id of the channel to send to
      * @param wantAck if we want an ack from the destination
      * @param wantResponse if we want the destination to send us a response
+     * @param pkiEncrypted if this packet should be pki encrypted
+     * @param publicKey the public key to use for pki encryption
      * @returns {Promise<*>}
      */
-    static async sendPacket(id, data, portNum, destination, channel, wantAck, wantResponse) {
+    static async sendPacket(id, data, portNum, destination, channel, wantAck, wantResponse, pkiEncrypted, publicKey) {
 
         // use provided packet id, otherwise generate one
         const packetId = id ?? this.generatePacketId();
@@ -250,6 +253,9 @@ class NodeAPI {
                 from: GlobalState.myNodeId,
                 channel: channel,
                 wantAck: wantAck,
+                priority: Protobuf.Mesh.MeshPacket_Priority.RELIABLE,
+                pkiEncrypted: pkiEncrypted,
+                publicKey: PacketUtils.uInt8ArrayToBase64(publicKey),
                 decoded: {
                     portnum: portNum,
                     payload: PacketUtils.uInt8ArrayToBase64(data),
@@ -283,6 +289,8 @@ class NodeAPI {
                 const destination = parseInt(nodeId);
                 const channel = ChannelUtils.getAdminChannelIndex(nodeId);
                 const wantAck = true; // always want ack, otherwise node doesn't send the packet on lora
+                const pkiEncrypted = channel === ChannelUtils.PKC_CHANNEL_INDEX;
+                const publicKey = channel === ChannelUtils.PKC_CHANNEL_INDEX ? NodeUtils.getPublicKey(nodeId) : new Uint8Array([]);
 
                 // handle response packet
                 responseMeshPacketListener = (meshPacket) => {
@@ -296,6 +304,31 @@ class NodeAPI {
                     const requestId = meshPacket.payloadVariant.value.requestId;
                     if(requestId !== id){
                         return;
+                    }
+
+                    // ignore packet if it's not from the destination node
+                    const from = meshPacket.from;
+                    if(from !== destination){
+                        return;
+                    }
+
+                    // check if we got a response from the destination indicating an error
+                    const portnum = meshPacket.payloadVariant.value.portnum;
+                    if(portnum === Protobuf.Portnums.PortNum.ROUTING_APP){
+
+                        // parse routing message
+                        const routing = Protobuf.Mesh.Routing.fromBinary(meshPacket.payloadVariant.value.payload);
+
+                        // reject promise if an error was received
+                        if(routing.variant.case === "errorReason"){
+                            if(routing.variant.value !== Protobuf.Mesh.Routing_Error.NONE){
+                                clearTimeout(timeout);
+                                Connection.removeMeshPacketListener(responseMeshPacketListener);
+                                reject(new RoutingError(routing.variant.value));
+                                return;
+                            }
+                        }
+
                     }
 
                     // we have response, so we no longer want to time out
@@ -322,7 +355,7 @@ class NodeAPI {
                 Connection.addMeshPacketListener(responseMeshPacketListener);
 
                 // send packet
-                await this.sendPacket(id, byteData, portNum, destination, channel, wantAck, wantResponse);
+                await this.sendPacket(id, byteData, portNum, destination, channel, wantAck, wantResponse, pkiEncrypted, publicKey);
 
             } catch(e) {
                 clearTimeout(timeout);

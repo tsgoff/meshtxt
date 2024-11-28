@@ -4,9 +4,13 @@ import PacketUtils from "./PacketUtils.js";
 
 class NodeUtils {
 
-    static hasPublicKey(nodeId) {
+    static getPublicKey(nodeId) {
         const publicKey = GlobalState.nodesById[nodeId]?.user?.publicKey;
-        return publicKey != null && publicKey.length > 0;
+        return publicKey != null && publicKey.length > 0 ? publicKey : null;
+    }
+
+    static hasPublicKey(nodeId) {
+        return this.getPublicKey(nodeId) !== null;
     }
 
     static getNodeHexId(nodeId) {
