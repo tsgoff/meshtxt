@@ -2,7 +2,7 @@
     <Page>
 
         <!-- app bar -->
-        <AppBar title="Node Channels" :subtitle="subtitle">
+        <AppBar title="Channels" :subtitle="subtitle">
             <template v-slot:leading>
                 <NodeIcon v-if="node" :node-id="node.num" class="mr-3"/>
             </template>
