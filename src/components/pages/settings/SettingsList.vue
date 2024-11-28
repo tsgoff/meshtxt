@@ -5,16 +5,16 @@
             <!-- node details -->
             <div class="flex flex-col items-center p-4 leading-tight">
                 <div class="mb-2">
-                    <div class="flex rounded-full h-20 w-20 text-white text-xl shadow" :style="{ backgroundColor: getNodeColour(GlobalState.myNodeId), color: getNodeTextColour(GlobalState.myNodeId)}">
-                        <div class="mx-auto my-auto drop-shadow-sm">{{ getNodeShortName(GlobalState.myNodeId) }}</div>
+                    <div class="flex rounded-full h-20 w-20 text-white text-xl shadow" :style="{ backgroundColor: getNodeColour(nodeId), color: getNodeTextColour(nodeId)}">
+                        <div class="mx-auto my-auto drop-shadow-sm">{{ getNodeShortName(nodeId) }}</div>
                     </div>
                 </div>
-                <div class="font-semibold">{{ getNodeLongName(GlobalState.myNodeId) }}</div>
-                <div class="text-sm text-gray-500">{{ getNodeHexId(GlobalState.myNodeId) }} / {{ GlobalState.myNodeId }}</div>
+                <div class="font-semibold">{{ getNodeLongName(nodeId) }}</div>
+                <div class="text-sm text-gray-500">{{ getNodeHexId(nodeId) }} / {{ nodeId }}</div>
             </div>
 
             <!-- user -->
-            <RouterLink :to="{ name: 'settings.user', params: { nodeId: GlobalState.myNodeId} }">
+            <RouterLink :to="{ name: 'settings.user', params: { nodeId: nodeId } }">
                 <div class="flex cursor-pointer px-2 py-3 bg-white hover:bg-gray-50">
 
                     <!-- leading -->
@@ -47,6 +47,9 @@ import NodeUtils from "../../../js/NodeUtils.js";
 
 export default {
     name: 'SettingsList',
+    props: {
+        nodeId: String | Number,
+    },
     methods: {
         getNodeHexId: (nodeId) => NodeUtils.getNodeHexId(nodeId),
         getNodeShortName: (nodeId) => NodeUtils.getNodeShortName(nodeId),
@@ -57,6 +60,12 @@ export default {
     computed: {
         GlobalState() {
             return GlobalState;
+        },
+        node() {
+            return GlobalState.nodesById[this.nodeId];
+        },
+        subtitle() {
+            return this.node ? this.getNodeLongName(this.node.num) : "Unknown Node";
         },
     },
 }

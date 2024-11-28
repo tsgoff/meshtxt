@@ -62,6 +62,12 @@ const router = createRouter({
             component: () => import("./components/pages/TraceRoutePage.vue"),
         },
         {
+            name: "settings",
+            path: '/settings/:nodeId',
+            props: true,
+            component: () => import("./components/pages/settings/SettingsPage.vue"),
+        },
+        {
             name: "settings.user",
             path: '/settings/:nodeId/user',
             props: true,
