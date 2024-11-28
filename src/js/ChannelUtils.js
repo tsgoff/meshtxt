@@ -9,15 +9,19 @@ class ChannelUtils {
 
     // https://github.com/meshtastic/firmware/blob/2b0113ae82f2dc5cde82e5c00921d41d10ac141d/src/mesh/Channels.cpp#L294
     static getChannelName(channelId) {
+        const channel = GlobalState.channelsByIndex[channelId];
+        return this.getChannelNameFromChannelAndLoraConfig(channel, GlobalState.loraConfig);
+    }
+
+    static getChannelNameFromChannelAndLoraConfig(channel, loraConfig) {
 
         // get channel name from channel settings
-        const channel = GlobalState.channelsByIndex[channelId];
         var channelName = channel?.settings?.name;
 
         // if channel name is empty, determine what the name should be based on modem preset
         if(channelName === ""){
-            if(GlobalState.loraConfig?.usePreset === true){
-                channelName = this.getModemPresetDisplayName(GlobalState.loraConfig.modemPreset);
+            if(loraConfig?.usePreset === true){
+                channelName = this.getModemPresetDisplayName(loraConfig.modemPreset);
             } else {
                 channelName = "Custom";
             }

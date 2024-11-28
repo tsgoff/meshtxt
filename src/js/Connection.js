@@ -127,6 +127,9 @@ class Connection {
         // no events will be fired because the subscription is to a previously closed database instance
         GlobalState.keepAliveKey++;
 
+        // we are starting a new connection, so we want to allow config changes to happen
+        GlobalState.isConfigComplete = false;
+
         // setup connection listeners
         await this.setupConnectionListeners(connection);
 
@@ -245,6 +248,7 @@ class Connection {
             if(data.payloadVariant.case.toString() === "configCompleteId"){
 
                 console.log("config complete");
+                GlobalState.isConfigComplete = true;
 
                 // send current timestamp to meshtastic device
                 // this allows it to send us an semi accurate rx timestamp for packets when we connect later on
@@ -337,9 +341,19 @@ class Connection {
         // listen for channels
         GlobalState.channelsByIndex = {};
         connection.events.onChannelPacket.subscribe(async (data) => {
+
             await databaseToBeReady;
             console.log("onChannelPacket", data);
+
+            // ignore channel packets when not waiting for config, otherwise when fetching channels for remote nodes, it overwrites our local channels
+            if(GlobalState.isConfigComplete){
+                console.log("ignoring onChannelPacket as isConfigComplete is true");
+                return;
+            }
+
+            // update local channels
             GlobalState.channelsByIndex[data.index] = data;
+
         });
 
         // listen for new messages

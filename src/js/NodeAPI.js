@@ -405,6 +405,44 @@ class NodeAPI {
 
     }
 
+    static async remoteAdminGetLoraConfig(nodeId) {
+
+        // create admin message packet
+        const adminMessageRequest = Protobuf.Admin.AdminMessage.fromJson({
+            getConfigRequest: Protobuf.Admin.AdminMessage_ConfigType.LORA_CONFIG,
+        });
+
+        // send packet and wait for response
+        const adminMessageResponse = await this.sendAdminPacketAndWaitForResponse(nodeId, adminMessageRequest, true);
+        const configResponse = adminMessageResponse.payloadVariant.value;
+
+        // return config from admin response
+        return configResponse.payloadVariant.value;
+
+    }
+
+    /**
+     * Sends an admin request to get a channel from the provided node id
+     * @param nodeId
+     * @param channelIndex
+     * @param timeoutMillis
+     * @returns {Promise<*>}
+     */
+    static async remoteAdminGetChannel(nodeId, channelIndex, timeoutMillis) {
+
+        // create admin message packet
+        const adminMessageRequest = Protobuf.Admin.AdminMessage.fromJson({
+            getChannelRequest: channelIndex,
+        });
+
+        // send packet and wait for response
+        const adminMessageResponse = await this.sendAdminPacketAndWaitForResponse(nodeId, adminMessageRequest, true, timeoutMillis);
+
+        // return channel from admin response
+        return adminMessageResponse.payloadVariant.value;
+
+    }
+
 }
 
 export default NodeAPI;

@@ -6,6 +6,7 @@ const globalState = reactive({
     keepAliveKey: 0,
 
     isConnected: false,
+    isConfigComplete: false,
     connection: null,
     deviceStatus: null,
 
