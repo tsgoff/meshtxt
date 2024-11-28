@@ -120,6 +120,7 @@ sudo systemctl status meshtxt.service
 
 ## TODO
 
+- Fix page state so we don't need to use KeepAlive, which is annoying when navigating forward
 - Pagination message history instead of loading all at once
 - Add side drawer navigation
 - Implement standalone "messages/inbox" page that shows conversations ordered by most recent message
