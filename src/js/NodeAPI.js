@@ -264,6 +264,8 @@ class NodeAPI {
             },
         });
 
+        console.log(`sending packet: ${packetId}`, toRadioMessage);
+
         return await GlobalState.connection.sendRaw(toRadioMessage.toBinary(), packetId);
 
     }
