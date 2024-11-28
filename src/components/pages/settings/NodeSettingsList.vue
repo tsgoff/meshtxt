@@ -14,7 +14,7 @@
             </div>
 
             <!-- user -->
-            <RouterLink :to="{ name: 'settings.user', params: { nodeId: nodeId } }">
+            <RouterLink :to="{ name: 'node.settings.user', params: { nodeId: nodeId } }">
                 <div class="flex cursor-pointer px-2 py-3 bg-white hover:bg-gray-50">
 
                     <!-- leading -->
