@@ -443,6 +443,25 @@ class NodeAPI {
 
     }
 
+    /**
+     * Sends an admin request to set a channel for the provided node id
+     * @param nodeId
+     * @param channel
+     * @param timeoutMillis
+     * @returns {Promise<*>}
+     */
+    static async remoteAdminSetChannel(nodeId, channel, timeoutMillis) {
+
+        // create admin message packet
+        const adminMessageRequest = Protobuf.Admin.AdminMessage.fromJson({
+            setChannel: channel.toJson(),
+        });
+
+        // send packet and wait for response
+        await this.sendAdminPacketAndWaitForResponse(nodeId, adminMessageRequest, false, timeoutMillis);
+
+    }
+
 }
 
 export default NodeAPI;

@@ -17,6 +17,9 @@ const globalState = reactive({
     channelsByIndex: {},
     nodesById: {},
 
+    // cache channels fetched from remote nodes
+    remoteNodeChannels: {},
+
 });
 
 export default globalState;

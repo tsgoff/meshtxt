@@ -26,20 +26,22 @@
         <div v-else-if="loraConfig != null && channels != null" class="flex h-full w-full overflow-hidden">
 
             <div class="w-full overflow-y-auto">
-                <div v-for="channel of channels" class="flex cursor-pointer p-2 bg-white hover:bg-gray-50">
-                    <div class="flex my-auto mr-4 size-12 bg-gray-200 rounded-full text-black">
-                        <span class="mx-auto my-auto">{{ channel.index }}</span>
-                    </div>
-                    <div class="my-auto">
-                        <div>{{ getChannelName(channel) }}</div>
-                        <div class="text-sm text-gray-500">
-                            <span v-if="channel.role === Protobuf.Channel.Channel_Role.PRIMARY">Primary Channel</span>
-                            <span v-else-if="channel.role === Protobuf.Channel.Channel_Role.SECONDARY">Secondary Channel</span>
-                            <span v-else-if="channel.role === Protobuf.Channel.Channel_Role.DISABLED">Disabled Channel</span>
-                            <span v-else>Unknown Channel Role</span>
+                <RouterLink v-for="channel of channels" :to="{ name: 'node.settings.channels.edit', params: { nodeId: node.num, channelId: channel.index } }">
+                    <div class="flex cursor-pointer p-2 bg-white hover:bg-gray-50">
+                        <div class="flex my-auto mr-4 size-12 bg-gray-200 rounded-full text-black">
+                            <span class="mx-auto my-auto">{{ channel.index }}</span>
+                        </div>
+                        <div class="my-auto">
+                            <div>{{ getChannelName(channel) }}</div>
+                            <div class="text-sm text-gray-500">
+                                <span v-if="channel.role === Protobuf.Channel.Channel_Role.PRIMARY">Primary Channel</span>
+                                <span v-else-if="channel.role === Protobuf.Channel.Channel_Role.SECONDARY">Secondary Channel</span>
+                                <span v-else-if="channel.role === Protobuf.Channel.Channel_Role.DISABLED">Disabled Channel</span>
+                                <span v-else>Unknown Channel Role</span>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </RouterLink>
             </div>
 
         </div>
@@ -155,6 +157,10 @@ export default {
                 // update channels list in ui after all channels loaded
                 this.loraConfig = loraConfig;
                 this.channels = channels;
+
+                // update global state
+                // fixme: this is used to access cached channels from channel settings page
+                GlobalState.remoteNodeChannels[this.nodeId] = channels;
 
             } catch(e) {
 
