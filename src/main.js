@@ -63,13 +63,13 @@ const router = createRouter({
         },
         {
             name: "node.settings",
-            path: '/settings/:nodeId',
+            path: '/nodes/:nodeId/settings',
             props: true,
             component: () => import("./components/pages/settings/NodeSettingsPage.vue"),
         },
         {
             name: "node.settings.user",
-            path: '/settings/:nodeId/user',
+            path: '/nodes/:nodeId/settings/user',
             props: true,
             component: () => import("./components/pages/settings/NodeUserSettingsPage.vue"),
         },
