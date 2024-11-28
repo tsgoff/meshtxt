@@ -144,13 +144,36 @@ export default {
                 const channelsToLoad = 8;
                 for(var channelIndex = 0; channelIndex < channelsToLoad; channelIndex++){
 
-                    // to fetch the first channel (primary) you must send a channel index of 1
-                    this.loadingStatus = `Fetching Channel ${channelIndex + 1} / ${channelsToLoad}`;
-                    const channel = await NodeAPI.remoteAdminGetChannel(this.nodeId, channelIndex + 1);
+                    // we might fail to get some responses, so we will retry a few times
+                    var maxAttempts = 5;
+                    var fetchedChannel = false;
+                    var fetchError = null;
+                    for(var attempt = 0; attempt < maxAttempts; attempt++){
+                        try {
 
-                    // add to channels list
-                    channels.push(channel);
-                    this.channelsLoaded = channels.length;
+                            // to fetch the first channel (primary) you must send a channel index of 1
+                            this.loadingStatus = `Fetching Channel ${channelIndex + 1} / ${channelsToLoad}`;
+                            const channel = await NodeAPI.remoteAdminGetChannel(this.nodeId, channelIndex + 1);
+
+                            // add to channels list
+                            channels.push(channel);
+                            this.channelsLoaded = channels.length;
+                            fetchedChannel = true;
+
+                            // we got the channel, so no need to attempt to fetch again
+                            break;
+
+                        } catch(e) {
+                            console.log(e);
+                            fetchError = e;
+                        }
+                    }
+
+                    // if we didn't fetch the channel, bail out
+                    if(!fetchedChannel){
+                        console.log(`failed to fetch channel after ${maxAttempts} attempts`);
+                        throw fetchError;
+                    }
 
                 }
 
