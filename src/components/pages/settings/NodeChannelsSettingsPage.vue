@@ -23,7 +23,7 @@
         </div>
 
         <!-- loaded -->
-        <div v-else-if="channels != null" class="flex h-full w-full overflow-hidden">
+        <div v-else-if="loraConfig != null && channels != null" class="flex h-full w-full overflow-hidden">
 
             <div class="w-full overflow-y-auto">
                 <div v-for="channel of channels" class="flex cursor-pointer p-2 bg-white hover:bg-gray-50">
@@ -127,7 +127,7 @@ export default {
             this.errorTitle = null;
             this.errorSubtitle = null;
             this.loraConfig = null;
-            this.channels = [];
+            this.channels = null;
             this.channelsLoaded = 0;
 
             // get channels from node
@@ -145,12 +145,6 @@ export default {
                     // to fetch the first channel (primary) you must send a channel index of 1
                     this.loadingStatus = `Fetching Channel ${channelIndex + 1} / ${channelsToLoad}`;
                     const channel = await NodeAPI.remoteAdminGetChannel(this.nodeId, channelIndex + 1);
-
-                    // if we find a disabled channel, don't add it to the list. we can also stop loading more channels
-                    // as the device always returns disabled channels after active channels
-                    if(channel.role === Protobuf.Channel.Channel_Role.DISABLED){
-                        break;
-                    }
 
                     // add to channels list
                     channels.push(channel);
