@@ -13,21 +13,80 @@
                 <div class="text-sm text-gray-500">{{ getNodeHexId(nodeId) }} / {{ nodeId }}</div>
             </div>
 
-            <div class="flex flex-col">
+            <!-- setting groups -->
+            <div class="space-y-4">
 
-                <!-- user -->
-                <RouterLink :to="{ name: 'node.settings.user', params: { nodeId: nodeId } }">
-                    <div class="flex cursor-pointer px-2 py-3 bg-white hover:bg-gray-50 border-b">
+                <!-- radio configuration -->
+                <div class="flex flex-col divide-y bg-white">
+
+                    <div class="bg-white p-2 font-semibold">Radio Configuration</div>
+
+                    <!-- user -->
+                    <RouterLink :to="{ name: 'node.settings.user', params: { nodeId: nodeId } }">
+                        <div class="flex cursor-pointer px-2 py-3 bg-white hover:bg-gray-50">
+
+                            <!-- leading -->
+                            <div class="my-auto ml-2 mr-4 text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                                </svg>
+                            </div>
+
+                            <!-- title -->
+                            <div class="my-auto mr-auto">User</div>
+
+                            <!-- trailing -->
+                            <div class="my-auto mr-2 text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                </svg>
+                            </div>
+
+                        </div>
+                    </RouterLink>
+
+                    <!-- channels -->
+                    <RouterLink :to="{ name: 'node.settings.channels', params: { nodeId: nodeId } }">
+                        <div class="flex cursor-pointer px-2 py-3 bg-white hover:bg-gray-50">
+
+                            <!-- leading -->
+                            <div class="my-auto ml-2 mr-4 text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                                </svg>
+                            </div>
+
+                            <!-- title -->
+                            <div class="my-auto mr-auto">Channels</div>
+
+                            <!-- trailing -->
+                            <div class="my-auto mr-2 text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                                </svg>
+                            </div>
+
+                        </div>
+                    </RouterLink>
+
+                </div>
+
+                <!-- commands -->
+                <div class="flex flex-col divide-y bg-white">
+
+                    <div class="bg-white p-2 font-semibold">Commands</div>
+
+                    <div @click="getDeviceFirmwareVersion(nodeId)" class="flex cursor-pointer px-2 py-3 bg-white hover:bg-gray-50">
 
                         <!-- leading -->
                         <div class="my-auto ml-2 mr-4 text-gray-500">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
                             </svg>
                         </div>
 
                         <!-- title -->
-                        <div class="my-auto mr-auto">User</div>
+                        <div class="my-auto mr-auto">Get Firmware Version</div>
 
                         <!-- trailing -->
                         <div class="my-auto mr-2 text-gray-500">
@@ -37,21 +96,18 @@
                         </div>
 
                     </div>
-                </RouterLink>
 
-                <!-- channels -->
-                <RouterLink :to="{ name: 'node.settings.channels', params: { nodeId: nodeId } }">
-                    <div class="flex cursor-pointer px-2 py-3 bg-white hover:bg-gray-50">
+                    <div @click="reboot(nodeId)" class="flex cursor-pointer px-2 py-3 bg-white hover:bg-gray-50">
 
                         <!-- leading -->
                         <div class="my-auto ml-2 mr-4 text-gray-500">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1 0 12.728 0M12 3v9" />
                             </svg>
                         </div>
 
                         <!-- title -->
-                        <div class="my-auto mr-auto">Channels</div>
+                        <div class="my-auto mr-auto">Reboot</div>
 
                         <!-- trailing -->
                         <div class="my-auto mr-2 text-gray-500">
@@ -60,26 +116,6 @@
                             </svg>
                         </div>
 
-                    </div>
-                </RouterLink>
-
-                <div @click="reboot(nodeId)" class="mt-4 flex cursor-pointer px-2 py-3 bg-white hover:bg-gray-50">
-
-                    <!-- leading -->
-                    <div class="my-auto ml-2 mr-4 text-gray-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1 0 12.728 0M12 3v9" />
-                        </svg>
-                    </div>
-
-                    <!-- title -->
-                    <div class="my-auto mr-auto">Reboot</div>
-
-                    <!-- trailing -->
-                    <div class="my-auto mr-2 text-gray-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                        </svg>
                     </div>
 
                 </div>
@@ -107,6 +143,15 @@ export default {
         getNodeLongName: (nodeId) => NodeUtils.getNodeLongName(nodeId),
         getNodeColour: (nodeId) => NodeUtils.getNodeColour(nodeId),
         getNodeTextColour: (nodeId) => NodeUtils.getNodeTextColour(nodeId),
+        async getDeviceFirmwareVersion(nodeId) {
+            try {
+                const response = await NodeAPI.remoteAdminGetDeviceMetadata(nodeId);
+                const firmwareVersion = response.firmwareVersion;
+                alert(firmwareVersion ?? "Unknown Firmware Version");
+            } catch(e) {
+                DialogUtils.showErrorAlert(e);
+            }
+        },
         async reboot(nodeId) {
 
             // confirm user wants to reboot node

@@ -481,6 +481,26 @@ class NodeAPI {
 
     }
 
+    /**
+     * Sends an admin request to get device metadata from the provided node id
+     * @param nodeId
+     * @returns {Promise<*>}
+     */
+    static async remoteAdminGetDeviceMetadata(nodeId) {
+
+        // create admin message packet
+        const adminMessageRequest = Protobuf.Admin.AdminMessage.fromJson({
+            getDeviceMetadataRequest: true,
+        });
+
+        // send packet and wait for response
+        const adminMessageResponse = await this.sendAdminPacketAndWaitForResponse(nodeId, adminMessageRequest, true);
+
+        // return device metadata from admin response
+        return adminMessageResponse.payloadVariant.value;
+
+    }
+
 }
 
 export default NodeAPI;
