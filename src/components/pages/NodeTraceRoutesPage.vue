@@ -31,7 +31,7 @@
                                     <span class="font-medium">{{ getNodeLongName(traceRoute.from) || '???' }}</span>
                                 </div>
                                 <div class="text-sm text-gray-700">
-                                    {{ getTimeAgo(new Date(traceRoute.timestamp)) }} • {{ traceRoute.data.route.length }} hop(s) on channel {{ getChannelName(traceRoute.channel) }}
+                                    {{ formatDateTime(new Date(traceRoute.timestamp)) }} • {{ traceRoute.data.route.length }} {{ traceRoute.data.route.length === 1 ? 'hop' : 'hops' }} on {{ getChannelName(traceRoute.channel) }}
                                 </div>
                             </div>
                         </div>
@@ -98,9 +98,9 @@ export default {
     },
     methods: {
         getNodeLongName: (nodeId) => NodeUtils.getNodeLongName(nodeId),
-        getTimeAgo: (date) => TimeUtils.getTimeAgo(date),
+        formatDateTime: (date) => TimeUtils.formatDateTime(date),
         getChannelName: (channelId) => {
-            return ChannelUtils.getChannelName(channelId) || `#${channelId}`;
+            return ChannelUtils.getChannelName(channelId) || `channel #${channelId}`;
         },
     },
     computed: {

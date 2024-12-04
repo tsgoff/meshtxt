@@ -2,6 +2,10 @@ import moment from "moment";
 
 class TimeUtils {
 
+    static formatDateTime(date) {
+        return moment(date).format("DD/MMM/YYYY hh:mm A");
+    };
+
     static getTimeAgo(date) {
         return moment(date).fromNow();
     };
