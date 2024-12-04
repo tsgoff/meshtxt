@@ -36,13 +36,16 @@
                                 <div>{{ getNodeHexId(traceRoute.to) }}</div>
                                 <div>Started the traceroute</div>
                             </div>
+                            <div v-if="traceRoute.data.snrTowards.length > 0 && traceRoute.data.snrTowards[0] != null && traceRoute.data.snrTowards[0] !== -128" class="my-auto mr-1 text-sm text-gray-500">
+                                {{ traceRoute.data.snrTowards[0] / 4 }}dB SNR
+                            </div>
                             <div class="my-auto">
                                 <NodeDropDownMenu :node="findNodeById(traceRoute.to)"/>
                             </div>
                         </li>
 
                         <!-- route toward nodes -->
-                        <li v-for="route of traceRoute.data.route" class="relative flex gap-x-4">
+                        <li v-for="(route, index) of traceRoute.data.route" class="relative flex gap-x-4">
                             <div class="absolute left-0 top-0 flex w-12 justify-center -bottom-3">
                                 <div class="w-px bg-gray-200"></div>
                             </div>
@@ -55,6 +58,9 @@
                                 <div class="font-medium text-gray-900">{{ getNodeLongName(route) || '???' }}</div>
                                 <div>{{ getNodeHexId(route) }}</div>
                                 <div>Forwarded the packet</div>
+                            </div>
+                            <div v-if="traceRoute.data.snrTowards.length > 0 && traceRoute.data.snrTowards[index + 1] != null && traceRoute.data.snrTowards[index + 1] !== -128" class="my-auto mr-1 text-sm text-gray-500">
+                                {{ traceRoute.data.snrTowards[index + 1] / 4 }}dB SNR
                             </div>
                             <div class="my-auto">
                                 <NodeDropDownMenu :node="findNodeById(route)"/>
@@ -76,13 +82,16 @@
                                 <div>{{ getNodeHexId(traceRoute.from) }}</div>
                                 <div>Replied to traceroute</div>
                             </div>
+                            <div v-if="traceRoute.data.snrBack.length > 0 && traceRoute.data.snrBack[0] != null && traceRoute.data.snrBack[0] !== -128" class="my-auto mr-1 text-sm text-gray-500">
+                                {{ traceRoute.data.snrBack[0] / 4 }}dB SNR
+                            </div>
                             <div class="my-auto">
                                 <NodeDropDownMenu :node="findNodeById(traceRoute.from)"/>
                             </div>
                         </li>
 
                         <!-- route back nodes -->
-                        <li v-for="route of traceRoute.data.routeBack" class="relative flex gap-x-4">
+                        <li v-for="(route, index) of traceRoute.data.routeBack" class="relative flex gap-x-4">
                             <div class="absolute left-0 top-0 flex w-12 justify-center -bottom-3">
                                 <div class="w-px bg-gray-200"></div>
                             </div>
@@ -100,6 +109,9 @@
                                     <div>{{ getNodeHexId(route) }}</div>
                                 </div>
                                 <div>Forwarded the packet</div>
+                            </div>
+                            <div v-if="traceRoute.data.snrBack.length > 0 && traceRoute.data.snrBack[index + 1] != null && traceRoute.data.snrBack[index + 1] !== -128" class="my-auto mr-1 text-sm text-gray-500">
+                                {{ traceRoute.data.snrBack[index + 1] / 4 }}dB SNR
                             </div>
                             <div class="my-auto">
                                 <NodeDropDownMenu :node="findNodeById(route)"/>
