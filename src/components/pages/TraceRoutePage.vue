@@ -9,72 +9,73 @@
             <div class="overflow-y-auto">
 
                 <!-- details -->
-                <div class="p-2 bg-white">
-                    <ul role="list" class="space-y-3">
+                <div>
+                    <div class="bg-gray-200 p-2 font-semibold">Route Towards</div>
+                    <div class="p-2 bg-white">
+                        <ul role="list" class="space-y-3">
 
-                        <!-- node that initiated traceroute -->
-                        <li class="relative flex gap-x-4">
-                            <div class="absolute left-0 top-0 flex w-12 justify-center top-3 -bottom-3">
-                                <div class="w-px bg-gray-200"></div>
-                            </div>
-                            <div class="my-auto relative flex flex-none items-center justify-center">
-                                <div>
-                                    <NodeIcon :node-id="traceRoute.to"/>
+                            <!-- node that initiated traceroute -->
+                            <li class="relative flex gap-x-4">
+                                <div class="absolute left-0 top-0 flex w-12 justify-center top-3 -bottom-3">
+                                    <div class="w-px bg-gray-200"></div>
                                 </div>
-                            </div>
-                            <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
-                                <div class="font-medium text-gray-900">{{ getNodeLongName(traceRoute.to) || '???' }}</div>
-                                <div>{{ getNodeHexId(traceRoute.to) }}</div>
-                                <div>Started the traceroute</div>
-                            </div>
-                            <div class="my-auto">
-                                <NodeDropDownMenu :node="findNodeById(traceRoute.to)"/>
-                            </div>
-                        </li>
-
-                        <!-- middleman nodes -->
-                        <li v-for="route of traceRoute.data.route" class="relative flex gap-x-4">
-                            <div class="absolute left-0 top-0 flex w-12 justify-center -bottom-3">
-                                <div class="w-px bg-gray-200"></div>
-                            </div>
-                            <div class="my-auto relative flex flex-none items-center justify-center">
-                                <div>
-                                    <NodeIcon :node-id="route"/>
+                                <div class="my-auto relative flex flex-none items-center justify-center">
+                                    <div>
+                                        <NodeIcon :node-id="traceRoute.to"/>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
-                                <div class="font-medium text-gray-900">{{ getNodeLongName(route) || '???' }}</div>
-                                <div>{{ getNodeHexId(route) }}</div>
-                                <div>Forwarded the packet</div>
-                            </div>
-                            <div class="my-auto">
-                                <NodeDropDownMenu :node="findNodeById(route)"/>
-                            </div>
-                        </li>
-
-                        <!-- node that replied to traceroute -->
-                        <li v-if="traceRoute.from" class="relative flex gap-x-4">
-                            <div class="absolute left-0 top-0 flex w-12 justify-center h-6">
-                                <div class="w-px bg-gray-200"></div>
-                            </div>
-                            <div class="my-auto relative flex flex-none items-center justify-center">
-                                <div>
-                                    <NodeIcon :node-id="traceRoute.from"/>
+                                <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
+                                    <div class="font-medium text-gray-900">{{ getNodeLongName(traceRoute.to) || '???' }}</div>
+                                    <div>{{ getNodeHexId(traceRoute.to) }}</div>
+                                    <div>Started the traceroute</div>
                                 </div>
-                            </div>
-                            <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
+                                <div class="my-auto">
+                                    <NodeDropDownMenu :node="findNodeById(traceRoute.to)"/>
+                                </div>
+                            </li>
 
-                                <div class="font-medium text-gray-900">{{ getNodeLongName(traceRoute.from) || '???' }}</div>
-                                <div>{{ getNodeHexId(traceRoute.from) }}</div>
-                                <div>Replied to traceroute</div>
-                            </div>
-                            <div class="my-auto">
-                                <NodeDropDownMenu :node="findNodeById(traceRoute.from)"/>
-                            </div>
-                        </li>
+                            <!-- middleman nodes -->
+                            <li v-for="route of traceRoute.data.route" class="relative flex gap-x-4">
+                                <div class="absolute left-0 top-0 flex w-12 justify-center -bottom-3">
+                                    <div class="w-px bg-gray-200"></div>
+                                </div>
+                                <div class="my-auto relative flex flex-none items-center justify-center">
+                                    <div>
+                                        <NodeIcon :node-id="route"/>
+                                    </div>
+                                </div>
+                                <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
+                                    <div class="font-medium text-gray-900">{{ getNodeLongName(route) || '???' }}</div>
+                                    <div>{{ getNodeHexId(route) }}</div>
+                                    <div>Forwarded the packet</div>
+                                </div>
+                                <div class="my-auto">
+                                    <NodeDropDownMenu :node="findNodeById(route)"/>
+                                </div>
+                            </li>
 
-                    </ul>
+                            <!-- node that replied to traceroute -->
+                            <li v-if="traceRoute.from" class="relative flex gap-x-4">
+                                <div class="absolute left-0 top-0 flex w-12 justify-center h-6">
+                                    <div class="w-px bg-gray-200"></div>
+                                </div>
+                                <div class="my-auto relative flex flex-none items-center justify-center">
+                                    <div>
+                                        <NodeIcon :node-id="traceRoute.from"/>
+                                    </div>
+                                </div>
+                                <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
+                                    <div class="font-medium text-gray-900">{{ getNodeLongName(traceRoute.from) || '???' }}</div>
+                                    <div>{{ getNodeHexId(traceRoute.from) }}</div>
+                                    <div>Replied to traceroute</div>
+                                </div>
+                                <div class="my-auto">
+                                    <NodeDropDownMenu :node="findNodeById(traceRoute.from)"/>
+                                </div>
+                            </li>
 
+                        </ul>
+                    </div>
                 </div>
 
                 <!-- raw data -->
