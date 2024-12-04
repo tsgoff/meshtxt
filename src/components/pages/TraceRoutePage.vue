@@ -24,7 +24,7 @@
                         <!-- node that initiated traceroute -->
                         <li class="relative flex gap-x-4">
                             <div class="absolute left-0 top-3 flex w-12 justify-center -bottom-3">
-                                <div class="w-px bg-gray-200"></div>
+                                <div class="w-px bg-gray-300"></div>
                             </div>
                             <div class="my-auto relative flex flex-none items-center justify-center">
                                 <div>
@@ -47,7 +47,7 @@
                         <!-- route toward nodes -->
                         <li v-for="(route, index) of traceRoute.data.route" class="relative flex gap-x-4">
                             <div class="absolute left-0 top-0 flex w-12 justify-center -bottom-3">
-                                <div class="w-px bg-gray-200"></div>
+                                <div class="w-px bg-gray-300"></div>
                             </div>
                             <div class="my-auto relative flex flex-none items-center justify-center">
                                 <div>
@@ -70,7 +70,7 @@
                         <!-- node that replied to traceroute -->
                         <li v-if="traceRoute.from" class="relative flex gap-x-4">
                             <div class="absolute left-0 top-0 flex w-12 justify-center -bottom-3">
-                                <div class="w-px bg-gray-200"></div>
+                                <div class="w-px bg-gray-300"></div>
                             </div>
                             <div class="my-auto relative flex flex-none items-center justify-center">
                                 <div>
@@ -93,7 +93,7 @@
                         <!-- route back nodes -->
                         <li v-for="(route, index) of traceRoute.data.routeBack" class="relative flex gap-x-4">
                             <div class="absolute left-0 top-0 flex w-12 justify-center -bottom-3">
-                                <div class="w-px bg-gray-200"></div>
+                                <div class="w-px bg-gray-300"></div>
                             </div>
                             <div class="my-auto relative flex flex-none items-center justify-center">
                                 <div>
@@ -121,7 +121,7 @@
                         <!-- node that initiated traceroute -->
                         <li class="relative flex gap-x-4">
                             <div class="absolute left-0 top-0 flex w-12 justify-center h-6">
-                                <div class="w-px bg-gray-200"></div>
+                                <div class="w-px bg-gray-300"></div>
                             </div>
                             <div class="my-auto relative flex flex-none items-center justify-center">
                                 <div>
