@@ -121,12 +121,6 @@ class Connection {
             return;
         }
 
-        // reset keep alive state. this forces kept alive pages such as MessageViewer to reset
-        // this allows them to be recreated with a new call to the "mounted" function, which sets up new database subscriptions
-        // without doing this, when the user opens the MessageViewer when a new database connection was created
-        // no events will be fired because the subscription is to a previously closed database instance
-        GlobalState.keepAliveKey++;
-
         // we are starting a new connection, so we want to allow config changes to happen
         GlobalState.isConfigComplete = false;
 

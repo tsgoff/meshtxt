@@ -126,7 +126,6 @@ export default {
     data() {
         return {
 
-            isActive: false,
             messages: [],
             messagesSubscription: null,
 
@@ -145,20 +144,12 @@ export default {
             this.messagesSubscription = Database.Message.getNodeMessages(this.nodeId).$.subscribe(this.onMessagesUpdated);
         }
 
-    },
-    unmounted() {
-        this.messagesSubscription?.unsubscribe();
-    },
-    activated() {
-
-        this.isActive = true;
-
-        // update read state when coming back to message viewer
+        // update read state
         this.updateMessagesLastReadAt();
 
     },
-    deactivated() {
-        this.isActive = false;
+    unmounted() {
+        this.messagesSubscription?.unsubscribe();
     },
     methods: {
         async sendMessage() {
@@ -274,11 +265,6 @@ export default {
             });
         },
         updateMessagesLastReadAt() {
-
-            // do nothing if route is not active
-            if(!this.isActive){
-                return;
-            }
 
             // check what type of messages we are viewing
             if(this.type === "node"){

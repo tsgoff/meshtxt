@@ -43,11 +43,6 @@ export default {
         NodesList,
         ChannelsList,
     },
-    data() {
-        return {
-            tab: 'channels',
-        };
-    },
     methods: {
         onChannelClick(channel) {
             this.$router.push({
@@ -78,6 +73,19 @@ export default {
         },
         nodes() {
             return Object.values(GlobalState.nodesById);
+        },
+        tab: {
+            get(){
+                return this.$route.query.tab ?? 'channels';
+            },
+            set(value){
+                this.$router.replace({
+                    query: {
+                        ...this.$route.query,
+                        tab: value,
+                    },
+                });
+            },
         },
     },
 }

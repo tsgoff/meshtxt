@@ -110,10 +110,6 @@ export default {
         Connection.removeClientNotificationListener(this.onClientNotification);
 
     },
-    beforeRouteLeave(to, from) {
-        // ignore previous trace route when coming back
-        this.isRunningTraceRoute = false;
-    },
     methods: {
         getNodeLongName: (nodeId) => NodeUtils.getNodeLongName(nodeId),
         async runTraceRoute(node) {
