@@ -501,6 +501,23 @@ class NodeAPI {
 
     }
 
+    /**
+     * Sends an admin request to reset the node db for the provided node id
+     * @param nodeId
+     * @returns {Promise<*>}
+     */
+    static async remoteAdminResetNodeDb(nodeId) {
+
+        // create admin message packet
+        const adminMessageRequest = Protobuf.Admin.AdminMessage.fromJson({
+            nodedbReset: 1, // this is what is sent by the android client, even though firmware doesn't use it
+        });
+
+        // send packet and wait for response
+        await this.sendAdminPacketAndWaitForResponse(nodeId, adminMessageRequest, false);
+
+    }
+
 }
 
 export default NodeAPI;
