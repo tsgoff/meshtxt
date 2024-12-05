@@ -35,9 +35,7 @@
                                 <div class="font-medium text-gray-900">{{ getNodeLongName(traceRoute.to) || '???' }}</div>
                                 <div>{{ getNodeHexId(traceRoute.to) }}</div>
                                 <div>Started the traceroute</div>
-                            </div>
-                            <div v-if="traceRoute.data.snrTowards.length > 0 && traceRoute.data.snrTowards[0] != null && traceRoute.data.snrTowards[0] !== -128" class="my-auto mr-1 text-sm text-gray-500">
-                                {{ traceRoute.data.snrTowards[0] / 4 }}dB SNR
+                                <TraceRouteSnrLabel :snr="traceRoute.data.snrTowards[0]"/>
                             </div>
                             <div class="my-auto">
                                 <NodeDropDownMenu :node="findNodeById(traceRoute.to)"/>
@@ -58,9 +56,7 @@
                                 <div class="font-medium text-gray-900">{{ getNodeLongName(route) || '???' }}</div>
                                 <div>{{ getNodeHexId(route) }}</div>
                                 <div>Forwarded the packet</div>
-                            </div>
-                            <div v-if="traceRoute.data.snrTowards.length > 0 && traceRoute.data.snrTowards[index + 1] != null && traceRoute.data.snrTowards[index + 1] !== -128" class="my-auto mr-1 text-sm text-gray-500">
-                                {{ traceRoute.data.snrTowards[index + 1] / 4 }}dB SNR
+                                <TraceRouteSnrLabel :snr="traceRoute.data.snrTowards[index + 1]"/>
                             </div>
                             <div class="my-auto">
                                 <NodeDropDownMenu :node="findNodeById(route)"/>
@@ -81,9 +77,7 @@
                                 <div class="font-medium text-gray-900">{{ getNodeLongName(traceRoute.from) || '???' }}</div>
                                 <div>{{ getNodeHexId(traceRoute.from) }}</div>
                                 <div>Replied to traceroute</div>
-                            </div>
-                            <div v-if="traceRoute.data.snrBack.length > 0 && traceRoute.data.snrBack[0] != null && traceRoute.data.snrBack[0] !== -128" class="my-auto mr-1 text-sm text-gray-500">
-                                {{ traceRoute.data.snrBack[0] / 4 }}dB SNR
+                                <TraceRouteSnrLabel :snr="traceRoute.data.snrBack[0]"/>
                             </div>
                             <div class="my-auto">
                                 <NodeDropDownMenu :node="findNodeById(traceRoute.from)"/>
@@ -109,9 +103,7 @@
                                     <div>{{ getNodeHexId(route) }}</div>
                                 </div>
                                 <div>Forwarded the packet</div>
-                            </div>
-                            <div v-if="traceRoute.data.snrBack.length > 0 && traceRoute.data.snrBack[index + 1] != null && traceRoute.data.snrBack[index + 1] !== -128" class="my-auto mr-1 text-sm text-gray-500">
-                                {{ traceRoute.data.snrBack[index + 1] / 4 }}dB SNR
+                                <TraceRouteSnrLabel :snr="traceRoute.data.snrBack[index + 1]"/>
                             </div>
                             <div class="my-auto">
                                 <NodeDropDownMenu :node="findNodeById(route)"/>
@@ -166,10 +158,12 @@ import ChannelUtils from "../../js/ChannelUtils.js";
 import TimeUtils from "../../js/TimeUtils.js";
 import Database from "../../js/Database.js";
 import NodeDropDownMenu from "../nodes/NodeDropDownMenu.vue";
+import TraceRouteSnrLabel from "../TraceRouteSnrLabel.vue";
 
 export default {
     name: 'TraceRoutePage',
     components: {
+        TraceRouteSnrLabel,
         NodeDropDownMenu,
         NodeIcon,
         Page,
