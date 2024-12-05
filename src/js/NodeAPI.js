@@ -390,6 +390,11 @@ class NodeAPI {
         // parse response message
         const telemetryResponse = Protobuf.Telemetry.Telemetry.fromBinary(responseMeshPacket.payloadVariant.value.payload);
 
+        // ensure telemetry response is device metrics
+        if(telemetryResponse.variant.case !== "deviceMetrics"){
+            throw `Unexpected Telemetry: ${telemetryResponse.variant.case}`;
+        }
+
         // return device metrics
         return telemetryResponse.variant.value;
 
