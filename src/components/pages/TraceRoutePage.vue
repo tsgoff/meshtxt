@@ -209,7 +209,7 @@ export default {
     computed: {
         subtitle() {
             if(this.traceRoute){
-                return `${this.formatDateTime(this.traceRoute.rxTime)} • on ${this.getChannelName(this.traceRoute.channel)}`;
+                return `${this.formatDateTime(this.traceRoute.timestamp)} • on ${this.getChannelName(this.traceRoute.channel)}`;
             } else {
                 return `#${this.traceRouteId}`;
             }
