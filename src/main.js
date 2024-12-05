@@ -5,7 +5,7 @@ import "./style.css";
 
 import App from './components/App.vue';
 import GlobalState from "./js/GlobalState.js";
-import {BleConnection, SerialConnection} from "@meshtastic/js";
+import {BleConnection, Protobuf, SerialConnection} from "@meshtastic/js";
 
 const router = createRouter({
     history: createMemoryHistory(),
@@ -103,3 +103,7 @@ window.addEventListener("beforeunload", () => {
         }
     }
 });
+
+// debug access to global state and protobufs
+window.GlobalState = GlobalState;
+window.Protobuf = Protobuf;

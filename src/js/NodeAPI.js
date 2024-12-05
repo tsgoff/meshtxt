@@ -264,21 +264,23 @@ class NodeAPI {
             },
         });
 
-        console.log(`sending packet: ${packetId}`, toRadioMessage);
+        console.log(`sending packet: ${packetId}`, toRadioMessage.toJson());
 
         return await GlobalState.connection.sendRaw(toRadioMessage.toBinary(), packetId);
 
     }
 
     /**
-     * Sends an AdminMessage to the provided node id, and waits for a response, or timeouts out after the provided delay
-     * @param nodeId the node id to send the admin message to
-     * @param adminMessage the AdminMessage to send
-     * @param wantResponse if we want the destination to send us a response
+     * Sends a packet to the provided node id, and waits for a response, or timeouts out after the provided delay
+     * @param destination the node id to send the admin message to
+     * @param portNum the meshtastic portnum this message is for
+     * @param byteData raw protobuf message bytes
+     * @param channel the channel to send this message to
+     * @param wantResponse if we want the destination node to send a response
      * @param timeoutMillis how long to wait before timing out
      * @returns {Promise<unknown>}
      */
-    static async sendAdminPacketAndWaitForResponse(nodeId, adminMessage, wantResponse = true, timeoutMillis = 15000) {
+    static async sendPacketAndWaitForResponse(destination, portNum, byteData, channel = 0, wantResponse = true, timeoutMillis = 15000) {
         var timeout = null;
         var responseMeshPacketListener = null;
         return new Promise(async (resolve, reject) => {
@@ -286,13 +288,10 @@ class NodeAPI {
 
                 // create packet data
                 const id = this.generatePacketId();
-                const byteData = adminMessage.toBinary();
-                const portNum = Protobuf.Portnums.PortNum.ADMIN_APP;
-                const destination = parseInt(nodeId);
-                const channel = ChannelUtils.getAdminChannelIndex(nodeId);
+                destination = parseInt(destination);
                 const wantAck = true; // always want ack, otherwise node doesn't send the packet on lora
                 const pkiEncrypted = channel === ChannelUtils.PKC_CHANNEL_INDEX;
-                const publicKey = channel === ChannelUtils.PKC_CHANNEL_INDEX ? NodeUtils.getPublicKey(nodeId) : new Uint8Array([]);
+                const publicKey = channel === ChannelUtils.PKC_CHANNEL_INDEX ? NodeUtils.getPublicKey(destination) : new Uint8Array([]);
 
                 // handle response packet
                 responseMeshPacketListener = (meshPacket) => {
@@ -339,11 +338,8 @@ class NodeAPI {
                     // stop listening for mesh packets
                     Connection.removeMeshPacketListener(responseMeshPacketListener);
 
-                    // parse admin response message
-                    const adminResponseMessage = Protobuf.Admin.AdminMessage.fromBinary(meshPacket.payloadVariant.value.payload);
-
                     // resolve promise
-                    resolve(adminResponseMessage);
+                    resolve(meshPacket);
 
                 };
 
@@ -365,6 +361,60 @@ class NodeAPI {
                 reject(e);
             }
         });
+    }
+
+    /**
+     * Sends our DeviceMetrics to, and requests the DeviceMetrics from the provided nodeId
+     * @param nodeId the node id to exchange DeviceMetrics with
+     * @returns {Promise<*>}
+     */
+    static async requestDeviceMetrics(nodeId) {
+
+        // get our own device metrics
+        const myNodeDeviceMetrics = GlobalState.myNodeDeviceMetrics;
+        if(!myNodeDeviceMetrics){
+            return;
+        }
+
+        // create telemetry message
+        const telemetryMessage = Protobuf.Telemetry.Telemetry.fromJson({
+            deviceMetrics: myNodeDeviceMetrics,
+        });
+
+        // send packet and wait for response
+        const portNum = Protobuf.Portnums.PortNum.TELEMETRY_APP;
+        const byteData = telemetryMessage.toBinary();
+        const channel = NodeUtils.getNodeChannel(nodeId);
+        const responseMeshPacket = await this.sendPacketAndWaitForResponse(nodeId, portNum, byteData, channel, true);
+
+        // parse response message
+        const telemetryResponse = Protobuf.Telemetry.Telemetry.fromBinary(responseMeshPacket.payloadVariant.value.payload);
+
+        // return device metrics
+        return telemetryResponse.variant.value;
+
+    }
+
+    /**
+     * Sends an AdminMessage to the provided node id, and waits for a response, or timeouts out after the provided delay
+     * @param nodeId the node id to send the admin message to
+     * @param adminMessage the AdminMessage to send
+     * @param wantResponse if we want the destination to send us a response
+     * @param timeoutMillis how long to wait before timing out
+     * @returns {Promise<unknown>}
+     */
+    static async sendAdminPacketAndWaitForResponse(nodeId, adminMessage, wantResponse = true, timeoutMillis = 15000) {
+
+        const portNum = Protobuf.Portnums.PortNum.ADMIN_APP;
+        const byteData = adminMessage.toBinary();
+        const channel = ChannelUtils.getAdminChannelIndex(nodeId);
+
+        // send admin packet and wait for response
+        const responseMeshPacket = await this.sendPacketAndWaitForResponse(nodeId, portNum, byteData, channel, wantResponse, timeoutMillis);
+
+        // parse admin response message
+        return Protobuf.Admin.AdminMessage.fromBinary(responseMeshPacket.payloadVariant.value.payload);
+
     }
 
     /**

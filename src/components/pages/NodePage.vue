@@ -97,7 +97,12 @@
 
                 <!-- device metrics -->
                 <div>
-                    <div class="flex bg-gray-200 p-2 font-semibold">Device Metrics</div>
+                    <div class="flex bg-gray-200 p-2 font-semibold items-center">
+                        <div>Device Metrics</div>
+                        <div class="ml-auto">
+                            <RefreshButton @click="requestDeviceMetrics" :is-refreshing="isRequestingDeviceMetrics"/>
+                        </div>
+                    </div>
                     <ul role="list" class="flex-1 divide-y divide-gray-200">
 
                         <!-- battery level -->
@@ -165,10 +170,14 @@ import Page from "./Page.vue";
 import NodeUtils from "../../js/NodeUtils.js";
 import moment from "moment";
 import NodeDropDownMenu from "../nodes/NodeDropDownMenu.vue";
+import NodeAPI from "../../js/NodeAPI.js";
+import DialogUtils from "../../js/DialogUtils.js";
+import RefreshButton from "../RefreshButton.vue";
 
 export default {
     name: 'NodePage',
     components: {
+        RefreshButton,
         NodeDropDownMenu,
         Page,
         NodeIcon,
@@ -176,6 +185,11 @@ export default {
     },
     props: {
         nodeId: String | Number,
+    },
+    data() {
+        return {
+            isRequestingDeviceMetrics: false,
+        };
     },
     mounted() {
 
@@ -210,6 +224,32 @@ export default {
             this.$router.push({
                 name: "main",
             });
+
+        },
+        async requestDeviceMetrics() {
+
+            // do nothing if already requesting device metrics
+            if(this.isRequestingDeviceMetrics){
+                return;
+            }
+
+            // show loading
+            this.isRequestingDeviceMetrics = true;
+
+            try {
+
+                // fetch device metrics from node
+                const deviceMetrics = await NodeAPI.requestDeviceMetrics(this.node.num);
+
+                // update this nodes device metrics
+                this.node.deviceMetrics = deviceMetrics;
+
+            } catch(e) {
+                DialogUtils.showErrorAlert(e);
+            }
+
+            // no longer requesting device metrics
+            this.isRequestingDeviceMetrics = false;
 
         },
     },

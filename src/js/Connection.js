@@ -272,6 +272,7 @@ class Connection {
             // check if we found our own node info
             if(nodeId === GlobalState.myNodeId){
                 GlobalState.myNodeUser = data.user;
+                GlobalState.myNodeDeviceMetrics = data.deviceMetrics;
             }
 
         });
