@@ -31,7 +31,7 @@
                                     <NodeIcon :node-id="traceRoute.to"/>
                                 </div>
                             </div>
-                            <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
+                            <div class="flex-auto text-sm leading-5 text-gray-500">
                                 <div class="font-medium text-gray-900">{{ getNodeLongName(traceRoute.to) || '???' }}</div>
                                 <div>{{ getNodeHexId(traceRoute.to) }}</div>
                                 <div>Started the traceroute</div>
@@ -52,7 +52,7 @@
                                     <NodeIcon :node-id="route"/>
                                 </div>
                             </div>
-                            <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
+                            <div class="flex-auto text-sm leading-5 text-gray-500">
                                 <div class="font-medium text-gray-900">{{ getNodeLongName(route) || '???' }}</div>
                                 <div>{{ getNodeHexId(route) }}</div>
                                 <div>Forwarded the packet</div>
@@ -73,7 +73,7 @@
                                     <NodeIcon :node-id="traceRoute.from"/>
                                 </div>
                             </div>
-                            <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
+                            <div class="flex-auto text-sm leading-5 text-gray-500">
                                 <div class="font-medium text-gray-900">{{ getNodeLongName(traceRoute.from) || '???' }}</div>
                                 <div>{{ getNodeHexId(traceRoute.from) }}</div>
                                 <div>Replied to traceroute</div>
@@ -94,7 +94,7 @@
                                     <NodeIcon :node-id="route"/>
                                 </div>
                             </div>
-                            <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
+                            <div class="flex-auto text-sm leading-5 text-gray-500">
                                 <div v-if="route === 0xFFFFFFFF">
                                     <div class="font-medium text-gray-900">Unknown Node</div>
                                 </div>
@@ -120,7 +120,7 @@
                                     <NodeIcon :node-id="traceRoute.to"/>
                                 </div>
                             </div>
-                            <div class="flex-auto py-0.5 text-sm leading-5 text-gray-500">
+                            <div class="flex-auto text-sm leading-5 text-gray-500">
                                 <div class="font-medium text-gray-900">{{ getNodeLongName(traceRoute.to) || '???' }}</div>
                                 <div>{{ getNodeHexId(traceRoute.to) }}</div>
                                 <div>Received traceroute response</div>
