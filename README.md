@@ -120,13 +120,11 @@ sudo systemctl status meshtxt.service
 
 ## TODO
 
-- Fix page state so we don't need to use KeepAlive, which is annoying when navigating forward
 - Pagination message history instead of loading all at once
 - Add side drawer navigation
 - Implement standalone "messages/inbox" page that shows conversations ordered by most recent message
 - Save nodes to database and allow user to set a custom name/label for "anonymous" nodes
 - Add lora region, frequency and modem preset settings page
-- Fix issue where opening message viewer a second time doesn't auto scroll to bottom of messages
 - Use an SQLite database when running from server.js to allow cross device message history sharing
 
 ## CORS Proxy for HTTP Connections
