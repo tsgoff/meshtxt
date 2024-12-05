@@ -375,6 +375,27 @@ class Connection {
             }
         });
 
+        // listen for telemetry
+        connection.events.onTelemetryPacket.subscribe(async (telemetryPacket) => {
+
+            await databaseToBeReady;
+            console.log("onTelemetryPacket", telemetryPacket);
+
+            // find node this telemetry is from, otherwise do nothing
+            const from = telemetryPacket.from;
+            const node = GlobalState.nodesById[from];
+            if(!node){
+                return;
+            }
+
+            // update device metrics for node
+            if(telemetryPacket.data.variant.case === "deviceMetrics"){
+                const deviceMetrics = telemetryPacket.data.variant.value;
+                node.deviceMetrics = deviceMetrics;
+            }
+
+        });
+
     }
 
     static async onPacketAck(requestId, ackedByNodeId, hopsAway) {
