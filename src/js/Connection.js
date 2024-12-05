@@ -208,6 +208,7 @@ class Connection {
 
         // listen for packets from radio
         // we use this for some packets that don't have their own event listener
+        GlobalState.myNodeFiles = [];
         connection.events.onFromRadio.subscribe(async (data) => {
 
             await databaseToBeReady;
@@ -236,6 +237,13 @@ class Connection {
                         clientNotificationListener(clientNotification);
                     } catch(e){}
                 }
+            }
+
+            // handle fileInfo
+            if(data.payloadVariant.case.toString() === "fileInfo"){
+                const fileInfo = data.payloadVariant.value;
+                console.log("fileInfo", fileInfo);
+                GlobalState.myNodeFiles.push(fileInfo);
             }
 
             // handle config complete
