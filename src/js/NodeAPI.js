@@ -573,6 +573,24 @@ class NodeAPI {
 
     }
 
+    /**
+     * Sends an admin request to delete a file from the provided node id
+     * @param nodeId
+     * @param filename the file to delete from the node
+     * @returns {Promise<*>}
+     */
+    static async remoteAdminDeleteFile(nodeId, filename) {
+
+        // create admin message packet
+        const adminMessageRequest = Protobuf.Admin.AdminMessage.fromJson({
+            deleteFileRequest: filename,
+        });
+
+        // send packet and wait for response
+        await this.sendAdminPacketAndWaitForResponse(nodeId, adminMessageRequest, false);
+
+    }
+
 }
 
 export default NodeAPI;
