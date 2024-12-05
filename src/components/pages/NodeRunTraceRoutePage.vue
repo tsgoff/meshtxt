@@ -27,7 +27,7 @@
 
                 <!-- run trace route button -->
                 <div class="w-full">
-                    <button @click="runTraceRoute(node)" type="button" class="mx-auto flex cursor-pointer bg-white rounded shadow px-3 py-2 text-black font-semibold hover:bg-gray-100">
+                    <button @click="runTraceRoute(node.num)" type="button" class="mx-auto flex cursor-pointer bg-white rounded shadow px-3 py-2 text-black font-semibold hover:bg-gray-100">
                         Run Now
                     </button>
                 </div>
@@ -102,6 +102,9 @@ export default {
             return;
         }
 
+        // auto run traceroute
+        this.runTraceRoute(this.node.num);
+
     },
     beforeUnmount() {
 
@@ -112,7 +115,7 @@ export default {
     },
     methods: {
         getNodeLongName: (nodeId) => NodeUtils.getNodeLongName(nodeId),
-        async runTraceRoute(node) {
+        async runTraceRoute(nodeId) {
 
             // do nothing if already running
             if(this.isRunningTraceRoute){
@@ -124,7 +127,7 @@ export default {
 
             // run trace route
             try {
-                await NodeAPI.traceRoute(node.num);
+                await NodeAPI.traceRoute(nodeId);
             } catch(e) {
                 // don't care about timeout
             }
