@@ -19,6 +19,7 @@ const globalState = reactive({
 
     // cache channels fetched from remote nodes
     remoteNodeChannels: {},
+    remoteNodeLoraConfig: {},
 
 });
 
