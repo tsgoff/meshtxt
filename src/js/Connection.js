@@ -497,6 +497,7 @@ class Connection {
                     status: "offering",
                     filename: fileTransferOffer.fileName,
                     filesize: fileTransferOffer.fileSize,
+                    progress: 0,
                     chunks: {},
                 };
 
@@ -588,11 +589,12 @@ class Connection {
 
             console.log(`[FileTransfer] ${fileTransfer.id} received part ${filePart.partIndex + 1}/${filePart.totalParts}`);
 
-            // update file transfer status
-            fileTransfer.status = "receiving";
-
             // cache received data
             fileTransfer.chunks[filePart.partIndex] = filePart.data;
+
+            // update file transfer status
+            fileTransfer.status = "receiving";
+            fileTransfer.progress = Math.ceil((filePart.partIndex + 1) / filePart.totalParts * 100);
 
             // check if complete
             // todo, check if all chunks received, and request others if not?
