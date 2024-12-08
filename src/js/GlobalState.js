@@ -21,6 +21,9 @@ const globalState = reactive({
     remoteNodeChannels: {},
     remoteNodeLoraConfig: {},
 
+    // cache file transfers in memory
+    fileTransfers: [],
+
 });
 
 export default globalState;

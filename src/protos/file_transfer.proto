@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+message FileTransferPacket {
+  optional OfferFileTransfer offerFileTransfer = 1;
+  optional AcceptFileTransfer acceptFileTransfer = 2;
+  optional RejectFileTransfer rejectFileTransfer = 3;
+  optional CancelFileTransfer cancelFileTransfer = 4;
+  optional CompletedFileTransfer completedFileTransfer = 5;
+  optional FilePart filePart = 6;
+  optional RequestFileParts requestFileParts = 7;
+}
+
+message OfferFileTransfer {
+  uint32 id = 1;
+  string fileName = 2;
+  uint32 fileSize = 3;
+}
+
+message AcceptFileTransfer {
+  uint32 fileTransferId = 1;
+  uint32 maxAcceptablePartSize = 2;
+}
+
+message RejectFileTransfer {
+  uint32 fileTransferId = 1;
+}
+
+message CancelFileTransfer {
+  uint32 fileTransferId = 1;
+}
+
+message CompletedFileTransfer {
+  uint32 fileTransferId = 1;
+}
+
+message RequestFileParts {
+  uint32 fileTransferId = 1;
+  repeated uint32 partIndexes = 2;
+}
+
+message FilePart {
+  uint32 fileTransferId = 1;
+  uint32 partIndex = 2;
+  uint32 totalParts = 3;
+  bytes data = 4;
+}

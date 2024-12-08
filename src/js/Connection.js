@@ -3,6 +3,7 @@ import {BleConnection, Constants, HttpConnection, Protobuf, SerialConnection, Ty
 import Database from "./Database.js";
 import NodeAPI from "./NodeAPI.js";
 import PacketUtils from "./PacketUtils.js";
+import FileTransferAPI from "./FileTransferAPI.js";
 
 class Connection {
 
@@ -422,6 +423,38 @@ class Connection {
 
         });
 
+        // listen for file transfer packets
+        connection.events.onMeshPacket.subscribe(async (meshPacket) => {
+            await databaseToBeReady;
+            // try catch in case PRIVATE_APP is sent by something else and collides with invalid data
+            try {
+
+                // skip packet if it's node decoded
+                if(meshPacket.payloadVariant.case !== "decoded"){
+                    return;
+                }
+
+                // skip packet if it's not a PRIVATE_APP
+                // todo replace with a proper portnum for file transfers?
+                const data = meshPacket.payloadVariant.value;
+                if(data.portnum !== Protobuf.Portnums.PortNum.PRIVATE_APP){
+                    return;
+                }
+
+                // lookup protos
+                const FileTransferPacket = await FileTransferAPI.getOrLoadFileTransferPacketProto();
+
+                // decode file transfer packet proto
+                const fileTransferPacket = FileTransferPacket.decode(data.payload);
+
+                // call file transfer handler
+                await this.onFileTransferPacket(meshPacket, fileTransferPacket);
+
+            } catch(e) {
+                console.log(e);
+            }
+        });
+
     }
 
     static async onPacketAck(requestId, ackedByNodeId, hopsAway) {
@@ -438,6 +471,213 @@ class Connection {
         // todo make sure request id was for a message, otherwise we might be updating an older packet for something else
         await Database.Message.setMessageAckedByNodeId(requestId, ackedByNodeId);
 
+    }
+
+    static async onFileTransferPacket(meshPacket, fileTransferPacket) {
+
+        console.log("onFileTransferPacket", fileTransferPacket);
+
+        if(fileTransferPacket.offerFileTransfer){
+
+            const fileTransferOffer = fileTransferPacket.offerFileTransfer;
+
+            // find existing file transfer
+            let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
+                return fileTransfer.id === fileTransferOffer.id;
+            });
+
+            // create new file transfer if one doesn't already exist
+            if(!fileTransfer){
+
+                fileTransfer = {
+                    id: fileTransferOffer.id,
+                    to: meshPacket.to,
+                    from: meshPacket.from,
+                    direction: "incoming",
+                    status: "offering",
+                    filename: fileTransferOffer.fileName,
+                    filesize: fileTransferOffer.fileSize,
+                    chunks: {},
+                };
+
+                GlobalState.fileTransfers.push(fileTransfer);
+
+                console.log(`[FileTransfer] ${fileTransfer.id} offer received`);
+
+            }
+
+        } else if(fileTransferPacket.acceptFileTransfer){
+
+            const acceptFileTransfer = fileTransferPacket.acceptFileTransfer;
+
+            // find existing file transfer
+            let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
+                return fileTransfer.id === acceptFileTransfer.fileTransferId;
+            });
+
+            // do nothing if file transfer not found
+            if(!fileTransfer){
+                return;
+            }
+
+            console.log(`[FileTransfer] ${fileTransfer.id} accepted`);
+
+            // determine how many parts will be sent
+            const maxAcceptablePartSize = acceptFileTransfer.maxAcceptablePartSize;
+            const totalParts = Math.ceil(fileTransfer.data.length / maxAcceptablePartSize);
+
+            // update file transfer status
+            fileTransfer.status = "accepted";
+            fileTransfer.total_parts = totalParts;
+            fileTransfer.max_acceptable_part_size = maxAcceptablePartSize;
+
+            // send first file part
+            await this.sendFilePart(fileTransfer, 0);
+
+        } else if(fileTransferPacket.rejectFileTransfer){
+
+            const rejectFileTransfer = fileTransferPacket.rejectFileTransfer;
+
+            // find existing file transfer
+            let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
+                return fileTransfer.id === rejectFileTransfer.fileTransferId;
+            });
+
+            // do nothing if file transfer not found
+            if(!fileTransfer){
+                return;
+            }
+
+            console.log(`[FileTransfer] ${fileTransfer.id} rejected`);
+
+            // update file transfer status
+            fileTransfer.status = "rejected";
+
+        } else if(fileTransferPacket.completedFileTransfer){
+
+            const completedFileTransfer = fileTransferPacket.completedFileTransfer;
+
+            // find existing file transfer
+            let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
+                return fileTransfer.id === completedFileTransfer.fileTransferId;
+            });
+
+            // do nothing if file transfer not found
+            if(!fileTransfer){
+                return;
+            }
+
+            console.log(`[FileTransfer] ${fileTransfer.id} completed`);
+
+            // update file transfer status
+            fileTransfer.status = "completed";
+
+        } else if(fileTransferPacket.filePart){
+
+            const filePart = fileTransferPacket.filePart;
+
+            // find existing file transfer
+            let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
+                return fileTransfer.id === filePart.fileTransferId;
+            });
+
+            // do nothing if file transfer not found
+            if(!fileTransfer){
+                return;
+            }
+
+            console.log(`[FileTransfer] ${fileTransfer.id} received part ${filePart.partIndex + 1}/${filePart.totalParts}`);
+
+            // update file transfer status
+            fileTransfer.status = "receiving";
+
+            // cache received data
+            fileTransfer.chunks[filePart.partIndex] = filePart.data;
+
+            // check if complete
+            // todo, check if all chunks received, and request others if not?
+            if(filePart.partIndex === filePart.totalParts - 1){
+                fileTransfer.status = "complete";
+                fileTransfer.blob = new Blob(Object.values(fileTransfer.chunks), {
+                    type: "application/octet-stream",
+                });
+                await this.completeFileTransfer(fileTransfer);
+                return;
+            }
+
+            // request next part
+            const nextFilePartIndex = filePart.partIndex + 1;
+            await this.requestFileParts(fileTransfer, [
+                nextFilePartIndex,
+            ]);
+
+        } else if(fileTransferPacket.requestFileParts){
+
+            const requestFileParts = fileTransferPacket.requestFileParts;
+
+            // find existing file transfer
+            let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
+                return fileTransfer.id === requestFileParts.fileTransferId;
+            });
+
+            // do nothing if file transfer not found
+            if(!fileTransfer){
+                return;
+            }
+
+            console.log(`[FileTransfer] ${fileTransfer.id} requested file parts ${requestFileParts.partIndexes}.`);
+
+            // send parts
+            for(const partIndex of requestFileParts.partIndexes){
+
+                console.log(`[FileTransfer] ${fileTransfer.id} sending part ${partIndex}`);
+
+                // send file part
+                await this.sendFilePart(fileTransfer, partIndex);
+
+            }
+
+        }
+
+    }
+
+    static async completeFileTransfer(fileTransfer) {
+        try {
+
+            // tell remote node we completed the file transfer
+            await FileTransferAPI.completeFileTransfer(fileTransfer.from, fileTransfer.id);
+
+        } catch(e) {
+            console.log(e);
+        }
+    }
+
+    static async requestFileParts(fileTransfer, partIndexes) {
+        try {
+
+            // ask remote node for parts
+            await FileTransferAPI.requestFileParts(fileTransfer.from, fileTransfer.id, partIndexes);
+
+        } catch(e) {
+            console.log(e);
+        }
+    }
+
+    static async sendFilePart(fileTransfer, partIndex) {
+        try {
+
+            // get data for this part
+            const partSize = fileTransfer.max_acceptable_part_size;
+            const start = partIndex * partSize;
+            const end = start + partSize;
+            const partData = fileTransfer.data.slice(start, end);
+
+            // send part to remote node
+            await FileTransferAPI.sendFilePart(fileTransfer.to, fileTransfer.id, partIndex, fileTransfer.total_parts, partData);
+
+        } catch(e) {
+            console.log(e);
+        }
     }
 
 }

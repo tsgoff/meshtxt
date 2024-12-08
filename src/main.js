@@ -44,6 +44,12 @@ const router = createRouter({
             component: () => import("./components/pages/NodeMessagesPage.vue"),
         },
         {
+            name: "node.files",
+            path: '/nodes/:nodeId/files',
+            props: true,
+            component: () => import("./components/pages/NodeFilesPage.vue"),
+        },
+        {
             name: "node.settings",
             path: '/nodes/:nodeId/settings',
             props: true,
