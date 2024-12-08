@@ -61,8 +61,6 @@
                             <div class="mr-auto">
                                 <div class="font-semibold">{{ fileTransfer.filename }}</div>
                                 <div class="text-sm text-gray-500">{{ fileTransfer.filesize }} bytes</div>
-                                <div v-if="fileTransfer.direction === 'incoming'" class="text-sm text-gray-500">From: [{{ getNodeShortName(fileTransfer.from) }}] {{ getNodeLongName(fileTransfer.from) }}</div>
-                                <div v-else class="text-sm text-gray-500">To: [{{ getNodeShortName(fileTransfer.to) }}] {{ getNodeLongName(fileTransfer.to) }}</div>
                                 <div class="text-sm text-gray-500">Status: {{ fileTransfer.status }}</div>
                             </div>
 
@@ -150,7 +148,6 @@ export default {
     },
     methods: {
         hasPublicKey: (nodeId) => NodeUtils.hasPublicKey(nodeId),
-        getNodeShortName: (nodeId) => NodeUtils.getNodeShortName(nodeId),
         getNodeLongName: (nodeId) => NodeUtils.getNodeLongName(nodeId),
         onNodeDeleted() {
 
