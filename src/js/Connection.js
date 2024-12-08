@@ -404,6 +404,24 @@ class Connection {
 
         });
 
+        // listen for positions
+        connection.events.onPositionPacket.subscribe(async (positionPacket) => {
+
+            await databaseToBeReady;
+            console.log("onPositionPacket", positionPacket);
+
+            // find node this position is from, otherwise do nothing
+            const from = positionPacket.from;
+            const node = GlobalState.nodesById[from];
+            if(!node){
+                return;
+            }
+
+            // update position for node
+            node.position = positionPacket.data;
+
+        });
+
     }
 
     static async onPacketAck(requestId, ackedByNodeId, hopsAway) {

@@ -401,6 +401,28 @@ class NodeAPI {
     }
 
     /**
+     * Sends our Position to, and requests the Position from the provided nodeId
+     * @param nodeId the node id to exchange Position with
+     * @returns {Promise<*>}
+     */
+    static async requestPosition(nodeId) {
+
+        // create empty position message
+        // todo send our actual position
+        const position = Protobuf.Mesh.Position.fromJson({});
+
+        // send packet and wait for response
+        const portNum = Protobuf.Portnums.PortNum.POSITION_APP;
+        const byteData = position.toBinary();
+        const channel = NodeUtils.getNodeChannel(nodeId);
+        const responseMeshPacket = await this.sendPacketAndWaitForResponse(nodeId, portNum, byteData, channel, true);
+
+        // return position from response
+        return Protobuf.Mesh.Position.fromBinary(responseMeshPacket.payloadVariant.value.payload);
+
+    }
+
+    /**
      * Sends an AdminMessage to the provided node id, and waits for a response, or timeouts out after the provided delay
      * @param nodeId the node id to send the admin message to
      * @param adminMessage the AdminMessage to send

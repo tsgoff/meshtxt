@@ -71,7 +71,12 @@
 
                 <!-- position -->
                 <div>
-                    <div class="flex bg-gray-200 p-2 font-semibold">Position</div>
+                    <div class="flex bg-gray-200 p-2 font-semibold items-center">
+                        <div>Position</div>
+                        <div class="ml-auto">
+                            <RefreshButton @click="requestPosition" :is-refreshing="isRequestingPosition"/>
+                        </div>
+                    </div>
                     <ul role="list" class="flex-1 divide-y divide-gray-200">
 
                         <!-- position -->
@@ -87,7 +92,7 @@
                         <li class="flex p-3">
                             <div class="text-sm font-medium text-gray-900">Altitude</div>
                             <div class="ml-auto text-sm text-gray-700">
-                                <span v-if="node.position && node.position.altitude != null">{{ node.position.altitude }}</span>
+                                <span v-if="node.position && node.position.altitude">{{ node.position.altitude }}</span>
                                 <span v-else>???</span>
                             </div>
 
@@ -189,6 +194,7 @@ export default {
     data() {
         return {
             isRequestingDeviceMetrics: false,
+            isRequestingPosition: false,
         };
     },
     mounted() {
@@ -250,6 +256,32 @@ export default {
 
             // no longer requesting device metrics
             this.isRequestingDeviceMetrics = false;
+
+        },
+        async requestPosition() {
+
+            // do nothing if already requesting position
+            if(this.isRequestingPosition){
+                return;
+            }
+
+            // show loading
+            this.isRequestingPosition = true;
+
+            try {
+
+                // fetch position from node
+                const position = await NodeAPI.requestPosition(this.node.num);
+
+                // update this nodes position
+                this.node.position = position;
+
+            } catch(e) {
+                DialogUtils.showErrorAlert(e);
+            }
+
+            // no longer requesting position
+            this.isRequestingPosition = false;
 
         },
     },
