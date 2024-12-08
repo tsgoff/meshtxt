@@ -95,8 +95,8 @@
                                 <span v-if="node.position && node.position.altitude">{{ node.position.altitude }}</span>
                                 <span v-else>???</span>
                             </div>
-
                         </li>
+
                     </ul>
                 </div>
 
