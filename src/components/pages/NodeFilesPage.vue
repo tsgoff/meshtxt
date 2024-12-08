@@ -61,7 +61,10 @@
                             <div class="mr-auto">
                                 <div class="font-semibold">{{ fileTransfer.filename }}</div>
                                 <div class="text-sm text-gray-500">{{ fileTransfer.filesize }} bytes</div>
-                                <div class="text-sm text-gray-500">Status: {{ fileTransfer.status }}</div>
+                                <div class="text-sm text-gray-500 space-x-1">
+                                    <span>Status: {{ fileTransfer.status }}</span>
+                                    <span v-if="fileTransfer.status === 'sending' || fileTransfer.status === 'receiving'">{{ fileTransfer.progress }}%</span>
+                                </div>
                             </div>
 
                             <!-- incoming file transfer offer -->
