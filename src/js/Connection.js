@@ -637,6 +637,10 @@ class Connection {
                 // send file part
                 await this.sendFilePart(fileTransfer, partIndex);
 
+                // update file transfer progress
+                fileTransfer.status = "sending";
+                fileTransfer.progress = Math.ceil((partIndex + 1) / fileTransfer.total_parts * 100);
+
             }
 
         }
