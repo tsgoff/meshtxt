@@ -554,6 +554,33 @@ class Connection {
             // update file transfer status
             fileTransfer.status = "rejected";
 
+        } else if(fileTransferPacket.cancelFileTransfer){
+
+            const cancelFileTransfer = fileTransferPacket.cancelFileTransfer;
+
+            // find existing file transfer
+            let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
+                return fileTransfer.id === cancelFileTransfer.fileTransferId;
+            });
+
+            // do nothing if file transfer not found
+            if(!fileTransfer){
+                return;
+            }
+
+            console.log(`[FileTransfer] ${fileTransfer.id} cancelled`);
+
+            // remove cancelled file transfer if it was in offering state
+            if(fileTransfer.status === "offering"){
+                GlobalState.fileTransfers = GlobalState.fileTransfers.filter((existingFileTransfer) => {
+                    return existingFileTransfer.id !== fileTransfer.id;
+                });
+                return;
+            }
+
+            // update file transfer status
+            fileTransfer.status = "cancelled";
+
         } else if(fileTransferPacket.completedFileTransfer){
 
             const completedFileTransfer = fileTransferPacket.completedFileTransfer;
@@ -571,7 +598,7 @@ class Connection {
             console.log(`[FileTransfer] ${fileTransfer.id} completed`);
 
             // update file transfer status
-            fileTransfer.status = "completed";
+            fileTransfer.status = "complete";
 
         } else if(fileTransferPacket.filePart){
 

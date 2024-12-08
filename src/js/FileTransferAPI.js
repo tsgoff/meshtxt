@@ -63,6 +63,14 @@ class FileTransferAPI {
         });
     }
 
+    static async cancelFileTransfer(nodeId, fileTransferId) {
+        await this.sendFileTransferPacket(nodeId, {
+            cancelFileTransfer: {
+                fileTransferId: fileTransferId,
+            },
+        });
+    }
+
     static async completeFileTransfer(nodeId, fileTransferId) {
         await this.sendFileTransferPacket(nodeId, {
             completedFileTransfer: {

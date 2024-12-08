@@ -55,26 +55,7 @@
                 <div class="divide-y">
                     <div v-for="fileTransfer of fileTransfers" class="bg-white p-2">
 
-                        <div class="flex items-center">
-
-                            <!-- icon -->
-                            <div class="mr-2">
-
-                                <!-- incoming icon -->
-                                <div v-if="fileTransfer.direction === 'incoming'" class="bg-gray-200 text-black rounded-full p-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                                    </svg>
-                                </div>
-
-                                <!-- outgoing icon -->
-                                <div v-else class="bg-gray-200 text-black rounded-full p-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
-                                    </svg>
-                                </div>
-
-                            </div>
+                        <div class="flex items-center pr-2">
 
                             <!-- file info -->
                             <div class="mr-auto">
@@ -85,15 +66,29 @@
                                 <div class="text-sm text-gray-500">Status: {{ fileTransfer.status }}</div>
                             </div>
 
-                            <!-- save button -->
-                            <div v-if="fileTransfer.direction === 'incoming' && fileTransfer.status === 'complete'">
-                                <SaveButton @click="downloadBlob(fileTransfer.filename, fileTransfer.blob)"/>
-                            </div>
-
                             <!-- incoming file transfer offer -->
                             <div v-if="fileTransfer.direction === 'incoming' && fileTransfer.status === 'offering'" class="space-x-1">
                                 <TextButton @click="acceptFileTransfer(fileTransfer)" class="bg-green-500 hover:bg-green-400">Accept</TextButton>
                                 <TextButton @click="rejectFileTransfer(fileTransfer)" class="bg-red-500 hover:bg-red-400">Reject</TextButton>
+                            </div>
+
+                            <!-- action buttons -->
+                            <div v-else class="flex items-center space-x-1">
+                                <TextButton v-if="fileTransfer.direction === 'incoming' && fileTransfer.status === 'complete'" @click="downloadBlob(fileTransfer.filename, fileTransfer.blob)" class="bg-gray-500 hover:bg-gray-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                                    </svg>
+                                </TextButton>
+                                <TextButton v-if="fileTransfer.status === 'complete' || fileTransfer.status === 'cancelled' || fileTransfer.status === 'rejected'" @click="removeFileTransfer(fileTransfer)" class="bg-gray-500 hover:bg-gray-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                    </svg>
+                                </TextButton>
+                                <TextButton v-else @click="cancelFileTransfer(fileTransfer)" class="bg-gray-500 hover:bg-gray-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                    </svg>
+                                </TextButton>
                             </div>
 
                         </div>
@@ -126,10 +121,12 @@ import TextButton from "../TextButton.vue";
 import DialogUtils from "../../js/DialogUtils.js";
 import SaveButton from "../SaveButton.vue";
 import FileTransferAPI from "../../js/FileTransferAPI.js";
+import IconButton from "../IconButton.vue";
 
 export default {
     name: 'NodeFilesPage',
     components: {
+        IconButton,
         SaveButton,
         TextButton,
         NodeDropDownMenu,
@@ -258,6 +255,46 @@ export default {
             } catch(e) {
                 console.log(e);
             }
+        },
+        async cancelFileTransfer(fileTransfer) {
+
+            // ask user to confirm
+            if(!confirm("Are you sure you want to cancel this file transfer?")){
+                return;
+            }
+
+            // remove from ui
+            GlobalState.fileTransfers = GlobalState.fileTransfers.filter((existingFileTransfer) => {
+                return existingFileTransfer.id !== fileTransfer.id;
+            });
+
+            // do nothing if already completed
+            if(fileTransfer.status === "completed"){
+                return;
+            }
+
+            try {
+
+                // tell remote node we cancelled the file transfer
+                await FileTransferAPI.cancelFileTransfer(fileTransfer.to, fileTransfer.id);
+
+            } catch(e) {
+                console.log(e);
+            }
+
+        },
+        async removeFileTransfer(fileTransfer) {
+
+            // ask user to confirm
+            if(!confirm("Are you sure you want to remove this file transfer?")){
+                return;
+            }
+
+            // remove from ui
+            GlobalState.fileTransfers = GlobalState.fileTransfers.filter((existingFileTransfer) => {
+                return existingFileTransfer.id !== fileTransfer.id;
+            });
+
         },
     },
     computed: {
