@@ -25,6 +25,9 @@ A simple, mobile friendly, web based [Meshtastic](https://meshtastic.org/) clien
 - Mark and unmark a node as a favourite
 - Filter nodes to only show favourites
 - Allows you to run a server directly from a meshtasticd (Linux Native) device
+- Allows file transfers between MeshTXT clients
+- Allows pinging a node to see how long it took to respond and how many hops away it is
+- Has a basic implementation of remote management, such as configuring user info and channels
 
 > Note: database state is saved in your browser, and is not shared across other browsers or devices. Maybe the server script could support a local SQLite database in the future.
 
