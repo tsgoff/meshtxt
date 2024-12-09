@@ -124,8 +124,9 @@ sudo systemctl status meshtxt.service
 ## TODO
 
 - Add new nodes to node list when a new node is discovered
-- Implement Tauri app shell for building portable .exe and .dmg
-  - Doesn't support BLE, Serial and `alert` dialogs by default...
+- Implement Tauri or Electron app shell for building portable .exe and .dmg
+  - Tauri doesn't support BLE and Serial by default
+  - Electron is very large when bundled, also requires rolling own implementation of BLE/Serial device selection
 - Pagination message history instead of loading all at once
 - Add side drawer navigation
 - Implement standalone "messages/inbox" page that shows conversations ordered by most recent message
