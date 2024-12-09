@@ -1,7 +1,7 @@
 {
   "name": "meshtxt",
   "version": "1.0.0",
-  "description": "",
+  "description": "A simple, mobile friendly, web based Meshtastic client developed by Liam Cottle",
   "main": "index.js",
   "type": "module",
   "scripts": {
