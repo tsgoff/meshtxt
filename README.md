@@ -133,6 +133,7 @@ sudo systemctl status meshtxt.service
 - Save nodes to database and allow user to set a custom name/label for "anonymous" nodes
 - Add lora region, frequency and modem preset settings page
 - Use an SQLite database when running from server.js to allow cross device message history sharing
+- Generate a unique memory cache key for file transfers between two nodes, so another node can't interfere by using the same file transfer ID.
 
 ## CORS Proxy for HTTP Connections
 
