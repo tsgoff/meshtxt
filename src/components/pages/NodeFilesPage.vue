@@ -42,11 +42,11 @@
             <div v-if="node != null" class="w-full">
 
                 <div class="flex bg-white p-2 items-center border-b">
-                    <div>
+                    <div class="overflow-hidden">
                         <input ref="file-input" type="file"/>
                     </div>
                     <div class="ml-auto">
-                        <TextButton @click="offerFileTransfer" type="button" class="bg-blue-500 hover:bg-blue-400">
+                        <TextButton @click="offerFileTransfer" type="button" class="bg-blue-500 hover:bg-blue-400 whitespace-nowrap">
                             Send File
                         </TextButton>
                     </div>
@@ -58,8 +58,8 @@
                         <div class="flex items-center pr-2">
 
                             <!-- file info -->
-                            <div class="mr-auto">
-                                <div class="font-semibold">{{ fileTransfer.filename }}</div>
+                            <div class="mr-auto overflow-hidden">
+                                <div class="font-semibold break-words">{{ fileTransfer.filename }}{{ fileTransfer.filename }}</div>
                                 <div class="text-sm text-gray-500">{{ fileTransfer.filesize }} bytes</div>
                                 <div class="text-sm text-gray-500 space-x-1">
                                     <span>Status: {{ fileTransfer.status }}</span>
@@ -68,13 +68,13 @@
                             </div>
 
                             <!-- incoming file transfer offer -->
-                            <div v-if="fileTransfer.direction === 'incoming' && fileTransfer.status === 'offering'" class="space-x-1">
+                            <div v-if="fileTransfer.direction === 'incoming' && fileTransfer.status === 'offering'" class="flex space-x-1">
                                 <TextButton @click="acceptFileTransfer(fileTransfer)" class="bg-green-500 hover:bg-green-400">Accept</TextButton>
                                 <TextButton @click="rejectFileTransfer(fileTransfer)" class="bg-red-500 hover:bg-red-400">Reject</TextButton>
                             </div>
 
                             <!-- action buttons -->
-                            <div v-else class="flex items-center space-x-1">
+                            <div v-else class="ml-2 flex items-center space-x-1">
                                 <TextButton v-if="fileTransfer.direction === 'incoming' && fileTransfer.status === 'complete'" @click="downloadBlob(fileTransfer.filename, fileTransfer.blob)" class="bg-gray-500 hover:bg-gray-400">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
