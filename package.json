@@ -9,8 +9,8 @@
     "dev": "vite",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Liam Cottle <liam@liamcottle.com>",
+  "license": "MIT",
   "dependencies": {
     "@meshtastic/js": "^2.3.7-5",
     "@tailwindcss/forms": "^0.5.9",
