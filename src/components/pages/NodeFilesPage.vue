@@ -133,7 +133,6 @@ import NodeDropDownMenu from "../nodes/NodeDropDownMenu.vue";
 import TextButton from "../TextButton.vue";
 import DialogUtils from "../../js/DialogUtils.js";
 import SaveButton from "../SaveButton.vue";
-import FileTransferAPI from "../../js/FileTransferAPI.js";
 import IconButton from "../IconButton.vue";
 import FileTransferrer from "../../js/FileTransferrer.js";
 
@@ -262,7 +261,7 @@ export default {
             }
 
             try {
-                await FileTransferAPI.cancelFileTransfer(fileTransfer.to, fileTransfer.id);
+                await FileTransferrer.cancelFileTransfer(fileTransfer);
             } catch(e) {
                 console.log(e);
             }
