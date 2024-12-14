@@ -540,6 +540,12 @@ class Connection {
             return;
         }
 
+        // do nothing if file transfer not in offering state
+        if(fileTransfer.status !== FileTransferrer.STATUS_OFFERING){
+            console.log(`[FileTransfer] ${fileTransfer.id} accepted, but no longer in offering state`);
+            return;
+        }
+
         console.log(`[FileTransfer] ${fileTransfer.id} accepted`);
 
         // determine how many parts will be sent
@@ -568,6 +574,12 @@ class Connection {
             return;
         }
 
+        // do nothing if file transfer not in offering state
+        if(fileTransfer.status !== FileTransferrer.STATUS_OFFERING){
+            console.log(`[FileTransfer] ${fileTransfer.id} rejected, but no longer in offering state`);
+            return;
+        }
+
         console.log(`[FileTransfer] ${fileTransfer.id} rejected`);
 
         // update file transfer status
@@ -584,6 +596,12 @@ class Connection {
 
         // do nothing if file transfer not found
         if(!fileTransfer){
+            return;
+        }
+
+        // do nothing if file transfer in completed state
+        if(fileTransfer.status === FileTransferrer.STATUS_COMPLETED){
+            console.log(`[FileTransfer] ${fileTransfer.id} cancelled, but already in completed state`);
             return;
         }
 
@@ -633,6 +651,12 @@ class Connection {
             return;
         }
 
+        // do nothing if file transfer not in accepted or receiving state
+        if(fileTransfer.status !== FileTransferrer.STATUS_ACCEPTED && fileTransfer.status !== FileTransferrer.STATUS_RECEIVING){
+            console.log(`[FileTransfer] ${fileTransfer.id} received part ${filePart.partIndex + 1}/${filePart.totalParts}, but not in accepted or receiving state.`);
+            return;
+        }
+
         console.log(`[FileTransfer] ${fileTransfer.id} received part ${filePart.partIndex + 1}/${filePart.totalParts}`);
 
         // cache received data
@@ -670,6 +694,12 @@ class Connection {
 
         // do nothing if file transfer not found
         if(!fileTransfer){
+            return;
+        }
+
+        // do nothing if file transfer not in accepted or sending state
+        if(fileTransfer.status !== FileTransferrer.STATUS_ACCEPTED && fileTransfer.status !== FileTransferrer.STATUS_SENDING){
+            console.log(`[FileTransfer] ${fileTransfer.id} requested file parts ${requestFileParts.partIndexes}, but not in accepted or sending state.`);
             return;
         }
 

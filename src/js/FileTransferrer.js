@@ -8,7 +8,6 @@ class FileTransferrer {
     static DIRECTION_OUTGOING = "outgoing";
 
     static STATUS_OFFERING = "offering";
-    static STATUS_OFFERED = "offered";
     static STATUS_ACCEPTED = "accepted";
     static STATUS_REJECTED = "rejected";
     static STATUS_CANCELLED = "cancelled";
@@ -54,7 +53,6 @@ class FileTransferrer {
                 this.log(`offerFileTransfer attempt ${attempt}`);
                 await FileTransferAPI.sendFileTransferRequest(to, fileTransferId, fileName, fileSize);
                 this.log(`offerFileTransfer attempt ${attempt} success`);
-                fileTransfer.status = this.STATUS_OFFERED;
                 return;
             } catch(e) {
                 console.log(e);
@@ -105,7 +103,7 @@ class FileTransferrer {
         for(var attempt = 1; attempt <= this.MAX_PACKET_ATTEMPTS; attempt++){
             try {
                 this.log(`rejectFileTransfer attempt ${attempt}`);
-                await FileTransferAPI.acceptFileTransfer(fileTransfer.from, fileTransfer.id);
+                await FileTransferAPI.rejectFileTransfer(fileTransfer.from, fileTransfer.id);
                 fileTransfer.status = this.STATUS_ACCEPTED;
                 return;
             } catch(e) {
@@ -153,6 +151,9 @@ class FileTransferrer {
             const start = partIndex * partSize;
             const end = start + partSize;
             const partData = fileTransfer.data.slice(start, end);
+
+            // update status
+            fileTransfer.status = FileTransferrer.STATUS_SENDING;
 
             // send part to remote node
             for(var attempt = 1; attempt <= this.MAX_PACKET_ATTEMPTS; attempt++){
