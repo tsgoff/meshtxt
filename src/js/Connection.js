@@ -694,7 +694,15 @@ class Connection {
         try {
 
             // tell remote node we completed the file transfer
-            await FileTransferAPI.completeFileTransfer(fileTransfer.from, fileTransfer.id);
+            for(var attempt = 0; attempt < 3; attempt++){
+                try {
+                    await FileTransferAPI.completeFileTransfer(fileTransfer.from, fileTransfer.id);
+                    console.log(`completeFileTransfer attempt ${attempt + 1} success`);
+                    break;
+                } catch(e) {
+                    console.log(`completeFileTransfer attempt ${attempt + 1} failed`);
+                }
+            }
 
         } catch(e) {
             console.log(e);
@@ -705,7 +713,15 @@ class Connection {
         try {
 
             // ask remote node for parts
-            await FileTransferAPI.requestFileParts(fileTransfer.from, fileTransfer.id, partIndexes);
+            for(var attempt = 0; attempt < 3; attempt++){
+                try {
+                    await FileTransferAPI.requestFileParts(fileTransfer.from, fileTransfer.id, partIndexes);
+                    console.log(`requestFileParts attempt ${attempt + 1} success`);
+                    break;
+                } catch(e) {
+                    console.log(`requestFileParts attempt ${attempt + 1} failed`);
+                }
+            }
 
         } catch(e) {
             console.log(e);
@@ -722,7 +738,16 @@ class Connection {
             const partData = fileTransfer.data.slice(start, end);
 
             // send part to remote node
-            await FileTransferAPI.sendFilePart(fileTransfer.to, fileTransfer.id, partIndex, fileTransfer.total_parts, partData);
+            for(var attempt = 0; attempt < 3; attempt++){
+                try {
+                    await FileTransferAPI.sendFilePart(fileTransfer.to, fileTransfer.id, partIndex, fileTransfer.total_parts, partData);
+                    console.log(`sendFilePart attempt ${attempt + 1} success`);
+                    break;
+                } catch(e) {
+                    console.log(`sendFilePart attempt ${attempt + 1} failed`);
+                }
+            }
+
 
         } catch(e) {
             console.log(e);
