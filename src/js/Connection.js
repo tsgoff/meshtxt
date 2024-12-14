@@ -13,6 +13,7 @@ class Connection {
     static clientNotificationListeners = [];
     static messageListeners = [];
     static traceRouteListeners = [];
+    static fileChunkListeners = [];
 
     static addMeshPacketListener(listener) {
         this.meshPacketListeners.push(listener);
@@ -60,6 +61,16 @@ class Connection {
 
     static removeTraceRouteListener(listenerToRemove) {
         this.traceRouteListeners = this.traceRouteListeners.filter((listener) => {
+            return listener !== listenerToRemove;
+        });
+    }
+
+    static addFileChunkListener(listener) {
+        this.fileChunkListeners.push(listener);
+    }
+
+    static removeFileChunkListener(listenerToRemove) {
+        this.fileChunkListeners = this.fileChunkListeners.filter((listener) => {
             return listener !== listenerToRemove;
         });
     }
@@ -492,6 +503,10 @@ class Connection {
             await this.onFilePartPacket(meshPacket, fileTransferPacket.filePart);
         } else if(fileTransferPacket.requestFileParts){
             await this.onRequestFilePartsPacket(meshPacket, fileTransferPacket.requestFileParts);
+        } else if(fileTransferPacket.fileChunk){
+            await this.onFileChunkPacket(meshPacket, fileTransferPacket.fileChunk);
+        } else if(fileTransferPacket.requestFileChunk){
+            await this.onRequestFileChunkPacket(meshPacket, fileTransferPacket.requestFileChunk);
         } else {
             console.log("unhandled file transfer packet", fileTransferPacket);
         }
@@ -718,6 +733,38 @@ class Connection {
             fileTransfer.progress = Math.ceil((partIndex + 1) / fileTransfer.total_parts * 100);
 
         }
+
+    }
+
+    static async onFileChunkPacket(meshPacket, fileChunk) {
+        for(const fileChunkListener of this.fileChunkListeners){
+            try {
+                fileChunkListener(meshPacket, fileChunk);
+            } catch(e){}
+        }
+    }
+
+    static async onRequestFileChunkPacket(meshPacket, requestFileChunk) {
+
+        // find existing file transfer
+        let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
+            return fileTransfer.id === requestFileChunk.fileTransferId;
+        });
+
+        // do nothing if file transfer not found
+        if(!fileTransfer){
+            return;
+        }
+
+        console.log(`[FileTransfer] ${fileTransfer.id} requested FileChunk[offset=${requestFileChunk.offset}, length=${requestFileChunk.length}]`);
+
+        // update file transfer progress
+        const filePointer = requestFileChunk.offset + requestFileChunk.length;
+        fileTransfer.status = FileTransferrer.STATUS_SENDING;
+        fileTransfer.progress = Math.min(100, Math.ceil(filePointer / fileTransfer.filesize * 100));
+
+        // send file part
+        await FileTransferrer.sendFileChunk(fileTransfer, requestFileChunk.offset, requestFileChunk.length);
 
     }
 

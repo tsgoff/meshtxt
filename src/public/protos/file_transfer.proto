@@ -20,6 +20,8 @@ message FileTransferPacket {
   optional CompletedFileTransfer completedFileTransfer = 5;
   optional FilePart filePart = 6;
   optional RequestFileParts requestFileParts = 7;
+  optional RequestFileChunk requestFileChunk = 8;
+  optional FileChunk fileChunk = 9;
 }
 
 message OfferFileTransfer {
@@ -54,5 +56,18 @@ message FilePart {
   uint32 fileTransferId = 1;
   uint32 partIndex = 2;
   uint32 totalParts = 3;
+  bytes data = 4;
+}
+
+message RequestFileChunk {
+  uint32 fileTransferId = 1;
+  uint32 offset = 2;
+  uint32 length = 3;
+}
+
+message FileChunk {
+  uint32 fileTransferId = 1;
+  uint32 offset = 2;
+  uint32 length = 3;
   bytes data = 4;
 }

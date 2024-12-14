@@ -99,6 +99,27 @@ class FileTransferAPI {
         });
     }
 
+    static async requestFileChunk(nodeId, fileTransferId, offset, length) {
+        await this.sendFileTransferPacket(nodeId, {
+            requestFileChunk: {
+                fileTransferId: fileTransferId,
+                offset: offset,
+                length: length,
+            },
+        });
+    }
+
+    static async sendFileChunk(nodeId, fileTransferId, offset, length, data) {
+        await this.sendFileTransferPacket(nodeId, {
+            fileChunk: {
+                fileTransferId: fileTransferId,
+                offset: offset,
+                length: length,
+                data: data,
+            },
+        });
+    }
+
 }
 
 export default FileTransferAPI;

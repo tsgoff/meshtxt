@@ -1,6 +1,7 @@
 import NodeAPI from "./NodeAPI.js";
 import GlobalState from "./GlobalState.js";
 import FileTransferAPI from "./FileTransferAPI.js";
+import Connection from "./Connection.js";
 
 class FileTransferrer {
 
@@ -67,19 +68,52 @@ class FileTransferrer {
 
     static async acceptFileTransfer(fileTransfer) {
 
-        for(var attempt = 1; attempt <= this.MAX_PACKET_ATTEMPTS; attempt++){
-            try {
-                this.log(`acceptFileTransfer attempt ${attempt}`);
-                await FileTransferAPI.acceptFileTransfer(fileTransfer.from, fileTransfer.id);
-                fileTransfer.status = this.STATUS_ACCEPTED;
+        // create buffer for file data
+        fileTransfer.status = this.STATUS_ACCEPTED;
+        fileTransfer.data = new Uint8Array(0);
+
+        // loop until all bytes received
+        var offset = 0;
+        var length = 200;
+        while(fileTransfer.data.length < fileTransfer.filesize){
+
+            // stop fetching file chunks if the file transfer has been cancelled
+            if(fileTransfer.status === FileTransferrer.STATUS_CANCELLED){
                 return;
-            } catch(e) {
-                console.log(e);
-                if(attempt === this.MAX_PACKET_ATTEMPTS){
-                    this.log("acceptFileTransfer failed", e);
-                    throw e;
-                }
             }
+
+            try {
+
+                // fetch next file chunk
+                offset = fileTransfer.data.length;
+                const fileChunk = await FileTransferrer.getFileChunk(fileTransfer, offset, length);
+
+                // append received data
+                fileTransfer.data = new Uint8Array([
+                    ...fileTransfer.data,
+                    ...fileChunk.data,
+                ]);
+
+                // check if completed
+                if(fileTransfer.data.length === fileTransfer.filesize){
+                    // todo check integrity of received data (implement a crc or hash)
+                    fileTransfer.status = FileTransferrer.STATUS_COMPLETED;
+                    fileTransfer.blob = new Blob([fileTransfer.data], {
+                        type: "application/octet-stream",
+                    });
+                    await FileTransferrer.completeFileTransfer(fileTransfer);
+                    return;
+                }
+
+                // update file transfer progress
+                const filePointer = fileChunk.offset + fileChunk.length;
+                fileTransfer.status = FileTransferrer.STATUS_RECEIVING;
+                fileTransfer.progress = Math.min(100, Math.ceil(filePointer / fileTransfer.filesize * 100));
+
+            } catch(e) {
+                this.log("failed to get file chunk", e);
+            }
+
         }
 
     }
@@ -182,6 +216,23 @@ class FileTransferrer {
         }
     }
 
+    static async requestFileChunk(fileTransfer, offset, length) {
+        await FileTransferAPI.requestFileChunk(fileTransfer.from, fileTransfer.id, offset, length);
+    }
+
+    static async sendFileChunk(fileTransfer, offset, length) {
+
+        // update status
+        fileTransfer.status = FileTransferrer.STATUS_SENDING;
+
+        // get data for this part
+        const data = fileTransfer.data.slice(offset, offset + length);
+
+        // send file chunk
+        await FileTransferAPI.sendFileChunk(fileTransfer.to, fileTransfer.id, offset, length, data);
+
+    }
+
     static async completeFileTransfer(fileTransfer) {
         for(var attempt = 1; attempt <= this.MAX_PACKET_ATTEMPTS; attempt++){
             try {
@@ -196,6 +247,72 @@ class FileTransferrer {
                 }
             }
         }
+    }
+
+    /**
+     * Fetches a file chunk for the provided file transfer
+     * @param fileTransfer the file transfer to get a file chunk from
+     * @param offset the offset to fetch from
+     * @param length the length of data to fetch
+     * @param timeoutMillis how long to wait for file chunk before giving up
+     * @returns {Promise<unknown>}
+     */
+    static async getFileChunk(fileTransfer, offset, length, timeoutMillis = 15000) {
+        var timeout = null;
+        var fileChunkListener = null;
+        return new Promise(async (resolve, reject) => {
+            try {
+
+                // handle file chunk
+                fileChunkListener = (meshPacket, fileChunk) => {
+
+                    // ignore packet if not from expected node
+                    if(meshPacket.from !== fileTransfer.from){
+                        this.log("ignoring file chunk that isn't from the node that offered this file transfer");
+                        return;
+                    }
+
+                    // ignore packet if not for requested file transfer id
+                    if(fileChunk.fileTransferId !== fileTransfer.id){
+                        this.log("ignoring file chunk that isn't for this file transfer");
+                        return;
+                    }
+
+                    // ignore packet if not for requested offset and length
+                    if(fileChunk.offset !== offset || fileChunk.length !== length){
+                        this.log("ignoring file chunk that isn't for the offset and length we requested");
+                        return;
+                    }
+
+                    // we have file chunk, so we no longer want to time out
+                    clearTimeout(timeout);
+
+                    // stop listening for file chunks
+                    Connection.removeFileChunkListener(fileChunkListener);
+
+                    // resolve promise
+                    resolve(fileChunk);
+
+                };
+
+                // timeout after configured delay
+                timeout = setTimeout(() => {
+                    Connection.removeFileChunkListener(fileChunkListener);
+                    reject("timeout");
+                }, timeoutMillis);
+
+                // listen for file chunks
+                Connection.addFileChunkListener(fileChunkListener);
+
+                // request file chunk
+                await this.requestFileChunk(fileTransfer, offset, length);
+
+            } catch(e) {
+                clearTimeout(timeout);
+                Connection.removeFileChunkListener(fileChunkListener);
+                reject(e);
+            }
+        });
     }
 
 }
