@@ -57,17 +57,8 @@ class FileTransferrer {
             } catch(e) {
                 console.log(e);
                 if(attempt === this.MAX_PACKET_ATTEMPTS){
-
                     this.log("offerFileTransfer failed", e);
-
-                    // remove file transfer
-                    GlobalState.fileTransfers = GlobalState.fileTransfers.filter((fileTransfer) => {
-                        return fileTransfer.id !== fileTransferId;
-                    });
-
-                    // rethrow exception
                     throw e;
-
                 }
             }
         }

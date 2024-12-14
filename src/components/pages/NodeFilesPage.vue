@@ -233,7 +233,7 @@ export default {
             try {
                 await FileTransferrer.offerFileTransfer(this.nodeId, file);
             } catch(e) {
-                DialogUtils.showErrorAlert(e);
+                console.log(e);
             }
 
         },
