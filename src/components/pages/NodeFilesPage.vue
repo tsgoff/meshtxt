@@ -59,7 +59,7 @@
 
                             <!-- file info -->
                             <div class="mr-auto overflow-hidden">
-                                <div class="font-semibold break-words">{{ fileTransfer.filename }}{{ fileTransfer.filename }}</div>
+                                <div class="font-semibold break-words">{{ fileTransfer.filename }}</div>
                                 <div class="text-sm text-gray-500">{{ fileTransfer.filesize }} bytes</div>
                                 <div class="text-sm text-gray-500 space-x-1">
                                     <span>Status: {{ fileTransfer.status }}</span>
