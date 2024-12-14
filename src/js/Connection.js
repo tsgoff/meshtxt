@@ -4,6 +4,7 @@ import Database from "./Database.js";
 import NodeAPI from "./NodeAPI.js";
 import PacketUtils from "./PacketUtils.js";
 import FileTransferAPI from "./FileTransferAPI.js";
+import FileTransferrer from "./FileTransferrer.js";
 
 class Connection {
 
@@ -511,8 +512,8 @@ class Connection {
                 id: fileTransferOffer.id,
                 to: meshPacket.to,
                 from: meshPacket.from,
-                direction: "incoming",
-                status: "offering",
+                direction: FileTransferrer.DIRECTION_INCOMING,
+                status: FileTransferrer.STATUS_OFFERING,
                 filename: fileTransferOffer.fileName,
                 filesize: fileTransferOffer.fileSize,
                 progress: 0,
@@ -546,12 +547,12 @@ class Connection {
         const totalParts = Math.ceil(fileTransfer.data.length / maxAcceptablePartSize);
 
         // update file transfer status
-        fileTransfer.status = "accepted";
+        fileTransfer.status = FileTransferrer.STATUS_ACCEPTED;
         fileTransfer.total_parts = totalParts;
         fileTransfer.max_acceptable_part_size = maxAcceptablePartSize;
 
         // send first file part
-        await this.sendFilePart(fileTransfer, 0);
+        await FileTransferrer.sendFilePart(fileTransfer, 0);
 
     }
 
@@ -570,7 +571,7 @@ class Connection {
         console.log(`[FileTransfer] ${fileTransfer.id} rejected`);
 
         // update file transfer status
-        fileTransfer.status = "rejected";
+        fileTransfer.status = FileTransferrer.STATUS_REJECTED;
 
     }
 
@@ -589,7 +590,7 @@ class Connection {
         console.log(`[FileTransfer] ${fileTransfer.id} cancelled`);
 
         // remove cancelled file transfer if it was in offering state
-        if(fileTransfer.status === "offering"){
+        if(fileTransfer.status === FileTransferrer.STATUS_OFFERING){
             GlobalState.fileTransfers = GlobalState.fileTransfers.filter((existingFileTransfer) => {
                 return existingFileTransfer.id !== fileTransfer.id;
             });
@@ -597,7 +598,7 @@ class Connection {
         }
 
         // update file transfer status
-        fileTransfer.status = "cancelled";
+        fileTransfer.status = FileTransferrer.STATUS_CANCELLED;
 
     }
 
@@ -616,7 +617,7 @@ class Connection {
         console.log(`[FileTransfer] ${fileTransfer.id} completed`);
 
         // update file transfer status
-        fileTransfer.status = "complete";
+        fileTransfer.status = FileTransferrer.STATUS_COMPLETED;
 
     }
 
@@ -638,23 +639,23 @@ class Connection {
         fileTransfer.chunks[filePart.partIndex] = filePart.data;
 
         // update file transfer status
-        fileTransfer.status = "receiving";
+        fileTransfer.status = FileTransferrer.STATUS_RECEIVING;
         fileTransfer.progress = Math.ceil((filePart.partIndex + 1) / filePart.totalParts * 100);
 
         // check if complete
         // todo, check if all chunks received, and request others if not?
         if(filePart.partIndex === filePart.totalParts - 1){
-            fileTransfer.status = "complete";
+            fileTransfer.status = FileTransferrer.STATUS_COMPLETED;
             fileTransfer.blob = new Blob(Object.values(fileTransfer.chunks), {
                 type: "application/octet-stream",
             });
-            await this.completeFileTransfer(fileTransfer);
+            await FileTransferrer.completeFileTransfer(fileTransfer);
             return;
         }
 
         // request next part
         const nextFilePartIndex = filePart.partIndex + 1;
-        await this.requestFileParts(fileTransfer, [
+        await FileTransferrer.requestFileParts(fileTransfer, [
             nextFilePartIndex,
         ]);
 
@@ -680,78 +681,14 @@ class Connection {
             console.log(`[FileTransfer] ${fileTransfer.id} sending part ${partIndex}`);
 
             // send file part
-            await this.sendFilePart(fileTransfer, partIndex);
+            await FileTransferrer.sendFilePart(fileTransfer, partIndex);
 
             // update file transfer progress
-            fileTransfer.status = "sending";
+            fileTransfer.status = FileTransferrer.STATUS_SENDING;
             fileTransfer.progress = Math.ceil((partIndex + 1) / fileTransfer.total_parts * 100);
 
         }
 
-    }
-
-    static async completeFileTransfer(fileTransfer) {
-        try {
-
-            // tell remote node we completed the file transfer
-            for(var attempt = 0; attempt < 3; attempt++){
-                try {
-                    await FileTransferAPI.completeFileTransfer(fileTransfer.from, fileTransfer.id);
-                    console.log(`completeFileTransfer attempt ${attempt + 1} success`);
-                    break;
-                } catch(e) {
-                    console.log(`completeFileTransfer attempt ${attempt + 1} failed`);
-                }
-            }
-
-        } catch(e) {
-            console.log(e);
-        }
-    }
-
-    static async requestFileParts(fileTransfer, partIndexes) {
-        try {
-
-            // ask remote node for parts
-            for(var attempt = 0; attempt < 3; attempt++){
-                try {
-                    await FileTransferAPI.requestFileParts(fileTransfer.from, fileTransfer.id, partIndexes);
-                    console.log(`requestFileParts attempt ${attempt + 1} success`);
-                    break;
-                } catch(e) {
-                    console.log(`requestFileParts attempt ${attempt + 1} failed`);
-                }
-            }
-
-        } catch(e) {
-            console.log(e);
-        }
-    }
-
-    static async sendFilePart(fileTransfer, partIndex) {
-        try {
-
-            // get data for this part
-            const partSize = fileTransfer.max_acceptable_part_size;
-            const start = partIndex * partSize;
-            const end = start + partSize;
-            const partData = fileTransfer.data.slice(start, end);
-
-            // send part to remote node
-            for(var attempt = 0; attempt < 3; attempt++){
-                try {
-                    await FileTransferAPI.sendFilePart(fileTransfer.to, fileTransfer.id, partIndex, fileTransfer.total_parts, partData);
-                    console.log(`sendFilePart attempt ${attempt + 1} success`);
-                    break;
-                } catch(e) {
-                    console.log(`sendFilePart attempt ${attempt + 1} failed`);
-                }
-            }
-
-
-        } catch(e) {
-            console.log(e);
-        }
     }
 
 }

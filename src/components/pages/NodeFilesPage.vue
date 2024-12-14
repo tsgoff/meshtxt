@@ -75,12 +75,12 @@
 
                             <!-- action buttons -->
                             <div v-else class="ml-2 flex items-center space-x-1">
-                                <TextButton v-if="fileTransfer.direction === 'incoming' && fileTransfer.status === 'complete'" @click="downloadBlob(fileTransfer.filename, fileTransfer.blob)" class="bg-gray-500 hover:bg-gray-400">
+                                <TextButton v-if="fileTransfer.direction === 'incoming' && fileTransfer.status === 'completed'" @click="downloadBlob(fileTransfer.filename, fileTransfer.blob)" class="bg-gray-500 hover:bg-gray-400">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                                     </svg>
                                 </TextButton>
-                                <TextButton v-if="fileTransfer.status === 'complete' || fileTransfer.status === 'cancelled' || fileTransfer.status === 'rejected'" @click="removeFileTransfer(fileTransfer)" class="bg-gray-500 hover:bg-gray-400">
+                                <TextButton v-if="fileTransfer.status === 'completed' || fileTransfer.status === 'cancelled' || fileTransfer.status === 'rejected'" @click="removeFileTransfer(fileTransfer)" class="bg-gray-500 hover:bg-gray-400">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                                     </svg>
@@ -117,12 +117,12 @@ import NodeIcon from "../nodes/NodeIcon.vue";
 import Page from "./Page.vue";
 import NodeUtils from "../../js/NodeUtils.js";
 import NodeDropDownMenu from "../nodes/NodeDropDownMenu.vue";
-import NodeAPI from "../../js/NodeAPI.js";
 import TextButton from "../TextButton.vue";
 import DialogUtils from "../../js/DialogUtils.js";
 import SaveButton from "../SaveButton.vue";
 import FileTransferAPI from "../../js/FileTransferAPI.js";
 import IconButton from "../IconButton.vue";
+import FileTransferrer from "../../js/FileTransferrer.js";
 
 export default {
     name: 'NodeFilesPage',
@@ -197,61 +197,24 @@ export default {
                 return;
             }
 
-            // generate random file transfer id
-            const fileTransferId = NodeAPI.generatePacketId();
-
-            // get file details
-            const to = parseInt(this.nodeId);
-            const fileName = file.name;
-            const fileData = new Uint8Array(await file.arrayBuffer());
-            const fileSize = fileData.length;
-
+            // offer file
             try {
+                await FileTransferrer.offerFileTransfer(this.nodeId, file);
+            } catch(e) {
+                DialogUtils.showErrorAlert(e);
+            }
 
-                // add to file transfers list
-                GlobalState.fileTransfers.push({
-                    id: fileTransferId,
-                    to: to,
-                    from: GlobalState.myNodeId,
-                    direction: "outgoing",
-                    status: "offering",
-                    filename: fileName,
-                    filesize: fileSize,
-                    progress: 0,
-                    data: fileData,
-                });
-
-                // send data
-                await FileTransferAPI.sendFileTransferRequest(to, fileTransferId, fileName, fileSize);
-
+        },
+        async acceptFileTransfer(fileTransfer) {
+            try {
+                await FileTransferrer.acceptFileTransfer(fileTransfer);
             } catch(e) {
                 DialogUtils.showErrorAlert(e);
             }
         },
-        async acceptFileTransfer(fileTransfer) {
-            try {
-
-                // mark as accepted
-                fileTransfer.status = "accepted";
-
-                // tell remote node we rejected file transfer
-                await FileTransferAPI.acceptFileTransfer(fileTransfer.from, fileTransfer.id);
-
-            } catch(e) {
-                console.log(e);
-            }
-        },
         async rejectFileTransfer(fileTransfer) {
             try {
-
-                // remove from ui
-                GlobalState.fileTransfers = GlobalState.fileTransfers.filter((existingFileTransfer) => {
-                    return existingFileTransfer.id !== fileTransfer.id;
-                });
-
-                // tell remote node we rejected file transfer
-                await FileTransferAPI.rejectFileTransfer(fileTransfer.from, fileTransfer.id);
-
+                await FileTransferrer.rejectFileTransfer(fileTransfer);
             } catch(e) {
                 console.log(e);
             }
@@ -263,37 +226,21 @@ export default {
                 return;
             }
 
-            // remove from ui
-            GlobalState.fileTransfers = GlobalState.fileTransfers.filter((existingFileTransfer) => {
-                return existingFileTransfer.id !== fileTransfer.id;
-            });
-
-            // do nothing if already completed
-            if(fileTransfer.status === "completed"){
-                return;
-            }
-
             try {
-
-                // tell remote node we cancelled the file transfer
                 await FileTransferAPI.cancelFileTransfer(fileTransfer.to, fileTransfer.id);
-
             } catch(e) {
                 console.log(e);
             }
 
         },
-        async removeFileTransfer(fileTransfer) {
+        removeFileTransfer(fileTransfer) {
 
             // ask user to confirm
             if(!confirm("Are you sure you want to remove this file transfer?")){
                 return;
             }
 
-            // remove from ui
-            GlobalState.fileTransfers = GlobalState.fileTransfers.filter((existingFileTransfer) => {
-                return existingFileTransfer.id !== fileTransfer.id;
-            });
+            FileTransferrer.removeFileTransfer(fileTransfer);
 
         },
     },
