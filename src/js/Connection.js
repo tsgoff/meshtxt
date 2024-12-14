@@ -478,197 +478,213 @@ class Connection {
         console.log("onFileTransferPacket", fileTransferPacket);
 
         if(fileTransferPacket.offerFileTransfer){
-
-            const fileTransferOffer = fileTransferPacket.offerFileTransfer;
-
-            // find existing file transfer
-            let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
-                return fileTransfer.id === fileTransferOffer.id;
-            });
-
-            // create new file transfer if one doesn't already exist
-            if(!fileTransfer){
-
-                fileTransfer = {
-                    id: fileTransferOffer.id,
-                    to: meshPacket.to,
-                    from: meshPacket.from,
-                    direction: "incoming",
-                    status: "offering",
-                    filename: fileTransferOffer.fileName,
-                    filesize: fileTransferOffer.fileSize,
-                    progress: 0,
-                    chunks: {},
-                };
-
-                GlobalState.fileTransfers.push(fileTransfer);
-
-                console.log(`[FileTransfer] ${fileTransfer.id} offer received`);
-
-            }
-
+            await this.onOfferFileTransferPacket(meshPacket, fileTransferPacket.offerFileTransfer);
         } else if(fileTransferPacket.acceptFileTransfer){
-
-            const acceptFileTransfer = fileTransferPacket.acceptFileTransfer;
-
-            // find existing file transfer
-            let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
-                return fileTransfer.id === acceptFileTransfer.fileTransferId;
-            });
-
-            // do nothing if file transfer not found
-            if(!fileTransfer){
-                return;
-            }
-
-            console.log(`[FileTransfer] ${fileTransfer.id} accepted`);
-
-            // determine how many parts will be sent
-            const maxAcceptablePartSize = acceptFileTransfer.maxAcceptablePartSize;
-            const totalParts = Math.ceil(fileTransfer.data.length / maxAcceptablePartSize);
-
-            // update file transfer status
-            fileTransfer.status = "accepted";
-            fileTransfer.total_parts = totalParts;
-            fileTransfer.max_acceptable_part_size = maxAcceptablePartSize;
-
-            // send first file part
-            await this.sendFilePart(fileTransfer, 0);
-
+            await this.onAcceptFileTransferPacket(meshPacket, fileTransferPacket.acceptFileTransfer);
         } else if(fileTransferPacket.rejectFileTransfer){
-
-            const rejectFileTransfer = fileTransferPacket.rejectFileTransfer;
-
-            // find existing file transfer
-            let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
-                return fileTransfer.id === rejectFileTransfer.fileTransferId;
-            });
-
-            // do nothing if file transfer not found
-            if(!fileTransfer){
-                return;
-            }
-
-            console.log(`[FileTransfer] ${fileTransfer.id} rejected`);
-
-            // update file transfer status
-            fileTransfer.status = "rejected";
-
+            await this.onRejectFileTransferPacket(meshPacket, fileTransferPacket.rejectFileTransfer);
         } else if(fileTransferPacket.cancelFileTransfer){
-
-            const cancelFileTransfer = fileTransferPacket.cancelFileTransfer;
-
-            // find existing file transfer
-            let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
-                return fileTransfer.id === cancelFileTransfer.fileTransferId;
-            });
-
-            // do nothing if file transfer not found
-            if(!fileTransfer){
-                return;
-            }
-
-            console.log(`[FileTransfer] ${fileTransfer.id} cancelled`);
-
-            // remove cancelled file transfer if it was in offering state
-            if(fileTransfer.status === "offering"){
-                GlobalState.fileTransfers = GlobalState.fileTransfers.filter((existingFileTransfer) => {
-                    return existingFileTransfer.id !== fileTransfer.id;
-                });
-                return;
-            }
-
-            // update file transfer status
-            fileTransfer.status = "cancelled";
-
+            await this.onCancelFileTransferPacket(meshPacket, fileTransferPacket.cancelFileTransfer);
         } else if(fileTransferPacket.completedFileTransfer){
-
-            const completedFileTransfer = fileTransferPacket.completedFileTransfer;
-
-            // find existing file transfer
-            let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
-                return fileTransfer.id === completedFileTransfer.fileTransferId;
-            });
-
-            // do nothing if file transfer not found
-            if(!fileTransfer){
-                return;
-            }
-
-            console.log(`[FileTransfer] ${fileTransfer.id} completed`);
-
-            // update file transfer status
-            fileTransfer.status = "complete";
-
+            await this.onCompletedFileTransferPacket(meshPacket, fileTransferPacket.completedFileTransfer);
         } else if(fileTransferPacket.filePart){
-
-            const filePart = fileTransferPacket.filePart;
-
-            // find existing file transfer
-            let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
-                return fileTransfer.id === filePart.fileTransferId;
-            });
-
-            // do nothing if file transfer not found
-            if(!fileTransfer){
-                return;
-            }
-
-            console.log(`[FileTransfer] ${fileTransfer.id} received part ${filePart.partIndex + 1}/${filePart.totalParts}`);
-
-            // cache received data
-            fileTransfer.chunks[filePart.partIndex] = filePart.data;
-
-            // update file transfer status
-            fileTransfer.status = "receiving";
-            fileTransfer.progress = Math.ceil((filePart.partIndex + 1) / filePart.totalParts * 100);
-
-            // check if complete
-            // todo, check if all chunks received, and request others if not?
-            if(filePart.partIndex === filePart.totalParts - 1){
-                fileTransfer.status = "complete";
-                fileTransfer.blob = new Blob(Object.values(fileTransfer.chunks), {
-                    type: "application/octet-stream",
-                });
-                await this.completeFileTransfer(fileTransfer);
-                return;
-            }
-
-            // request next part
-            const nextFilePartIndex = filePart.partIndex + 1;
-            await this.requestFileParts(fileTransfer, [
-                nextFilePartIndex,
-            ]);
-
+            await this.onFilePartPacket(meshPacket, fileTransferPacket.filePart);
         } else if(fileTransferPacket.requestFileParts){
+            await this.onRequestFilePartsPacket(meshPacket, fileTransferPacket.requestFileParts);
+        } else {
+            console.log("unhandled file transfer packet", fileTransferPacket);
+        }
 
-            const requestFileParts = fileTransferPacket.requestFileParts;
+    }
 
-            // find existing file transfer
-            let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
-                return fileTransfer.id === requestFileParts.fileTransferId;
+    static async onOfferFileTransferPacket(meshPacket, fileTransferOffer) {
+
+        // find existing file transfer
+        let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
+            return fileTransfer.id === fileTransferOffer.id;
+        });
+
+        // create new file transfer if one doesn't already exist
+        if(!fileTransfer){
+
+            fileTransfer = {
+                id: fileTransferOffer.id,
+                to: meshPacket.to,
+                from: meshPacket.from,
+                direction: "incoming",
+                status: "offering",
+                filename: fileTransferOffer.fileName,
+                filesize: fileTransferOffer.fileSize,
+                progress: 0,
+                chunks: {},
+            };
+
+            GlobalState.fileTransfers.push(fileTransfer);
+
+            console.log(`[FileTransfer] ${fileTransfer.id} offer received`);
+
+        }
+
+    }
+
+    static async onAcceptFileTransferPacket(meshPacket, acceptFileTransfer) {
+
+        // find existing file transfer
+        let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
+            return fileTransfer.id === acceptFileTransfer.fileTransferId;
+        });
+
+        // do nothing if file transfer not found
+        if(!fileTransfer){
+            return;
+        }
+
+        console.log(`[FileTransfer] ${fileTransfer.id} accepted`);
+
+        // determine how many parts will be sent
+        const maxAcceptablePartSize = acceptFileTransfer.maxAcceptablePartSize;
+        const totalParts = Math.ceil(fileTransfer.data.length / maxAcceptablePartSize);
+
+        // update file transfer status
+        fileTransfer.status = "accepted";
+        fileTransfer.total_parts = totalParts;
+        fileTransfer.max_acceptable_part_size = maxAcceptablePartSize;
+
+        // send first file part
+        await this.sendFilePart(fileTransfer, 0);
+
+    }
+
+    static async onRejectFileTransferPacket(meshPacket, rejectFileTransfer) {
+
+        // find existing file transfer
+        let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
+            return fileTransfer.id === rejectFileTransfer.fileTransferId;
+        });
+
+        // do nothing if file transfer not found
+        if(!fileTransfer){
+            return;
+        }
+
+        console.log(`[FileTransfer] ${fileTransfer.id} rejected`);
+
+        // update file transfer status
+        fileTransfer.status = "rejected";
+
+    }
+
+    static async onCancelFileTransferPacket(meshPacket, cancelFileTransfer) {
+
+        // find existing file transfer
+        let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
+            return fileTransfer.id === cancelFileTransfer.fileTransferId;
+        });
+
+        // do nothing if file transfer not found
+        if(!fileTransfer){
+            return;
+        }
+
+        console.log(`[FileTransfer] ${fileTransfer.id} cancelled`);
+
+        // remove cancelled file transfer if it was in offering state
+        if(fileTransfer.status === "offering"){
+            GlobalState.fileTransfers = GlobalState.fileTransfers.filter((existingFileTransfer) => {
+                return existingFileTransfer.id !== fileTransfer.id;
             });
+            return;
+        }
 
-            // do nothing if file transfer not found
-            if(!fileTransfer){
-                return;
-            }
+        // update file transfer status
+        fileTransfer.status = "cancelled";
 
-            console.log(`[FileTransfer] ${fileTransfer.id} requested file parts ${requestFileParts.partIndexes}.`);
+    }
 
-            // send parts
-            for(const partIndex of requestFileParts.partIndexes){
+    static async onCompletedFileTransferPacket(meshPacket, completedFileTransfer) {
 
-                console.log(`[FileTransfer] ${fileTransfer.id} sending part ${partIndex}`);
+        // find existing file transfer
+        let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
+            return fileTransfer.id === completedFileTransfer.fileTransferId;
+        });
 
-                // send file part
-                await this.sendFilePart(fileTransfer, partIndex);
+        // do nothing if file transfer not found
+        if(!fileTransfer){
+            return;
+        }
 
-                // update file transfer progress
-                fileTransfer.status = "sending";
-                fileTransfer.progress = Math.ceil((partIndex + 1) / fileTransfer.total_parts * 100);
+        console.log(`[FileTransfer] ${fileTransfer.id} completed`);
 
-            }
+        // update file transfer status
+        fileTransfer.status = "complete";
+
+    }
+
+    static async onFilePartPacket(meshPacket, filePart) {
+
+        // find existing file transfer
+        let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
+            return fileTransfer.id === filePart.fileTransferId;
+        });
+
+        // do nothing if file transfer not found
+        if(!fileTransfer){
+            return;
+        }
+
+        console.log(`[FileTransfer] ${fileTransfer.id} received part ${filePart.partIndex + 1}/${filePart.totalParts}`);
+
+        // cache received data
+        fileTransfer.chunks[filePart.partIndex] = filePart.data;
+
+        // update file transfer status
+        fileTransfer.status = "receiving";
+        fileTransfer.progress = Math.ceil((filePart.partIndex + 1) / filePart.totalParts * 100);
+
+        // check if complete
+        // todo, check if all chunks received, and request others if not?
+        if(filePart.partIndex === filePart.totalParts - 1){
+            fileTransfer.status = "complete";
+            fileTransfer.blob = new Blob(Object.values(fileTransfer.chunks), {
+                type: "application/octet-stream",
+            });
+            await this.completeFileTransfer(fileTransfer);
+            return;
+        }
+
+        // request next part
+        const nextFilePartIndex = filePart.partIndex + 1;
+        await this.requestFileParts(fileTransfer, [
+            nextFilePartIndex,
+        ]);
+
+    }
+
+    static async onRequestFilePartsPacket(meshPacket, requestFileParts) {
+
+        // find existing file transfer
+        let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
+            return fileTransfer.id === requestFileParts.fileTransferId;
+        });
+
+        // do nothing if file transfer not found
+        if(!fileTransfer){
+            return;
+        }
+
+        console.log(`[FileTransfer] ${fileTransfer.id} requested file parts ${requestFileParts.partIndexes}.`);
+
+        // send parts
+        for(const partIndex of requestFileParts.partIndexes){
+
+            console.log(`[FileTransfer] ${fileTransfer.id} sending part ${partIndex}`);
+
+            // send file part
+            await this.sendFilePart(fileTransfer, partIndex);
+
+            // update file transfer progress
+            fileTransfer.status = "sending";
+            fileTransfer.progress = Math.ceil((partIndex + 1) / fileTransfer.total_parts * 100);
 
         }
 
