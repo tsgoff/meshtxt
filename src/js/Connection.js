@@ -651,9 +651,9 @@ class Connection {
             return;
         }
 
-        // do nothing if file transfer not in accepted or receiving state
-        if(fileTransfer.status !== FileTransferrer.STATUS_ACCEPTED && fileTransfer.status !== FileTransferrer.STATUS_RECEIVING){
-            console.log(`[FileTransfer] ${fileTransfer.id} received part ${filePart.partIndex + 1}/${filePart.totalParts}, but not in accepted or receiving state.`);
+        // do nothing if file transfer not in offering, accepted or receiving state
+        if(fileTransfer.status !== FileTransferrer.STATUS_OFFERING && fileTransfer.status !== FileTransferrer.STATUS_ACCEPTED && fileTransfer.status !== FileTransferrer.STATUS_RECEIVING){
+            console.log(`[FileTransfer] ${fileTransfer.id} received part ${filePart.partIndex + 1}/${filePart.totalParts}, but not in offering, accepted or receiving state.`);
             return;
         }
 
