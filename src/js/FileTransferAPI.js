@@ -36,7 +36,7 @@ class FileTransferAPI {
 
     }
 
-    static async sendFileTransferRequest(nodeId, fileTransferId, fileName, fileSize) {
+    static async offerFileTransfer(nodeId, fileTransferId, fileName, fileSize) {
         await this.sendFileTransferPacket(nodeId, {
             offerFileTransfer: {
                 id: fileTransferId,

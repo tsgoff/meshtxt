@@ -48,11 +48,11 @@ class FileTransferrer {
         // add to file transfers list
         GlobalState.fileTransfers.push(fileTransfer);
 
-        // send file transfer request
+        // send file transfer offer
         for(var attempt = 1; attempt <= this.MAX_PACKET_ATTEMPTS; attempt++){
             try {
                 this.log(`offerFileTransfer attempt ${attempt}`);
-                await FileTransferAPI.sendFileTransferRequest(to, fileTransferId, fileName, fileSize);
+                await FileTransferAPI.offerFileTransfer(to, fileTransferId, fileName, fileSize);
                 this.log(`offerFileTransfer attempt ${attempt} success`);
                 return;
             } catch(e) {
