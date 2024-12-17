@@ -491,8 +491,6 @@ class Connection {
 
         if(fileTransferPacket.offerFileTransfer){
             await this.onOfferFileTransferPacket(meshPacket, fileTransferPacket.offerFileTransfer);
-        } else if(fileTransferPacket.acceptFileTransfer){
-            await this.onAcceptFileTransferPacket(meshPacket, fileTransferPacket.acceptFileTransfer);
         } else if(fileTransferPacket.rejectFileTransfer){
             await this.onRejectFileTransferPacket(meshPacket, fileTransferPacket.rejectFileTransfer);
         } else if(fileTransferPacket.cancelFileTransfer){
@@ -540,40 +538,6 @@ class Connection {
             console.log(`[FileTransfer] ${fileTransfer.id} offer received`);
 
         }
-
-    }
-
-    static async onAcceptFileTransferPacket(meshPacket, acceptFileTransfer) {
-
-        // find existing file transfer
-        let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
-            return fileTransfer.id === acceptFileTransfer.fileTransferId;
-        });
-
-        // do nothing if file transfer not found
-        if(!fileTransfer){
-            return;
-        }
-
-        // do nothing if file transfer not in offering state
-        if(fileTransfer.status !== FileTransferrer.STATUS_OFFERING){
-            console.log(`[FileTransfer] ${fileTransfer.id} accepted, but no longer in offering state`);
-            return;
-        }
-
-        console.log(`[FileTransfer] ${fileTransfer.id} accepted`);
-
-        // determine how many parts will be sent
-        const maxAcceptablePartSize = acceptFileTransfer.maxAcceptablePartSize;
-        const totalParts = Math.ceil(fileTransfer.data.length / maxAcceptablePartSize);
-
-        // update file transfer status
-        fileTransfer.status = FileTransferrer.STATUS_ACCEPTED;
-        fileTransfer.total_parts = totalParts;
-        fileTransfer.max_acceptable_part_size = maxAcceptablePartSize;
-
-        // send first file part
-        await FileTransferrer.sendFilePart(fileTransfer, 0);
 
     }
 

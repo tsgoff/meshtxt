@@ -46,15 +46,6 @@ class FileTransferAPI {
         });
     }
 
-    static async acceptFileTransfer(nodeId, fileTransferId) {
-        await this.sendFileTransferPacket(nodeId, {
-            acceptFileTransfer: {
-                fileTransferId: fileTransferId,
-                maxAcceptablePartSize: 200,
-            },
-        });
-    }
-
     static async rejectFileTransfer(nodeId, fileTransferId) {
         await this.sendFileTransferPacket(nodeId, {
             rejectFileTransfer: {
