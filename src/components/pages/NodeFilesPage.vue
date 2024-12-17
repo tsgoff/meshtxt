@@ -260,6 +260,10 @@ export default {
                 return;
             }
 
+            // remove from ui
+            FileTransferrer.removeFileTransfer(fileTransfer);
+
+            // tell remove node we are cancelling it
             try {
                 await FileTransferrer.cancelFileTransfer(fileTransfer);
             } catch(e) {
@@ -274,6 +278,7 @@ export default {
                 return;
             }
 
+            // remove from ui
             FileTransferrer.removeFileTransfer(fileTransfer);
 
         },
