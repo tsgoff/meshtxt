@@ -497,10 +497,6 @@ class Connection {
             await this.onCancelFileTransferPacket(meshPacket, fileTransferPacket.cancelFileTransfer);
         } else if(fileTransferPacket.completedFileTransfer){
             await this.onCompletedFileTransferPacket(meshPacket, fileTransferPacket.completedFileTransfer);
-        } else if(fileTransferPacket.filePart){
-            await this.onFilePartPacket(meshPacket, fileTransferPacket.filePart);
-        } else if(fileTransferPacket.requestFileParts){
-            await this.onRequestFilePartsPacket(meshPacket, fileTransferPacket.requestFileParts);
         } else if(fileTransferPacket.fileChunk){
             await this.onFileChunkPacket(meshPacket, fileTransferPacket.fileChunk);
         } else if(fileTransferPacket.requestFileChunk){
@@ -615,88 +611,6 @@ class Connection {
 
         // update file transfer status
         fileTransfer.status = FileTransferrer.STATUS_COMPLETED;
-
-    }
-
-    static async onFilePartPacket(meshPacket, filePart) {
-
-        // find existing file transfer
-        let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
-            return fileTransfer.id === filePart.fileTransferId;
-        });
-
-        // do nothing if file transfer not found
-        if(!fileTransfer){
-            return;
-        }
-
-        // do nothing if file transfer not in offering, accepted or receiving state
-        if(fileTransfer.status !== FileTransferrer.STATUS_OFFERING && fileTransfer.status !== FileTransferrer.STATUS_ACCEPTED && fileTransfer.status !== FileTransferrer.STATUS_RECEIVING){
-            console.log(`[FileTransfer] ${fileTransfer.id} received part ${filePart.partIndex + 1}/${filePart.totalParts}, but not in offering, accepted or receiving state.`);
-            return;
-        }
-
-        console.log(`[FileTransfer] ${fileTransfer.id} received part ${filePart.partIndex + 1}/${filePart.totalParts}`);
-
-        // cache received data
-        fileTransfer.chunks[filePart.partIndex] = filePart.data;
-
-        // update file transfer status
-        fileTransfer.status = FileTransferrer.STATUS_RECEIVING;
-        fileTransfer.progress = Math.ceil((filePart.partIndex + 1) / filePart.totalParts * 100);
-
-        // check if complete
-        // todo, check if all chunks received, and request others if not?
-        if(filePart.partIndex === filePart.totalParts - 1){
-            fileTransfer.status = FileTransferrer.STATUS_COMPLETED;
-            fileTransfer.blob = new Blob(Object.values(fileTransfer.chunks), {
-                type: "application/octet-stream",
-            });
-            await FileTransferrer.completeFileTransfer(fileTransfer);
-            return;
-        }
-
-        // request next part
-        const nextFilePartIndex = filePart.partIndex + 1;
-        await FileTransferrer.requestFileParts(fileTransfer, [
-            nextFilePartIndex,
-        ]);
-
-    }
-
-    static async onRequestFilePartsPacket(meshPacket, requestFileParts) {
-
-        // find existing file transfer
-        let fileTransfer = GlobalState.fileTransfers.find((fileTransfer) => {
-            return fileTransfer.id === requestFileParts.fileTransferId;
-        });
-
-        // do nothing if file transfer not found
-        if(!fileTransfer){
-            return;
-        }
-
-        // do nothing if file transfer not in accepted or sending state
-        if(fileTransfer.status !== FileTransferrer.STATUS_ACCEPTED && fileTransfer.status !== FileTransferrer.STATUS_SENDING){
-            console.log(`[FileTransfer] ${fileTransfer.id} requested file parts ${requestFileParts.partIndexes}, but not in accepted or sending state.`);
-            return;
-        }
-
-        console.log(`[FileTransfer] ${fileTransfer.id} requested file parts ${requestFileParts.partIndexes}.`);
-
-        // send parts
-        for(const partIndex of requestFileParts.partIndexes){
-
-            console.log(`[FileTransfer] ${fileTransfer.id} sending part ${partIndex}`);
-
-            // send file part
-            await FileTransferrer.sendFilePart(fileTransfer, partIndex);
-
-            // update file transfer progress
-            fileTransfer.status = FileTransferrer.STATUS_SENDING;
-            fileTransfer.progress = Math.ceil((partIndex + 1) / fileTransfer.total_parts * 100);
-
-        }
 
     }
 

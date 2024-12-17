@@ -70,26 +70,6 @@ class FileTransferAPI {
         });
     }
 
-    static async requestFileParts(nodeId, fileTransferId, partIndexes) {
-        await this.sendFileTransferPacket(nodeId, {
-            requestFileParts: {
-                fileTransferId: fileTransferId,
-                partIndexes: partIndexes,
-            },
-        });
-    }
-
-    static async sendFilePart(nodeId, fileTransferId, partIndex, totalParts, data) {
-        await this.sendFileTransferPacket(nodeId, {
-            filePart: {
-                fileTransferId: fileTransferId,
-                partIndex: partIndex,
-                totalParts: totalParts,
-                data: data,
-            },
-        });
-    }
-
     static async requestFileChunk(nodeId, fileTransferId, offset, length) {
         await this.sendFileTransferPacket(nodeId, {
             requestFileChunk: {

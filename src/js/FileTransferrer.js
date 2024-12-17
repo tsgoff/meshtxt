@@ -168,54 +168,6 @@ class FileTransferrer {
         });
     }
 
-    static async sendFilePart(fileTransfer, partIndex) {
-        try {
-
-            // get data for this part
-            const partSize = fileTransfer.max_acceptable_part_size;
-            const start = partIndex * partSize;
-            const end = start + partSize;
-            const partData = fileTransfer.data.slice(start, end);
-
-            // update status
-            fileTransfer.status = FileTransferrer.STATUS_SENDING;
-
-            // send part to remote node
-            for(var attempt = 1; attempt <= this.MAX_PACKET_ATTEMPTS; attempt++){
-                try {
-                    this.log(`sendFilePart attempt ${attempt}`);
-                    await FileTransferAPI.sendFilePart(fileTransfer.to, fileTransfer.id, partIndex, fileTransfer.total_parts, partData);
-                    return;
-                } catch(e) {
-                    console.log(e);
-                    if(attempt === this.MAX_PACKET_ATTEMPTS){
-                        this.log("sendFilePart failed", e);
-                        throw e;
-                    }
-                }
-            }
-
-        } catch(e) {
-            console.log(e);
-        }
-    }
-
-    static async requestFileParts(fileTransfer, partIndexes) {
-        for(var attempt = 1; attempt <= this.MAX_PACKET_ATTEMPTS; attempt++){
-            try {
-                this.log(`requestFileParts attempt ${attempt}`);
-                await FileTransferAPI.requestFileParts(fileTransfer.from, fileTransfer.id, partIndexes);
-                return;
-            } catch(e) {
-                console.log(e);
-                if(attempt === this.MAX_PACKET_ATTEMPTS){
-                    this.log("requestFileParts failed", e);
-                    throw e;
-                }
-            }
-        }
-    }
-
     static async requestFileChunk(fileTransfer, offset, length) {
         await FileTransferAPI.requestFileChunk(fileTransfer.from, fileTransfer.id, offset, length);
     }

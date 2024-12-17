@@ -15,8 +15,6 @@ message FileTransferPacket {
   optional RejectFileTransfer rejectFileTransfer = 3;
   optional CancelFileTransfer cancelFileTransfer = 4;
   optional CompletedFileTransfer completedFileTransfer = 5;
-  optional FilePart filePart = 6;
-  optional RequestFileParts requestFileParts = 7;
   optional RequestFileChunk requestFileChunk = 8;
   optional FileChunk fileChunk = 9;
 }
@@ -37,18 +35,6 @@ message CancelFileTransfer {
 
 message CompletedFileTransfer {
   uint32 fileTransferId = 1;
-}
-
-message RequestFileParts {
-  uint32 fileTransferId = 1;
-  repeated uint32 partIndexes = 2;
-}
-
-message FilePart {
-  uint32 fileTransferId = 1;
-  uint32 partIndex = 2;
-  uint32 totalParts = 3;
-  bytes data = 4;
 }
 
 message RequestFileChunk {
