@@ -1,12 +1,10 @@
 /**
  File transfer protos written by Liam Cottle <liam@liamcottle.com>
  - sender should send an OfferFileTransfer to other user
- - recipient should send back an AcceptFileTransfer or RejectFileTransfer
- - recipient can tell the sender how big each file part can be when accepting the file transfer
- - sender should send the first file part to the recipient when receiving an AcceptFileTransfer
- - recipient should then send RequestFileParts until all remaining parts are received
- - sender should send a FilePart for each index in partIndexes when a RequestFileParts is received
- - recipient should send CompletedFileTransfer when all parts are received
+ - recipient should send RejectFileTransfer if they don't want this file
+ - recipient should send RequestFileChunk as many times as needed to receive the file if they want it
+ - sender should send a FileChunk back when a RequestFileChunk is received
+ - recipient should send CompletedFileTransfer when they have received the entire file
  - sender and recipient can send CancelFileTransfer to tell the other side they are no longer interested in the file
  - todo: add fileHash or fileCrc in OfferFileTransfer to allow recipient to confirm assembled parts are not corrupted
  */
