@@ -644,7 +644,7 @@ class Connection {
 
         // update file transfer progress
         fileTransfer.status = FileTransferrer.STATUS_SENDING;
-        fileTransfer.progress = Math.min(100, Math.ceil(requestFileChunk.offset + requestFileChunk.length / fileTransfer.filesize * 100));
+        fileTransfer.progress = Math.min(100, Math.ceil((requestFileChunk.offset + requestFileChunk.length) / fileTransfer.filesize * 100));
 
         // send file part
         await FileTransferrer.sendFileChunk(fileTransfer, requestFileChunk.offset, requestFileChunk.length);

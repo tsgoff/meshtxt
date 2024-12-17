@@ -105,7 +105,7 @@ class FileTransferrer {
                 }
 
                 // update file transfer progress
-                fileTransfer.progress = Math.min(100, Math.ceil(fileChunk.offset + fileChunk.length / fileTransfer.filesize * 100));
+                fileTransfer.progress = Math.min(100, Math.ceil((fileChunk.offset + fileChunk.length) / fileTransfer.filesize * 100));
 
             } catch(e) {
                 this.log("failed to get file chunk", e);
