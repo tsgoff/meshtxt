@@ -1,6 +1,6 @@
 /**
  File transfer protos written by Liam Cottle <liam@liamcottle.com>
- - sender should send an OfferFileTransfer to other user
+ - sender should send an OfferFileTransfer to recipient
  - recipient should send RejectFileTransfer if they don't want this file
  - recipient should send RequestFileChunk as many times as needed to receive the file if they want it
  - sender should send a FileChunk back when a RequestFileChunk is received
