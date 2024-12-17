@@ -37,6 +37,18 @@
             </template>
         </AppBar>
 
+        <!-- offered file transfers banner -->
+        <div v-if="offeredFilesCount" class="flex bg-blue-500 font-semibold text-white p-2 items-center">
+            <div class="mr-2">You have {{ offeredFilesCount }} incoming file {{ offeredFilesCount === 1 ? 'transfer' : 'transfers' }}</div>
+            <div class="ml-auto">
+                <RouterLink :to="{ name: 'node.files', params: { nodeId: node.num } }">
+                    <button type="button" class="bg-white text-black font-semibold px-2 py-1 rounded shadow hover:bg-gray-100">
+                        Show Files
+                    </button>
+                </RouterLink>
+            </div>
+        </div>
+
         <!-- list -->
         <div class="flex h-full w-full overflow-hidden">
             <MessageViewer v-if="node != null" type="node" :node-id="node.num"/>
@@ -53,10 +65,13 @@ import NodeIcon from "../nodes/NodeIcon.vue";
 import Page from "./Page.vue";
 import NodeUtils from "../../js/NodeUtils.js";
 import NodeDropDownMenu from "../nodes/NodeDropDownMenu.vue";
+import TextButton from "../TextButton.vue";
+import FileTransferrer from "../../js/FileTransferrer.js";
 
 export default {
     name: 'NodeMessagesPage',
     components: {
+        TextButton,
         NodeDropDownMenu,
         Page,
         NodeIcon,
@@ -101,6 +116,14 @@ export default {
         },
         subtitle() {
             return this.node ? this.getNodeLongName(this.node.num) : "Unknown Node";
+        },
+        offeredFilesCount() {
+            return this.node ? GlobalState.fileTransfers.filter((fileTransfer) => {
+                const isFromThisNode = fileTransfer.from === this.node.num;
+                const isIncoming = fileTransfer.direction === FileTransferrer.DIRECTION_INCOMING;
+                const isOffering = fileTransfer.status === FileTransferrer.STATUS_OFFERING;
+                return isFromThisNode && isIncoming && isOffering;
+            }).length : 0;
         },
     },
 }
