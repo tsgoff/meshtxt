@@ -9,7 +9,6 @@ class FileTransferrer {
     static DIRECTION_OUTGOING = "outgoing";
 
     static STATUS_OFFERING = "offering";
-    static STATUS_ACCEPTED = "accepted";
     static STATUS_REJECTED = "rejected";
     static STATUS_CANCELLED = "cancelled";
     static STATUS_COMPLETED = "completed";
@@ -69,7 +68,7 @@ class FileTransferrer {
     static async acceptFileTransfer(fileTransfer) {
 
         // create buffer for file data
-        fileTransfer.status = this.STATUS_ACCEPTED;
+        fileTransfer.status = this.STATUS_RECEIVING;
         fileTransfer.data = new Uint8Array(0);
 
         // loop until all bytes received
@@ -106,9 +105,7 @@ class FileTransferrer {
                 }
 
                 // update file transfer progress
-                const filePointer = fileChunk.offset + fileChunk.length;
-                fileTransfer.status = FileTransferrer.STATUS_RECEIVING;
-                fileTransfer.progress = Math.min(100, Math.ceil(filePointer / fileTransfer.filesize * 100));
+                fileTransfer.progress = Math.min(100, Math.ceil(fileChunk.offset + fileChunk.length / fileTransfer.filesize * 100));
 
             } catch(e) {
                 this.log("failed to get file chunk", e);
@@ -129,7 +126,7 @@ class FileTransferrer {
             try {
                 this.log(`rejectFileTransfer attempt ${attempt}`);
                 await FileTransferAPI.rejectFileTransfer(fileTransfer.from, fileTransfer.id);
-                fileTransfer.status = this.STATUS_ACCEPTED;
+                fileTransfer.status = this.STATUS_REJECTED;
                 return;
             } catch(e) {
                 console.log(e);

@@ -526,7 +526,7 @@ class Connection {
                 filename: fileTransferOffer.fileName,
                 filesize: fileTransferOffer.fileSize,
                 progress: 0,
-                chunks: {},
+                data: new Uint8Array(0),
             };
 
             GlobalState.fileTransfers.push(fileTransfer);
@@ -634,12 +634,17 @@ class Connection {
             return;
         }
 
+        // do nothing if file transfer completed, cancelled or rejected
+        if(fileTransfer.status === FileTransferrer.STATUS_COMPLETED || fileTransfer.status === FileTransferrer.STATUS_CANCELLED || fileTransfer.status === FileTransferrer.STATUS_REJECTED){
+            console.log(`[FileTransfer] ${fileTransfer.id} cancelled, but already in completed state`);
+            return;
+        }
+
         console.log(`[FileTransfer] ${fileTransfer.id} requested FileChunk[offset=${requestFileChunk.offset}, length=${requestFileChunk.length}]`);
 
         // update file transfer progress
-        const filePointer = requestFileChunk.offset + requestFileChunk.length;
         fileTransfer.status = FileTransferrer.STATUS_SENDING;
-        fileTransfer.progress = Math.min(100, Math.ceil(filePointer / fileTransfer.filesize * 100));
+        fileTransfer.progress = Math.min(100, Math.ceil(requestFileChunk.offset + requestFileChunk.length / fileTransfer.filesize * 100));
 
         // send file part
         await FileTransferrer.sendFileChunk(fileTransfer, requestFileChunk.offset, requestFileChunk.length);

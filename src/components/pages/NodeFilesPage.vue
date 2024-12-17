@@ -108,7 +108,7 @@
                         </div>
 
                         <!-- progress bar -->
-                        <div v-if="fileTransfer.status === 'accepted' || fileTransfer.status === 'sending' || fileTransfer.status === 'receiving'" class="mt-2">
+                        <div v-if="fileTransfer.status === 'sending' || fileTransfer.status === 'receiving'" class="mt-2">
                             <div class="overflow-hidden rounded-full bg-gray-200">
                                 <div class="h-2 rounded-full bg-blue-500" :style="{ width: `${fileTransfer.progress}%` }"></div>
                             </div>
