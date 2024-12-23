@@ -324,9 +324,10 @@ class Connection {
                 return;
             }
 
-            // update last heard and hops away for the node we received packet from
+            // update last heard, hops away and snr for the node we received packet from
             node.lastHeard = rxTime;
             node.hopsAway = PacketUtils.getPacketHops(data);
+            node.snr = data.rxSnr;
 
         });
 
