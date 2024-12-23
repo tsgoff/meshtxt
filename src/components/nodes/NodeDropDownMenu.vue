@@ -12,7 +12,25 @@
             <!-- node details -->
             <div class="p-2 border-b">
                 <div class="text-sm text-gray-500 font-semibold">{{ getNodeLongName(node.num) }}</div>
-                <div class="text-sm text-gray-500">{{ getNodeHexId(node.num) }}</div>
+                <div class="flex space-x-1 text-sm text-gray-500">
+
+                    <!-- node num -->
+                    <div>{{ getNodeHexId(node.num) }}</div>
+
+                    <!-- hops away -->
+                    <div v-if="node.hopsAway !== -1" class="flex my-auto text-sm text-gray-500 space-x-1">
+                        <span>•</span>
+                        <span v-if="node.hopsAway === 0">Direct</span>
+                        <span v-else-if="node.hopsAway === 1">1 Hop</span>
+                        <span v-else>{{ node.hopsAway }} Hops</span>
+                    </div>
+
+                    <!-- snr (only shown for direct nodes) -->
+                    <div v-if="node.hopsAway === 0" class="my-auto text-sm text-gray-500">
+                        <span>• SNR {{ node.snr }}</span>
+                    </div>
+
+                </div>
             </div>
 
             <!-- node info button -->
