@@ -39,6 +39,11 @@
                         <span v-else>{{ node.hopsAway }} Hops</span>
                     </span>
 
+                    <!-- snr (only shown for direct nodes) -->
+                    <span v-if="node.hopsAway === 0" class="flex my-auto text-sm text-gray-500 space-x-1">
+                        <span>• SNR {{ node.snr }}</span>
+                    </span>
+
                 </div>
 
             </div>
