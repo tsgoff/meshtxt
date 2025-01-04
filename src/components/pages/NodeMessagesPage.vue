@@ -8,7 +8,7 @@
             </template>
             <template v-slot:trailing>
                 <div v-if="node" class="my-auto mr-1">
-                    <div v-if="hasPublicKey(node.num)" @click="onPublicKeyInfoClick">
+                    <div v-if="hasPublicKey(GlobalState.myNodeId) && hasPublicKey(node.num)" @click="onPublicKeyInfoClick">
                         <div class="cursor-pointer flex space-x-1 bg-green-50 rounded-md px-2 py-1 text-xs text-green-700 border border-green-700 font-medium">
                             <div>
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4">
@@ -111,6 +111,9 @@ export default {
         },
     },
     computed: {
+        GlobalState() {
+            return GlobalState;
+        },
         node() {
             return GlobalState.nodesById[this.nodeId];
         },
