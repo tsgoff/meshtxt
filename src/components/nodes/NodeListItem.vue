@@ -31,12 +31,11 @@
                     </span>
 
                     <!-- hops away -->
-                    <span class="flex my-auto text-sm text-gray-500 space-x-1">
-                        <span>•</span>
-                        <span v-if="node.hopsAway === -1">???</span>
-                        <span v-else-if="node.hopsAway === 0">Direct</span>
-                        <span v-else-if="node.hopsAway === 1">1 Hop</span>
-                        <span v-else>{{ node.hopsAway }} Hops</span>
+                    <span class="my-auto text-sm text-gray-500 space-x-1" :class="[ node.hopsAway === 0 ? 'hidden min-[420px]:flex' : 'flex' ]">
+                        <span v-if="node.hopsAway === -1">• ???</span>
+                        <span v-else-if="node.hopsAway === 0" class="hidden min-[420px]:block">• Direct</span>
+                        <span v-else-if="node.hopsAway === 1">• 1 Hop</span>
+                        <span v-else>• {{ node.hopsAway }} Hops</span>
                     </span>
 
                     <!-- snr (only shown for direct nodes) -->
