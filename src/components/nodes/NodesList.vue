@@ -71,8 +71,8 @@ export default {
     },
     data() {
         return {
-            filter: "all",
-            order: "heard-recently",
+            filter: window.localStorage.getItem("nodes_list_filter") ?? "all",
+            order: window.localStorage.getItem("nodes_list_order") ?? "heard-recently",
             nodesSearchTerm: "",
         };
     },
@@ -170,5 +170,13 @@ export default {
 
         },
     },
+    watch: {
+        filter() {
+            window.localStorage.setItem("nodes_list_filter", this.filter);
+        },
+        order() {
+            window.localStorage.setItem("nodes_list_order", this.order);
+        },
+    }
 }
 </script>
