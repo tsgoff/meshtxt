@@ -132,10 +132,10 @@ export default {
         },
         getFilteredNodes(nodes) {
 
-            // filter by favourites only
+            // filter by favourites only (making sure to still include our own node)
             if(this.filter === "favourites-only"){
                 return nodes.filter((node) => {
-                    return node.isFavorite;
+                    return node.isFavorite || node.num === GlobalState.myNodeId;
                 });
             }
 
