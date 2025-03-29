@@ -121,6 +121,13 @@ sudo systemctl status meshtxt.service
 
 > Note: Make sure to update the usernames in the service file if needed.
 
+**Running in Docker**
+
+```
+docker build -t meshtxt .
+docker run --name meshtxt -e API_URL="https://yourmashtasticnode.domain.tld" -d -p 8080:8080 meshtxt
+```
+
 ## TODO
 
 - Add new nodes to node list when a new node is discovered
